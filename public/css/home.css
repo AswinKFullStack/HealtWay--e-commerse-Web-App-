@@ -1,0 +1,91 @@
+/* home.css */
+
+
+
+/* Navbar Styles */
+
+.navbar {
+    background-color: #343a40;
+    border-bottom: 3px solid #ffc107; 
+}
+
+.nav-link {
+    font-size: 1rem;
+    color: #343a40;
+    margin-right: 15px;
+}
+
+
+.navbar .navbar-nav .nav-link.active {
+    font-weight: bold;
+}
+
+.navbar .navbar-brand img {
+    width: 50px;
+}
+
+.navbar .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.navbar .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+
+
+
+
+/* Product Card Styles */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+/* Wishlist Button */
+.btn-light {
+    background-color: transparent;
+    border: none;
+}
+
+.btn-light i {
+    color: #e74c3c;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #E0F4D2;
+}
+
+footer .text-uppercase {
+    font-weight: bold;
+}
+
+footer .text-dark {
+    color: #343a40;
+}
+
+footer .list-unstyled {
+    padding-left: 0;
+}
+
+footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+}

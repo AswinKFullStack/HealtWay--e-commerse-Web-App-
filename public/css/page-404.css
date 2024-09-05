@@ -1,0 +1,37 @@
+/* Custom Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Error Container */
+h1 {
+    font-size: 100px;
+    color: #ff6b6b;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+p {
+    font-size: 18px;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+a.btn-primary {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+a.btn-primary:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+}
