@@ -2,41 +2,6 @@
 
 
 
-/* Navbar Styles */
-
-.navbar {
-    background-color: #343a40;
-    border-bottom: 3px solid #ffc107; 
-}
-
-.nav-link {
-    font-size: 1rem;
-    color: #343a40;
-    margin-right: 15px;
-}
-
-
-.navbar .navbar-nav .nav-link.active {
-    font-weight: bold;
-}
-
-.navbar .navbar-brand img {
-    width: 50px;
-}
-
-.navbar .btn-outline-primary {
-    border-color: #007bff;
-    color: #007bff;
-}
-
-.navbar .btn-outline-primary:hover {
-    background-color: #007bff;
-    color: #ffffff;
-}
-
-
-
-
 
 /* Product Card Styles */
 .card {

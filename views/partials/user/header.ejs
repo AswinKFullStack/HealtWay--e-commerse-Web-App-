@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>HealthWay</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../public/css/home.css">
+    <link rel="stylesheet" href="/css/navbarNoUser.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom-custom">
+     <!-- Navbar -->
+     <nav class="navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand" href="#">
-            <img src="../../../public/images/logo_page-1.jpg" alt="Brand" width="50">
+            Health<span>Way</span> <!-- Styled logo text with green and yellow -->
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,8 @@
                     <a class="nav-link" href="#">Location: Current City</a>
                 </li>
             </ul>
-            <button class="btn btn-outline-primary my-2 my-sm-0 ml-3" type="button">Login/Signup</button>
-            <i class="bi bi-person-circle ml-2" style="font-size: 1.5rem; color: #007bff;"></i>
+            <button class="btn btn-outline-primary my-2 my-sm-0 ml-3" type="button" onclick="location.href='/signup'">Sign up</button>
+            <button class="btn btn-outline-primary my-2 my-sm-0 ml-3" type="button" onclick="location.href='/login'">Login</button>
+            <i class="bi bi-person-circle ml-2" style="font-size: 1.5rem; color: #28a745;"></i>
         </div>
     </nav>

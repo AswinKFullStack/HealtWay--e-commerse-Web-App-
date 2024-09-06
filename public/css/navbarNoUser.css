@@ -1,0 +1,73 @@
+ /* Custom styling for HealthWay branding */
+ .navbar-brand {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #28a745; /* Green for the logo text */
+}
+
+.navbar-brand span {
+    color: #ffc107; /* Yellow for the highlighted part */
+}
+
+.navbar {
+    background-color: #ffffff; /* White background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
+}
+
+/* Styling for navbar links */
+.navbar-nav .nav-link {
+    color: #28a745; /* Green for links */
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffc107; /* Yellow on hover */
+}
+
+/* Styling for buttons */
+.btn-outline-primary {
+    border-color: #ffc107;
+    color: #28a745;
+}
+
+.btn-outline-primary:hover {
+    background-color: #ffc107;
+    color: #ffffff;
+    border-color: #ffc107;
+}
+
+/* Custom search box styling */
+.form-control {
+    border: 2px solid #28a745;
+    border-radius: 50px;
+    padding: 0.6rem 1.2rem;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}
+
+
+
+/* Footer Styles */
+footer {
+    background-color: #E0F4D2;
+}
+
+footer .text-uppercase {
+    font-weight: bold;
+}
+
+footer .text-dark {
+    color: #343a40;
+}
+
+footer .list-unstyled {
+    padding-left: 0;
+}
+
+footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+}

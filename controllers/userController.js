@@ -17,10 +17,18 @@ const loadHomepage = async (req,res)=>{
     }
 }
 
-
+const loadSignup = async(req,res)=>{
+    try{
+        return res.render("signup");
+    }catch(error){
+        console.log("Login page is not found",error);
+        res.status(500).send("Server error");
+    }
+}
 
 
 module.exports = {
     loadHomepage,
-    pageNotFound
+    pageNotFound,
+    loadSignup
 }
