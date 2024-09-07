@@ -107,5 +107,5 @@ function validatePassword(password){
 
 // Function for "Sign Up with Google"
 function signupWithGoogle() {
-    alert('Google signup functionality is not yet implemented.');
+    //alert('Google signup functionality is not yet implemented.');
 }

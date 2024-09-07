@@ -16,12 +16,12 @@
         type:String,
         required:false, //may be user signup using google account,so that it not mondatory
         unique:false,
-        spare:false, //for setting uniqe constrans.there is no phonenumber when signup using single signup.so that we set true //
+        spare:true, //for setting uniqe constrans.there is no phonenumber when signup using single signup.so that we set true //
         default:null
     },
     googleId:{
         type:String,
-        unique:false
+        unique:true
     },
     password:{
         type:String,

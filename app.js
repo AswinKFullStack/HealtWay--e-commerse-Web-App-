@@ -3,6 +3,7 @@ const app = express();
 const path = require("path");
 const env = require("dotenv").config();
 const session = require("express-session");
+const passport = require("./config/passport")
 const db = require("./config/db");
 const { urlencoded } = require("body-parser");
 const userRouter= require("./routes/userRouter");
@@ -23,6 +24,9 @@ app.use(session({
     }
 
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.set("view engine","ejs");
