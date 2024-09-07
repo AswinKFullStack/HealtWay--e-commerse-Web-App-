@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/verify-otp.css">
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fas fa-envelope"></i>Email Verification</h1>
+    <p>Please enter the OTP sent to your email</p>
+    
+    <!-- Form Starts Here -->
+    <form id="otp-form" action="/verify-otp" method="POST">
+        <input type="text" id="otp-input" name="otp" placeholder="Enter OTP">
+        <button type="submit" id="verify-btn"><i class="fas fa-check-circle"></i>Verify Email</button>
+    </form>
+
+    <p class="resend-otp" id="resend-btn"><i class="fas fa-sync-alt"></i>Resend OTP</p>
+    <p class="countdown" id="countdown"></p>
+    <p class="login-link">Already verified? <a href="#">Login now</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/verify-otp.js"></script>
+</body>
+</html>
+
+
+

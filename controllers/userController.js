@@ -1,6 +1,7 @@
 const User = require("../models/userSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 
 
 
@@ -63,6 +64,7 @@ async function sendVerificationEmail(email,otp){
 
 const signup = async (req,res)=>{
     try{
+       
         const {name,email,phone,password,confirmPassword} = req.body;
         if(password !== confirmPassword){
             return res.render("signup",{message:"Password do not match"});
@@ -78,10 +80,10 @@ const signup = async (req,res)=>{
         }
 
         req.session.userOtp = otp;
-        req.session.userDate = {email,password};
-        console.log( req.session.userDate);
+        req.session.userData = {name,phone,email,password};
+        console.log( req.session.userData);
 
-        // res.render("verify-otp");
+        res.render("verify-otp");
         console.log("OTP Sent ",otp);
 
 
@@ -92,10 +94,59 @@ const signup = async (req,res)=>{
         res.redirect("/pageNotFound");
     }
 }
+//Hashing password
+const securePassword = async (password)=>{
+    try {
+        
+            const passwordHash = await bcrypt.hash(password,10);
+            return passwordHash;
+           
+    } catch (error) {
+        
+    }
+}
 
 
+//OTP verification
 
+const verifyOtp = async (req,res)=>{
+    try {
+       
 
+        const {otp} = req.body;
+        console.log(otp);
+        console.log("Session OTP:", req.session.userOtp);
+        console.log("User    OTP:", otp);
+        console.log("Session User Data:", req.session.userData);
+        
+        if(otp === req.session.userOtp){
+            console.log("otp validation successfull");
+            const user = req.session.userData;
+            const passwordHash = await securePassword(user.password);
+            const saveUserData = new User({
+                name:user.name,
+                email:user.email,
+                phone:user.phone,
+                password:passwordHash
+            })
+            await saveUserData.save().catch(error => {
+                console.error("Error saving user in DB:", error);
+                res.status(500).json({ success: false, message: "Database error" });
+            });
+            console.log("User data saved in database successfully");
+            req.session.user = saveUserData._id;
+            console.log(`user uniqe session ID ${req.session.user} from  here got it ${saveUserData._id}`);
+            res.json({success:true,redirectUrl:"/"})
+
+        }else{
+            res.status(400).json({success:false,message:"Invalid OTP , Please try again "})
+        }
+    } catch (error) {
+        console.error("Error verifying OTP", error);
+        res.status(500).json({ success: false, message: error.message });
+
+    }
+}
 
 
 
@@ -104,5 +155,6 @@ module.exports = {
     loadHomepage,
     pageNotFound,
     loadSignup,
-    signup
+    signup,
+    verifyOtp
 }

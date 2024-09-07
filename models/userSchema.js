@@ -57,7 +57,7 @@
     },
     referalCode:{
         type:String,
-         required:true
+         required:false
     },
     redeemed:{
         type:Boolean
