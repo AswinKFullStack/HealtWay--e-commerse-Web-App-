@@ -46,8 +46,8 @@ document.getElementById("otp-form").addEventListener("submit", function(event) {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Invalid OTP',
-                        text: 'The OTP entered is incorrect. Please try again.',
+                        title: response.message,
+                        text: response.description,
                     });
                 }
             },
@@ -66,13 +66,24 @@ document.getElementById("otp-form").addEventListener("submit", function(event) {
 document.getElementById("resend-btn").addEventListener("click", function() {
     $.ajax({
         url: '/resend-otp',
-        type: 'GET',
+        type: 'POST',
         success: function(response) {
-            Swal.fire({
-                icon: 'success',
-                title: 'OTP Resent!',
-                text: 'A new OTP has been sent to your email.',
-            });
+            if(response.success){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Resent!',
+                    text: 'A new OTP has been sent to your email.',
+                });
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: response.title,
+                    text: response.message,
+                });
+            }
+            
+
+            
 
             // Reset countdown
             countdown = 90;
