@@ -1,4 +1,6 @@
 const User = require("../models/userSchema");
+const env = require("dotenv").config();
+const nodemailer = require("nodemailer");
 
 
 
@@ -27,10 +29,37 @@ const loadSignup = async(req,res)=>{
         res.status(500).send("Server error");
     }
 }
+
+//for genarating otp
 function generateOtp(){
-    return Math.floor(100000 + Math.random()*900000).toString;
+    return Math.floor(100000 + Math.random()*900000).toString();
 }
 
+async function sendVerificationEmail(email,otp){
+    try {
+        const transporter = nodemailer.createTransport({
+            service:'gmail',
+            port:587,
+            secure:false,
+            requireTLS:true,
+            auth:{
+                user:process.env.NODEMAILER_EMAIL,
+                pass:process.env.NODEMAILER_PASSWORD
+            }
+        }) 
+        const info = await transporter.sendMail({
+            from:process.env.NODEMAILER_EMAIL,
+            to:email,
+            subject:"Verify your account",
+            text:`Your OTP is ${otp}`,
+            html:`<b> Your OTP : ${otp}</b>`
+        })
+        return info.accepted.length > 0;
+    } catch (error) {
+     console.error("Error sending email",error);
+     return false;   
+    }
+}
 
 const signup = async (req,res)=>{
     try{
@@ -43,12 +72,33 @@ const signup = async (req,res)=>{
             return res.render("signup",{message:"User with email already exists"});
         }
         const otp = generateOtp();
+        const emailSent = await sendVerificationEmail(email,otp);
+        if(!emailSent){
+            return res.json("email-error");
+        }
+
+        req.session.userOtp = otp;
+        req.session.userDate = {email,password};
+        console.log( req.session.userDate);
+
+        // res.render("verify-otp");
+        console.log("OTP Sent ",otp);
+
+
+
 
     }catch(error){
-        console.log("Erro for save user",error);
-        res.status(500).send('Internal server error');
+        console.error("signup error",error);
+        res.redirect("/pageNotFound");
     }
 }
+
+
+
+
+
+
+
 
 module.exports = {
     loadHomepage,
