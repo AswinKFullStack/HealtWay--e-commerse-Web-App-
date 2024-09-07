@@ -16,12 +16,12 @@
         type:String,
         required:false, //may be user signup using google account,so that it not mondatory
         unique:false,
-        spare:true, //for setting uniqe constrans.there is no phonenumber when signup using single signup.so that we set true //
+        spare:false, //for setting uniqe constrans.there is no phonenumber when signup using single signup.so that we set true //
         default:null
     },
     googleId:{
         type:String,
-        unique:true
+        unique:false
     },
     password:{
         type:String,
@@ -56,14 +56,16 @@
 
     },
     referalCode:{
-        type:String
+        type:String,
+         required:true
     },
     redeemed:{
         type:Boolean
     },
     redeemUser:[{
         type:Schema.Types.ObjectId,
-        ref:"User"
+        ref:"User",
+        // required:true
     }],
     searchHistory:[{
         category:{
@@ -77,7 +79,7 @@
             type:Date,
             default:Date.now
         }
-    }]
+   }]
  })
 
 
