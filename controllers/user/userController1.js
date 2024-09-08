@@ -139,7 +139,8 @@ const verifyOtp = async (req,res)=>{
                 name:user.name,
                 email:user.email,
                 phone:user.phone,
-                password:passwordHash
+                password:passwordHash,
+                ...(user.googleId && { googleId: user.googleId }) // Only include googleId if it exists
             })
 
               // Attempt to save the user and handle errors
