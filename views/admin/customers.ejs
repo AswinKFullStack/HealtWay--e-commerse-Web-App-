@@ -28,8 +28,8 @@
     </div>
 </div>
 
- <!-- Customer Table -->
- <div class="table-responsive">
+  <!-- Customer Table -->
+  <div class="table-responsive">
     <table class="table table-hover">
         <thead>
             <tr>
@@ -40,11 +40,35 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="customerTableBody">
-            <!-- Rows will be populated dynamically through JavaScript -->
+        <tbody>
+            <!-- Example of an Active User -->
+            <tr data-status="active" data-added-date="2023-09-07">
+                <td>John Doe</td>
+                <td>+123 456 7890</td>
+                <td>john@example.com</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>
+                    <button class="btn btn-sm btn-warning">Edit <i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn btn-sm btn-danger">Delete <i class="bi bi-trash-fill"></i></button>
+                    <button class="btn btn-sm btn-secondary block-btn">Block <i class="bi bi-lock-fill"></i></button>
+                </td>
+            </tr>
+            <!-- Example of a Blocked User -->
+            <tr data-status="blocked" data-added-date="2023-09-06">
+                <td>Jane Smith</td>
+                <td>+123 555 7890</td>
+                <td>jane@example.com</td>
+                <td><span class="badge badge-danger">Blocked</span></td>
+                <td>
+                    <button class="btn btn-sm btn-warning">Edit <i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn btn-sm btn-danger">Delete <i class="bi bi-trash-fill"></i></button>
+                    <button class="btn btn-sm btn-success unblock-btn">Unblock <i class="bi bi-unlock-fill"></i></button>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
+
 
  <!-- Pagination Controls -->
  <nav>

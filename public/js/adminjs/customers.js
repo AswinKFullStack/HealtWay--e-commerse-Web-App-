@@ -1,75 +1,31 @@
-// JavaScript for Customer List Page
+// JavaScript for blocking/unblocking users
 
-document.getElementById('searchCustomer').addEventListener('input', function () {
-    const searchTerm = this.value.toLowerCase();
-    const rows = document.querySelectorAll('tbody tr');
+// Function to toggle between Block and Unblock
+document.querySelectorAll('.block-btn, .unblock-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const row = this.closest('tr');
+        const statusBadge = row.querySelector('.badge');
 
-    rows.forEach(row => {
-        const name = row.children[0].textContent.toLowerCase();
-        if (name.includes(searchTerm)) {
-            row.style.display = '';
+        if (statusBadge.classList.contains('badge-success')) {
+            // If the user is active, block them
+            statusBadge.classList.remove('badge-success');
+            statusBadge.classList.add('badge-danger');
+            statusBadge.textContent = 'Blocked';
+            this.textContent = 'Unblock';
+            this.classList.remove('btn-secondary');
+            this.classList.add('btn-success');
+            this.classList.remove('block-btn');
+            this.classList.add('unblock-btn');
         } else {
-            row.style.display = 'none';
+            // If the user is blocked, unblock them
+            statusBadge.classList.remove('badge-danger');
+            statusBadge.classList.add('badge-success');
+            statusBadge.textContent = 'Active';
+            this.textContent = 'Block';
+            this.classList.remove('btn-success');
+            this.classList.add('btn-secondary');
+            this.classList.remove('unblock-btn');
+            this.classList.add('block-btn');
         }
     });
 });
-
-document.getElementById('sortCustomer').addEventListener('change', function () {
-    const sortBy = this.value;
-    const rowsArray = Array.from(document.querySelectorAll('tbody tr'));
-
-    rowsArray.sort((a, b) => {
-        let aValue, bValue;
-
-        switch (sortBy) {
-            case 'newest':
-                aValue = a.dataset.addedDate;
-                bValue = b.dataset.addedDate;
-                break;
-            case 'oldest':
-                aValue = a.dataset.addedDate;
-                bValue = b.dataset.addedDate;
-                break;
-            case 'more-purchaser':
-                aValue = parseInt(a.dataset.purchaseCount, 10);
-                bValue = parseInt(b.dataset.purchaseCount, 10);
-                break;
-            case 'low-purchaser':
-                aValue = parseInt(a.dataset.purchaseCount, 10);
-                bValue = parseInt(b.dataset.purchaseCount, 10);
-                break;
-            case 'active':
-                aValue = a.dataset.status;
-                bValue = b.dataset.status;
-                break;
-            case 'blocked':
-                aValue = a.dataset.status;
-                bValue = b.dataset.status;
-                break;
-            default:
-                aValue = a.dataset.addedDate;
-                bValue = b.dataset.addedDate;
-        }
-
-        return aValue > bValue ? 1 : -1;
-    });
-
-    const tbody = document.querySelector('tbody');
-    rowsArray.forEach(row => tbody.appendChild(row));
-});
-
-function blockUser(button) {
-    const row = button.closest('tr');
-    row.children[3].innerHTML = '<span class="badge badge-danger">Blocked</span>';
-    button.innerHTML = 'Unblock';
-    button.className = 'btn btn-sm btn-success';
-    button.setAttribute('onclick', 'unblockUser(this)');
-}
-
-function unblockUser(button) {
-    const row = button.closest('tr');
-    row.children[3].innerHTML = '<span class="badge badge-success">Active</span>';
-    button.innerHTML = 'Block';
-    button.className = 'btn btn-sm btn-danger';
-    button.setAttribute('onclick', 'blockUser(this)');
-}
