@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HealthWay</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">
+            Health<span>Way</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow p-4">
+                    <h2 class="text-center mb-4">Login</h2>
+                    <form id="loginForm" action="/login" method="post">
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                            <div id="emailError" class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+                            <div id="passwordError" class="invalid-feedback"></div>
+                            <!-- Backend error message -->
+                            <% if (locals.message && message.length > 0) { %>
+                                <div class="alert alert-danger mt-3 text-center error-message">
+                                    <%= message %>
+                                </div>
+                                <% } %>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary btn-block">Login</button>
+                        <div class="text-center mt-3">or</div>
+                        <button type="button" class="btn btn-outline-danger btn-block">
+                            <i class="bi bi-google"></i> Login with Google
+                        </button>
+                        <div class="text-center mt-3">
+                            <a href="#" class="text-secondary">Forgot your password?</a>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="/signup" class="text-success">Don't have an account? Sign up</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-lg-start mt-5" style="background-color: #E0F4D2;">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <h5 class="text-uppercase">About Us</h5>
+                    <p>Providing the best natural food products for your health. Quality and safety are our top priorities.</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-uppercase">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#!" class="text-dark">Home</a></li>
+                        <li><a href="#!" class="text-dark">Shop</a></li>
+                        <li><a href="#!" class="text-dark">About Us</a></li>
+                        <li><a href="#!" class="text-dark">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-uppercase">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#!" class="text-dark"><i class="bi bi-envelope"></i> email@example.com</a></li>
+                        <li><a href="#!" class="text-dark"><i class="bi bi-telephone"></i> +123 456 7890</a></li>
+                        <li><a href="#!" class="text-dark"><i class="bi bi-geo-alt"></i> Your Address</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3" style="background-color: #C8E6C9;">
+            © 2024 Company Name | All rights reserved
+        </div>
+    </footer>
+
+    <script src="/js/login.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

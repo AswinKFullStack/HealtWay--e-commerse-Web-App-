@@ -15,7 +15,17 @@ const pageNotFound = async (req,res)=>{
 
 const loadHomepage = async (req,res)=>{
     try{
-        return res.render("home");
+        const user = req.session.user;
+        if(user){
+            
+            const userData = await User.findOne({_id:user});
+            res.render("home",{user:userData})
+            console.log("User in home page with session, req.session.user =",req.session.user)
+            console.log("User details :", userData)
+        }else{
+            return res.render("home");
+        }
+        
     }catch(error){
         console.log("Home page not found");
         res.status(500).send("Server error");

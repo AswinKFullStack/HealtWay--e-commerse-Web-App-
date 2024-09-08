@@ -34,6 +34,12 @@ app.set("views",[path.join(__dirname,"views/user"),path.join(__dirname,"views/ad
 app.use(express.static(path.join(__dirname,"public")));
 
 
+// Middleware to log method and URL for each request
+app.use((req, res, next) => {
+    console.log(`Method: ${req.method}, URL: ${req.url}`);
+    next(); // Pass control to the next handler
+});
+
 app.use("/",userRouter);
 //app.use("/admin",adminRouter);
 

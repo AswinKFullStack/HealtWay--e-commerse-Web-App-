@@ -1,5 +1,5 @@
- /* Custom styling for HealthWay branding */
- .navbar-brand {
+/* Custom styling for HealthWay branding */
+.navbar-brand {
     font-family: 'Poppins', sans-serif;
     font-size: 1.8rem;
     font-weight: bold;
@@ -49,6 +49,28 @@
     box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
 }
 
+/* Dropdown styles */
+.navbar-nav .dropdown-menu {
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    border: 1px solid #28a745;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .dropdown-menu a {
+    color: #28a745;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+}
+
+.navbar-nav .dropdown-menu a:hover {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.navbar-nav .dropdown-toggle::after {
+    content: none;
+}
 
 
 /* Footer Styles */
