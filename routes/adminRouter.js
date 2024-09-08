@@ -5,7 +5,10 @@ const { route } = require("./userRouter");
 
 
 router.get("/login",adminController1.loadLogin);
+router.post("/login",adminController1.login);
 
+//Dashboard 
+router.get("/",adminController1.loadDashboard);
 
 
 

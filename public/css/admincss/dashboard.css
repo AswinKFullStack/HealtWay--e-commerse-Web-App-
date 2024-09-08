@@ -1,0 +1,154 @@
+/* dashboard.css */
+
+/* Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #343a40;
+    border-bottom: 3px solid #ffc107; /* Changed to yellow */
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand {
+    color: #ffffff;
+}
+
+.navbar .nav-link:hover {
+    color: #ffc107;
+}
+
+.navbar .btn-outline-danger {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.navbar .btn-outline-danger:hover {
+    background-color: #ffc107;
+    color: #343a40;
+    border-color: #ffc107;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar .nav-link {
+    color: #343a40;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link.active {
+    background-color: #ffc107;
+    color: #ffffff;
+    border-radius: 5px;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Dashboard Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card .card-body {
+    position: relative;
+}
+
+.circle-progress {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin: 0 auto;
+}
+
+.circle-progress canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.circle-progress-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+/* Table Styling */
+.table thead th {
+    background-color: #343a40;
+    color: #ffffff;
+    border: none;
+}
+
+.table tbody td {
+    vertical-align: middle;
+}
+
+.table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.badge-instock {
+    background-color: #28a745;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.badge-outofstock {
+    background-color: #dc3545;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.footer p {
+    margin: 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        z-index: 1050;
+        top: 0;
+        left: -250px;
+        width: 250px;
+        transition: all 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    #sidebarCollapse {
+        display: block;
+    }
+}
