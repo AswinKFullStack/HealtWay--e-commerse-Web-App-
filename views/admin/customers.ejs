@@ -1,0 +1,58 @@
+<%-include("../../views/partials/admin/header")%>
+
+<link rel="stylesheet" href="/css/adminCss/customers.css">
+
+<div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+    <h2 class="my-4">Customer List</h2> 
+    <div>
+        <button class="btn btn-primary mr-2">Add New User <i class="bi bi-person-plus-fill"></i></button>
+        <button class="btn btn-success">Export Users <i class="bi bi-file-earmark-excel-fill"></i></button>
+    </div>
+</div>
+
+ <!-- Search and Sort Options -->
+ <div class="form-row mb-3">
+    <div class="col-md-4">
+        <input type="text" class="form-control" id="searchCustomer" placeholder="Search Customers">
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="sortCustomer">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="more-purchaser">More Purchaser</option>
+            <option value="low-purchaser">Low Purchaser</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+            <option value="deleted">Deleted</option>
+        </select>
+    </div>
+</div>
+
+ <!-- Customer Table -->
+ <div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="customerTableBody">
+            <!-- Rows will be populated dynamically through JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+ <!-- Pagination Controls -->
+ <nav>
+    <ul class="pagination justify-content-center" id="paginationControls">
+        <!-- Pagination buttons will be dynamically created here -->
+    </ul>
+</nav>
+
+
+<%-include("../../views/partials/admin/footer")%>
+<script src="/js/adminJs/customers.js"></script>

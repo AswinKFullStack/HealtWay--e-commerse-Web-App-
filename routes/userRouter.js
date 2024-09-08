@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const userController1 = require("../controllers/userController1");
-const userController2 = require("../controllers/userController2");
+const userController1 = require("../controllers/user/userController1");
+const userController2 = require("../controllers/user/userController2");
+const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
 //page not found routes

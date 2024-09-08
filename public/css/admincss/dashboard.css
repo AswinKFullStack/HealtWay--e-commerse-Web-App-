@@ -1,60 +1,4 @@
-/* dashboard.css */
-
-/* Body Styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-}
-
-/* Navbar Styling */
-.navbar {
-    background-color: #343a40;
-    border-bottom: 3px solid #ffc107; /* Changed to yellow */
-}
-
-.navbar .nav-link,
-.navbar .navbar-brand {
-    color: #ffffff;
-}
-
-.navbar .nav-link:hover {
-    color: #ffc107;
-}
-
-.navbar .btn-outline-danger {
-    color: #ffc107;
-    border-color: #ffc107;
-}
-
-.navbar .btn-outline-danger:hover {
-    background-color: #ffc107;
-    color: #343a40;
-    border-color: #ffc107;
-}
-
-/* Sidebar Styling */
-.sidebar {
-    min-height: 100vh;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-}
-
-.sidebar .nav-link {
-    color: #343a40;
-    font-weight: 500;
-    margin-bottom: 10px;
-}
-
-.sidebar .nav-link.active {
-    background-color: #ffc107;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-.sidebar .nav-link i {
-    margin-right: 10px;
-    font-size: 1.2rem;
-}
-
+/*Dashboard style
 /* Dashboard Cards */
 .card {
     border: none;
@@ -121,34 +65,4 @@ body {
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 0.9rem;
-}
-
-/* Footer Styling */
-.footer {
-    background-color: #343a40;
-    color: #ffffff;
-}
-
-.footer p {
-    margin: 0;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 767.98px) {
-    .sidebar {
-        position: fixed;
-        z-index: 1050;
-        top: 0;
-        left: -250px;
-        width: 250px;
-        transition: all 0.3s;
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
-
-    #sidebarCollapse {
-        display: block;
-    }
 }

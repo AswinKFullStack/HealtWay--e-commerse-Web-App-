@@ -1,8 +1,11 @@
-const User = require("../models/userSchema");
+const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-
+//Error page
+const pageError = async(req,res)=>{
+   res.render("Error"); 
+}
 const loadLogin = async (req,res)=>{
     try {
         if(req.session.admin){
@@ -24,7 +27,7 @@ const login = async (req,res)=>{
         const passwordMatch = bcrypt.compare(password,admin.password);
         if(passwordMatch){
             console.log("password matching successfull");
-            req.session.admin = true;
+            req.session.admin = admin._id;
             return res.redirect("/admin");
 
         }else{
@@ -35,7 +38,7 @@ const login = async (req,res)=>{
     }
    } catch (error) {
     console.error("Admin login fountion error",error);
-    return res.redirect("/pageError")
+    return res.redirect("/pageerror")
    }
 }
 
@@ -50,13 +53,33 @@ const loadDashboard = async(req,res)=>{
             }
             
         } catch (error) {
-            return res.redirect("/pageError")
+            return res.redirect("/pageerror")
         }
     
+}
+
+//Admin logot
+
+const logout = async (req,res)=>{
+    try {
+        req.session.destroy(error=>{
+            if(error){
+                console.log("Error in Admin session destroying ",error);
+                return res.redirect("/pageerror");
+            }
+            res.redirect("/admin/login");
+        })
+    } catch (error) {
+        console.log("Unexpected Error in Admin session destroying ",error);
+        return res.redirect("/pageerror")
+    }
+
 }
 
 module.exports = {
     loadLogin,
     login,
-    loadDashboard
+    loadDashboard,
+    pageError,
+    logout
 }

@@ -1,227 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/admincss/dashboard.css">
-</head>
+<%-include("../../views/partials/admin/header")%>
+<link rel="stylesheet" href="/css/adminCss/dashboard.css">
 
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom-custom">
-        <a class="navbar-brand" href="#">
-            <img src="images/logo_page-0001.jpg" alt="Brand" width="50">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Welcome, Admin</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Settings <i class="bi bi-gear-fill"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Help <i class="bi bi-question-circle-fill"></i></a>
-                </li>
-                <li class="nav-item">
-                    <button class="btn btn-outline-danger my-2 my-sm-0 ml-3" type="button">Logout <i
-                            class="bi bi-box-arrow-right"></i></button>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebarMenu" class="col-md-2 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="sidebar-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                <i class="bi bi-speedometer2"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-list-ul"></i>
-                                Category
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-bag-fill"></i>
-                                Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-ticket-detailed-fill"></i>
-                                Coupons
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-gift-fill"></i>
-                                Offers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-box-seam"></i>
-                                Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-people-fill"></i>
-                                Customers
-                                <span class="badge badge-secondary ml-2">User Management</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="bi bi-gear-fill"></i>
-                                Other Settings
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
 
-            <!-- Dashboard Content -->
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-                <!-- Dashboard Cards -->
-                <div class="row mt-4">
-                    <!-- Total Sales Card -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="mr-3">
-                                        <div class="circle-progress" data-percentage="75">
-                                            <span class="circle-progress-value">75%</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="card-title">Total Sales</h5>
-                                        <h3>₹1,20,000</h3>
-                                        <p>Products Sold: 450</p>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- Dashboard Cards -->
+ <div class="row mt-4">
+    <!-- Total Sales Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="mr-3">
+                        <div class="circle-progress" data-percentage="75">
+                            <span class="circle-progress-value">75%</span>
                         </div>
                     </div>
-                    <!-- Total Revenue Card -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="mr-3">
-                                        <div class="circle-progress" data-percentage="60">
-                                            <span class="circle-progress-value">60%</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="card-title">Total Revenue</h5>
-                                        <h3>₹3,50,000</h3>
-                                        <p>Growth: 15% <i class="bi bi-graph-up text-success"></i></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- User Count Card -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="mr-3">
-                                        <div class="circle-progress" data-percentage="90">
-                                            <span class="circle-progress-value">90%</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="card-title">User Count</h5>
-                                        <h3>1,200</h3>
-                                        <p>New Users: 150</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <h5 class="card-title">Total Sales</h5>
+                        <h3>₹1,20,000</h3>
+                        <p>Products Sold: 450</p>
                     </div>
                 </div>
-                <!-- Products Table -->
-                <div class="card shadow mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Product Sales Details</h5>
-                        <div>
-                            <input type="date" id="startDate" class="form-control d-inline-block" style="width: auto;">
-                            <span class="mx-2">to</span>
-                            <input type="date" id="endDate" class="form-control d-inline-block" style="width: auto;">
-                            <button class="btn btn-primary ml-2" id="filterButton">Filter</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="productTable">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th scope="col">Image</th>
-                                        <th scope="col">Product Name</th>
-                                        <th scope="col">Price (₹)</th>
-                                        <th scope="col">Quantity Sold</th>
-                                        <th scope="col">Stock Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Dynamic Rows Will Be Injected Here -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Pagination -->
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-center" id="pagination">
-                                <!-- Dynamic Pagination Will Be Injected Here -->
-                            </ul>
-                        </nav>
-                        <div class="text-right">
-                            <button class="btn btn-success" id="reportButton">Click Here for Details <i
-                                    class="bi bi-file-earmark-text-fill"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </main>
+            </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer bg-light py-3">
-        <div class="container">
-            <p class="text-center mb-0">© 2024 Your Company Name. All rights reserved.</p>
+    <!-- Total Revenue Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="mr-3">
+                        <div class="circle-progress" data-percentage="60">
+                            <span class="circle-progress-value">60%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="card-title">Total Revenue</h5>
+                        <h3>₹3,50,000</h3>
+                        <p>Growth: 15% <i class="bi bi-graph-up text-success"></i></p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+    <!-- User Count Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="mr-3">
+                        <div class="circle-progress" data-percentage="90">
+                            <span class="circle-progress-value">90%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="card-title">User Count</h5>
+                        <h3>1,200</h3>
+                        <p>New Users: 150</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Products Table -->
+<div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Product Sales Details</h5>
+        <div>
+            <input type="date" id="startDate" class="form-control d-inline-block" style="width: auto;">
+            <span class="mx-2">to</span>
+            <input type="date" id="endDate" class="form-control d-inline-block" style="width: auto;">
+            <button class="btn btn-primary ml-2" id="filterButton">Filter</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="productTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Price (₹)</th>
+                        <th scope="col">Quantity Sold</th>
+                        <th scope="col">Stock Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic Rows Will Be Injected Here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- Dynamic Pagination Will Be Injected Here -->
+            </ul>
+        </nav>
+        <div class="text-right">
+            <button class="btn btn-success" id="reportButton">Click Here for Details <i
+                    class="bi bi-file-earmark-text-fill"></i></button>
+        </div>
+    </div>
+</div>
 
-    <!-- Bootstrap and jQuery Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js for Circle Progress -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom JS -->
-    <script src="/js/adminjs/dashboard.js"></script>
-</body>
 
-</html>
+
+<%-include("../../views/partials/admin/footer")%>
+<script src="/js/adminJs/dashboard.js"></script> 

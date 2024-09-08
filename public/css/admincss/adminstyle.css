@@ -1,0 +1,108 @@
+/* Custom Navbar Styles */
+.navbar-brand {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.navbar-brand span {
+    color: #ffc107;
+}
+
+.navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .nav-link {
+    color: #28a745;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffc107;
+}
+
+.btn-outline-primary {
+    border-color: #ffc107;
+    color: #28a745;
+}
+
+.btn-outline-primary:hover {
+    background-color: #ffc107;
+    color: #ffffff;
+    border-color: #ffc107;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #f8f9fa;
+    padding-top: 60px; /* Space for the fixed navbar */
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    font-size: 16px;
+    color: #333;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #e9ecef;
+    color: #28a745;
+}
+
+/* Content Styles */
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    margin-top: 60px; /* Space for the fixed navbar */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sidebar .nav-link {
+        text-align: center;
+        padding: 15px;
+    }
+
+    .content {
+        margin-left: 0;
+    }
+}
+
+/* Footer Styles */
+footer {
+    background-color: #E0F4D2;
+}
+
+footer .text-uppercase {
+    font-weight: bold;
+}
+
+footer .text-dark {
+    color: #343a40;
+}
+
+footer .list-unstyled {
+    padding-left: 0;
+}
+
+footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+}
