@@ -39,11 +39,46 @@ const customerInfo = async (req,res)=>{
     }
 }
  
+const customerBlocked = async (req,res)=>{
+    try {
+        const userId = req.query.id; // Get the user ID from the query parameters
+        
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { isBlocked: true },
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        res.redirect('/admin/users'); // Redirect to the user list page
+    } catch (error) {
+        console.error("Error blocking user:", error);
+        res.status(500).send("Server error");
+    }
+}
 
-
-
+const customerUnblocked = async (req,res)=>{
+    try {
+        const userId = req.query.id; // Get the user ID from the query parameters
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { isBlocked: false },
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        res.redirect('/admin/users'); // Redirect to the user list page
+    } catch (error) {
+        console.error("Error unblocking user:", error);
+        res.status(500).send("Server error");
+    }
+}
 
 
 module.exports = {
-    customerInfo
+    customerInfo,
+    customerBlocked,
+    customerUnblocked
 }

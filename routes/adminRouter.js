@@ -23,7 +23,8 @@ router.get("/",adminController1.loadDashboard);
 
 
 router.get("/users",adminAuth,customerController.customerInfo);
-
+router.get("/blockCustomer",adminAuth,customerController.customerBlocked);
+router.get("/unblockCustomer",adminAuth,customerController.customerUnblocked);
 
 
 
