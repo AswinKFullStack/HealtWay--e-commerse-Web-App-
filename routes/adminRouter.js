@@ -57,6 +57,10 @@ router.get("/brands",adminAuth,brandController.getBrandpage)
 router.get("/addBrand",adminAuth,brandController.getAddBrand);
 router.post("/addBrand",adminAuth,upload.single("brandImage"),brandController.postAddBrand);
 
+router.get('/brand/block/:id',adminAuth,brandController.blockBrand);
+router.get('/brand/unblock/:id',adminAuth,brandController.unblockBrand);
+router.get('/brand/delete/:id',adminAuth,brandController.deleteBrand);
+
 
 //Product management
 

@@ -9,7 +9,7 @@ const getBrandpage = async(req,res)=>{
     
         // Filter categories by search term (case-insensitive) and exclude deleted categories
         const searchQuery = {
-          ...((searchTerm && { name: { $regex: new RegExp(searchTerm, "i") } }) || {})
+          ...((searchTerm && { brandName: { $regex: new RegExp(searchTerm, "i") } }) || {})
          
         };
     
@@ -77,8 +77,48 @@ const getAddBrand = async (req, res) => {
   
 
 
+
+  const blockBrand = async (req, res) => {
+    try {
+      const brandId = req.params.id;
+      await Brand.findByIdAndUpdate(brandId, { isBlocked: true });
+      res.redirect('/admin/brands');
+    } catch (error) {
+      console.error(error);
+      res.redirect('/pageerror');
+    }
+  };
+  
+  const unblockBrand = async (req, res) => {
+    try {
+      const brandId = req.params.id;
+      await Brand.findByIdAndUpdate(brandId, { isBlocked: false });
+      res.redirect('/admin/brands');
+    } catch (error) {
+      console.error(error);
+      res.redirect('/pageerror');
+    }
+  };
+  
+
+
+  const deleteBrand = async (req, res) => {
+    try {
+      const brandId = req.params.id;
+      await Brand.findByIdAndDelete(brandId);
+      res.redirect('/admin/brands');
+    } catch (error) {
+      console.error(error);
+      res.redirect('/pageerror');
+    }
+  };
+  
+
 module.exports ={
     getBrandpage,
     getAddBrand,
-    postAddBrand
+    postAddBrand,
+    blockBrand,
+    unblockBrand,
+    deleteBrand
 }
