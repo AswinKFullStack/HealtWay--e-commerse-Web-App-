@@ -22,9 +22,14 @@
     },
     status: {
         type: String,
-        enum: ['Active', 'Inactive'],
-        default: 'Inactive'
+        enum: ['Listed', 'Unlisted'],
+        default: 'Unlisted'
+
     },
+    isDeleted: {
+        type: Boolean,
+        default: false, // Default to false as the category is not deleted initially
+      },
     createdAt:{
         type:Number,
         default:Date.now

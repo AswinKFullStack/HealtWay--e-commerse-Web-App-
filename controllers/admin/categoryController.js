@@ -5,46 +5,42 @@ const mongoose = require("mongoose");
 
 
 
-const categoryInfo = async (req,res)=>{
+const categoryInfo = async (req, res) => {
     try {
-        
-        const searchTerm = req.query.search || ''; // Search term from query string
-        const currentPage = Math.max(1,parseInt(req.query.page)); // Current page number from query string
-        const itemsPerPage = 3; // Number of categories per page
-
-        // Filter categories by search term (case-insensitive)
-        const searchQuery = searchTerm
-            ? { name: { $regex: new RegExp(searchTerm, 'i') } }
-            : {};
-
-        // Count total categories for pagination
-        const totalCategories = await Category.countDocuments(searchQuery);
-
-        // Fetch the categories for the current page
-        const categories = await Category.find(searchQuery)
-            .skip((currentPage - 1) * itemsPerPage)
-            .limit(itemsPerPage);
-
-        // Calculate total pages
-        const totalPages = Math.ceil(totalCategories / itemsPerPage);
-
-        // Render the category management page with fetched data
-        res.render('categories', {
-            data: categories,
-            totalpages: totalPages,
-            currentPage: currentPage,
-            searchTerm: searchTerm // Pass this for prefilling the search box
-        });
-
-
-
-       
-          
+      const searchTerm = req.query.search || ""; // Search term from query string
+      const currentPage = Math.max(1, parseInt(req.query.page)); // Current page number from query string
+      const itemsPerPage = 3; // Number of categories per page
+  
+      // Filter categories by search term (case-insensitive) and exclude deleted categories
+      const searchQuery = {
+        ...((searchTerm && { name: { $regex: new RegExp(searchTerm, "i") } }) || {}),
+        isDeleted: false, // Exclude categories marked as deleted
+      };
+  
+      // Count total categories for pagination
+      const totalCategories = await Category.countDocuments(searchQuery);
+  
+      // Fetch the categories for the current page
+      const categories = await Category.find(searchQuery)
+        .skip((currentPage - 1) * itemsPerPage)
+        .limit(itemsPerPage);
+  
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCategories / itemsPerPage);
+  
+      // Render the category management page with fetched data
+      res.render("categories", {
+        data: categories,
+        totalpages: totalPages,
+        currentPage: currentPage,
+        searchTerm: searchTerm, // Pass this for prefilling the search box
+      });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error when category Listing');
+      console.error(error);
+      res.status(500).send("Server Error when listing categories");
     }
-}
+  };
+  
 
 
 
@@ -166,17 +162,22 @@ const postEditCategory = async (req, res) => {
     }
 };
 
-// Delete category controller function
+// Soft delete category controller function
 const deleteCategory = async (req, res) => {
     try {
-        const categoryId = req.params.id;
-        await Category.findByIdAndDelete(categoryId);
-        res.redirect('/admin/categories');// Redirect to the category list page after deletion
+      const categoryId = req.params.id;
+  
+      // Perform a soft delete by setting isDeleted to true
+      await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
+  
+      // Redirect to the category list page after soft deletion
+      res.redirect("/admin/categories");
     } catch (error) {
-        console.error('Error deleting category:', error);
-        res.status(500).send('Error deleting category');
+      console.error("Error soft deleting category:", error);
+      res.status(500).send("Error soft deleting category");
     }
-};
+  };
+  
 
 // View single category details
 const viewCategoryDetails = async (req, res) => {
@@ -195,6 +196,37 @@ const viewCategoryDetails = async (req, res) => {
 
 
 
+
+// categoryController.js
+
+// Change category status to 'Listed'
+const listCategory = async (req, res) => {
+    const categoryId = req.params.id;
+    try {
+      await Category.findByIdAndUpdate(categoryId, { status: 'Listed' });
+      res.redirect('/admin/categories');
+    } catch (error) {
+      console.error('Error listing category:', error);
+      res.status(500).send('Error listing category');
+    }
+};
+  
+  // Change category status to 'Unlisted'
+const unlistCategory = async (req, res) => {
+    const categoryId = req.params.id;
+    try {
+      await Category.findByIdAndUpdate(categoryId, { status: 'Unlisted' });
+      res.redirect('/admin/categories');
+    } catch (error) {
+      console.error('Error unlisting category:', error);
+      res.status(500).send('Error unlisting category');
+    }
+};
+  
+  
+
+
+
 module.exports = {
     categoryInfo,
     addCategoryOffer,
@@ -204,6 +236,8 @@ module.exports = {
     getEditCategory,
     postEditCategory,
     deleteCategory,
-    viewCategoryDetails
+    viewCategoryDetails,
+    listCategory,
+    unlistCategory
 
 };

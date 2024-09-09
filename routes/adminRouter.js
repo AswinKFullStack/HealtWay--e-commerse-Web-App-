@@ -18,7 +18,7 @@ router.post("/login",adminController1.login);
 router.get("/logout",adminController1.logout)
 
 //Dashboard 
-router.get("/",adminController1.loadDashboard);
+router.get("/",adminAuth,adminController1.loadDashboard);
 
 //Custermer management
 
@@ -43,5 +43,8 @@ router.get('/category/delete/:id', adminAuth, categoryController.deleteCategory)
                     //Viewing Single Category
 router.get('/category/view/:id', adminAuth, categoryController.viewCategoryDetails);
 
+// aList and unlist
+router.get('/category/list/:id', adminAuth, categoryController.listCategory);
+router.get('/category/unlist/:id', adminAuth, categoryController.unlistCategory);
 
 module.exports = router

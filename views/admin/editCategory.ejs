@@ -14,11 +14,12 @@
     <div class="mb-3">
         <label for="status">Status</label>
         <select class="form-select" id="status" name="status" required>
-            <option value="Active" <%= category.status === 'Active' ? 'selected' : '' %>>Active</option>
-            <option value="Inactive" <%= category.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+            <option value="Listed" <%= category.status === 'Listed' ? 'selected' : '' %>>Listed</option>
+            <option value="Unlisted" <%= category.status === 'Unlisted' ? 'selected' : '' %>>Unlisted</option>
         </select>
     </div>
     <button type="submit" class="btn btn-primary">Update Category</button>
 </form>
 
 <%- include("../../views/partials/admin/footer") %>
+
