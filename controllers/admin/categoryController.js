@@ -64,9 +64,18 @@ const addCategoryOffer = async (req, res) => {
         // Fetch all products in this category
         const products = await Product.find({ category: categoryId });
 
-        // Update each product's salePrice based on the offer
+        // Update each product's salePrice based on both category and product offer
         for (const product of products) {
-            const discountedPrice = product.regularPrice - (product.regularPrice * offerPrice / 100);
+            let finalDiscount = offerPrice; // Start with the category discount
+
+            // If product-specific offer exists, combine the offers (or pick the greater offer)
+            if (product.productOffer > 0) {
+                // Example: Choose the greater of the two offers
+                finalDiscount = Math.max(offerPrice, product.productOffer);
+            }
+
+            // Calculate the discounted price
+            const discountedPrice = product.regularPrice - (product.regularPrice * finalDiscount / 100);
             await Product.findByIdAndUpdate(product._id, { salePrice: discountedPrice });
         }
 
@@ -76,7 +85,6 @@ const addCategoryOffer = async (req, res) => {
         res.status(500).send('Error when adding category offer');
     }
 };
-
 
 // Remove offer from a category
 const removeCategoryOffer = async (req, res) => {
@@ -89,9 +97,17 @@ const removeCategoryOffer = async (req, res) => {
         // Fetch all products in this category
         const products = await Product.find({ category: categoryId });
 
-        // Revert the salePrice of each product to its regularPrice
+        // Revert the salePrice of each product based on their product-specific offer (if any)
         for (const product of products) {
-            await Product.findByIdAndUpdate(product._id, { salePrice: product.regularPrice });
+            let finalPrice = product.regularPrice; // Default to regular price
+
+            // If product has its own offer, calculate sale price based on product offer
+            if (product.productOffer > 0) {
+                finalPrice = product.regularPrice - (product.regularPrice * product.productOffer / 100);
+            }
+
+            // Update the sale price
+            await Product.findByIdAndUpdate(product._id, { salePrice: finalPrice });
         }
 
         res.redirect(`/admin/categories?page=${req.query.page || 1}`);
