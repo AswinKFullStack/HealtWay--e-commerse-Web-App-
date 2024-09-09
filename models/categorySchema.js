@@ -15,9 +15,15 @@
         type:Boolean,
         default:true
     },
-    categoryOffer:{
-        type:Number,
-        default:0
+    offerPrice: {
+        type: Number,
+        min: [0, 'Offer price must be a positive number'],
+        default: null
+    },
+    status: {
+        type: String,
+        enum: ['Active', 'Inactive'],
+        default: 'Inactive'
     },
     createdAt:{
         type:Number,
