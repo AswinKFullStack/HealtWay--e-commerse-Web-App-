@@ -1,0 +1,24 @@
+<%- include("../../views/partials/admin/header") %>
+
+<h2>Edit Category</h2>
+
+<form action="/admin/category/edit/<%= category._id %>" method="POST">
+    <div class="mb-3">
+        <label for="name">Category Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= category.name %>" required>
+    </div>
+    <div class="mb-3">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required><%= category.description %></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="status">Status</label>
+        <select class="form-select" id="status" name="status" required>
+            <option value="Active" <%= category.status === 'Active' ? 'selected' : '' %>>Active</option>
+            <option value="Inactive" <%= category.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Category</button>
+</form>
+
+<%- include("../../views/partials/admin/footer") %>
