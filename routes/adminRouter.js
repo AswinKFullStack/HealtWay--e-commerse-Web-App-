@@ -32,6 +32,8 @@ router.get("/unblockCustomer",adminAuth,customerController.customerUnblocked);
 router.get("/categories",adminAuth,categoryController.categoryInfo); // Route to list categories with pagination and search
 router.post('/category/offer/add/:id',adminAuth, categoryController.addCategoryOffer);// Route to add offer to a category
 router.post('/category/offer/remove/:id',adminAuth, categoryController.removeCategoryOffer);// Route to remove offer from a category
-
+                      // Add new category
+router.get('/addCategory', adminAuth, categoryController.getAddCategory);
+router.post('/addCategory', adminAuth, categoryController.postAddCategory);
 
 module.exports = router

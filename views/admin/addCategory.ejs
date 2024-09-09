@@ -1,0 +1,24 @@
+<%-include("../../views/partials/admin/header")%>
+<link rel="stylesheet" href="/css/adminCss/addCategory.css">
+
+
+<h2 class="mb-4">Add New Category</h2>
+        <form id="addCategoryForm" action="/admin/addCategory" method="POST">
+            <div class="form-group">
+                <label for="categoryName">Category Name</label>
+                <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" name="name" required>
+                <div id="categoryNameError" class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="categoryDescription">Description</label>
+                <textarea class="form-control" id="categoryDescription" rows="3" placeholder="Enter description" name="description"></textarea>
+                <div id="categoryDescriptionError" class="invalid-feedback"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Category</button>
+            <a href="dashboard.html" class="btn btn-secondary ml-2">Cancel</a>
+        </form>
+
+
+
+<%-include("../../views/partials/admin/footer")%>
+<script src="/js/adminJs/addCategory.js"></script>

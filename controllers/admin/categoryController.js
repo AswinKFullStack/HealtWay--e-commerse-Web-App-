@@ -79,8 +79,31 @@ const removeCategoryOffer = async (req, res) => {
     }
 };
 
+
+
+// Render add category form
+const getAddCategory = (req, res) => {
+    res.render('addCategory');
+};
+
+// Handle adding new category
+const postAddCategory = async (req, res) => {
+    try {
+        const { name, description } = req.body;
+        const newCategory = new Category({ name, description });
+        await newCategory.save();
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.error('Error adding new category:', error);
+        res.status(500).send('Error adding new category');
+    }
+};
+
+
 module.exports = {
     categoryInfo,
     addCategoryOffer,
-    removeCategoryOffer
+    removeCategoryOffer,
+    getAddCategory,
+    postAddCategory
 };
