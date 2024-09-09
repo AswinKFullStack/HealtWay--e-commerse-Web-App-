@@ -11,10 +11,6 @@
         type:String,
         required:true
     },
-    isListed:{
-        type:Boolean,
-        default:true
-    },
     offerPrice: {
         type: Number,
         min: [0, 'Offer price must be a positive number'],
