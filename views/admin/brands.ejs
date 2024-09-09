@@ -1,0 +1,70 @@
+<%- include("../../views/partials/admin/header") %>
+
+<link rel="stylesheet" href="/css/adminCss/customers.css">
+
+<h2 class="my-4">Brand Management</h2>
+<div class="mb-3">
+  <a href="/admin/addBrand" class="btn btn-primary">Create Brand</a>
+</div>
+<div class="form-group mb-4">
+  <input type="text" class="form-control" id="searchBrand" placeholder="Search brands" value="<%= searchTerm %>">
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Brand</th>
+      <th>Logo</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="brandTable">
+    <% data.forEach(function(brand) { %>
+      <tr>
+        <td><%= brand.brandName %></td>
+        <td>
+          <% if (brand.brandImage.length) { %>
+            <img src="/uploads/re-image/<%= brand.brandImage[0] %>" alt="<%= brand.name %> Logo" width="50" height="50">
+          <% } else { %>
+            No logo
+          <% } %>
+        </td>
+        <td>
+          <% if (brand.status === 'Active') { %>
+            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+          <% } else { %>
+            <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Blocked</span>
+          <% } %>
+        </td>
+        <td>
+          <% if (brand.status === 'Active') { %>
+            <button class="btn btn-warning btn-sm" onclick="location.href='/admin/brand/block/<%= brand._id %>'">
+              <i class="bi bi-lock-fill"></i> Block
+            </button>
+          <% } else { %>
+            <button class="btn btn-success btn-sm" onclick="location.href='/admin/brand/unblock/<%= brand._id %>'">
+              <i class="bi bi-unlock-fill"></i> Unblock
+            </button>
+          <% } %>
+          <button class="btn btn-danger btn-sm" onclick="location.href='/admin/brand/delete/<%= brand._id %>'">
+            <i class="bi bi-trash-fill"></i> Delete
+          </button>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+
+<!-- Pagination Controls -->
+<nav>
+  <ul class="pagination justify-content-center" id="paginationControls">
+    <% for (let i = 1; i <= totalpages; i++) { %>
+      <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= i %>&search=<%= encodeURIComponent(searchTerm) %>"><%= i %></a>
+      </li>
+    <% } %>
+  </ul>
+</nav>
+
+<script src="/js/adminJs/brands.js"></script>

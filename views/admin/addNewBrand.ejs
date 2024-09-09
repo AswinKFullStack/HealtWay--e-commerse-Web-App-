@@ -1,0 +1,27 @@
+<%- include("../../views/partials/admin/header") %>
+
+<h2 class="my-4">Add New Brand</h2>
+<link rel="stylesheet" href="/css/adminCss/addCategory.css">
+
+<form action="/admin/addBrand" method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label for="brandName" class="form-label">Brand Name</label>
+    <input type="text" class="form-control" id="brandName" name="brandName" placeholder="Enter brand name" required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="brandImage" class="form-label">Brand Image</label>
+    <input type="file" class="form-control" id="brandImage" name="brandImage" accept="image/*" required>
+  </div>
+  
+  <div class="mb-3">
+    <button type="submit" class="btn btn-primary">Add Brand</button>
+  </div>
+
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger"><%= errorMessage %></div>
+  <% } %>
+  
+</form>
+
+<%- include("../../views/partials/admin/footer") %>

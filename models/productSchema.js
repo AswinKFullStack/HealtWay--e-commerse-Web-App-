@@ -32,11 +32,15 @@
         type:Number,
         default:0
     },
+    weight: {
+        type: String, // Options like '500g' or '1000g'
+        required: false
+    },
     quantity:{
         type:Number,
         default:true
     },
-    productImage:{
+    productImages:{
         type:[String], //multiple images will be there,so that we deifine inside an array
         required:true
 

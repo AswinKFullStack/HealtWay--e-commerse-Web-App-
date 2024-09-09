@@ -2,9 +2,15 @@ const express = require("express");
 const router = express.Router();
 const adminController1 = require("../controllers/admin/adminController1");
 const customerController = require("../controllers/admin/customerController");
-const categoryController = require("../controllers/admin/categoryController")
+const categoryController = require("../controllers/admin/categoryController");
+const productController = require("../controllers/admin/productController");
+const brandController = require("../controllers/admin/brandController");
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
+
+const multer = require("multer");
+const upload = require("../helpers/multer");
+
 
 
 //Errorpage
@@ -42,9 +48,19 @@ router.post('/category/edit/:id', adminAuth, categoryController.postEditCategory
 router.get('/category/delete/:id', adminAuth, categoryController.deleteCategory);
                     //Viewing Single Category
 router.get('/category/view/:id', adminAuth, categoryController.viewCategoryDetails);
-
-// aList and unlist
+        // aList and unlist
 router.get('/category/list/:id', adminAuth, categoryController.listCategory);
 router.get('/category/unlist/:id', adminAuth, categoryController.unlistCategory);
+
+//Brand management
+router.get("/brands",adminAuth,brandController.getBrandpage)
+router.get("/addBrand",adminAuth,brandController.getAddBrand);
+router.post("/addBrand",adminAuth,upload.single("brandImage"),brandController.postAddBrand);
+
+
+//Product management
+
+
+router.get('/addProduct',adminAuth,productController.getProductAddPage);
 
 module.exports = router

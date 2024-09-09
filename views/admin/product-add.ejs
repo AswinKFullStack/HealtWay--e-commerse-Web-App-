@@ -1,0 +1,110 @@
+<%-include("../../views/partials/admin/header")%>
+
+
+
+
+
+<!-- Add Product Form -->
+
+    <h2 class="mt-4">Add New Product</h2>
+    <form id="addProductForm" class="needs-validation" novalidate>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="productName">Product Name</label>
+                <input type="text" class="form-control" id="productName" placeholder="Enter product name" required>
+                <div class="invalid-feedback">
+                    Please provide a valid product name.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="productCategory">Category</label>
+                <select class="custom-select" id="productCategory" required>
+                    <option selected disabled value="">Choose...</option>
+                    <option>Electronics</option>
+                    <option>Clothing</option>
+                    <option>Home Appliances</option>
+                    <option>Books</option>
+                    <option>Accessories</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select a valid category.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="productBrand">Brand</label>
+                <select class="custom-select" id="productBrand" required>
+                    <option selected disabled value="">Choose...</option>
+                    <option>Brand A</option>
+                    <option>Brand B</option>
+                    <option>Brand C</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please provide a valid brand.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="regularPrice">Regular Price</label>
+                <input type="number" class="form-control" id="regularPrice" placeholder="Enter regular price" required>
+                <div class="invalid-feedback">
+                    Please provide a valid regular price.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="salePrice">Sale Price</label>
+                <input type="number" class="form-control" id="salePrice" placeholder="Enter sale price" required>
+                <div class="invalid-feedback">
+                    Please provide a valid sale price.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="productQuantity">Quantity</label>
+                <select class="custom-select" id="productQuantity" required>
+                    <option selected disabled value="">Choose...</option>
+                    <option>1</option>
+                    <option>5</option>
+                    <option>10</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select a valid quantity.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="productWeight">Weight</label>
+                <select class="custom-select" id="productWeight">
+                    <option selected disabled value="">Choose weight...</option>
+                    <option>500g</option>
+                    <option>1000g (1kg)</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select a valid weight.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="productImage">Product Images</label>
+                <input type="file" class="form-control-file" id="productImage" multiple required>
+                <div class="invalid-feedback">
+                    Please upload at least one product image.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-12 mb-3">
+                <label for="productDescription">Description</label>
+                <textarea class="form-control" id="productDescription" rows="3" required></textarea>
+                <div class="invalid-feedback">
+                    Please provide a description.
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Add Product</button>
+        <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
+    </form>
+
+
+<%-include("../../views/partials/admin/footer")%>

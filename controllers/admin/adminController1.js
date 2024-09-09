@@ -50,6 +50,9 @@ const loadDashboard = async(req,res)=>{
         try {
             if(req.session.admin){
                 return res.render("dashboard");
+            }else {
+                // If the admin session does not exist, redirect to the admin login page
+                return res.redirect("/admin/login");
             }
             
         } catch (error) {
