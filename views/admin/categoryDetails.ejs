@@ -1,0 +1,17 @@
+<%- include("../../views/partials/admin/header") %>
+
+<h2>Category Details</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Name: <%= category.name %></h5>
+        <p class="card-text">Description: <%= category.description %></p>
+        <p class="card-text">Status: <%= category.status %></p>
+        <p class="card-text">Offer Price: <%= category.offerPrice ? category.offerPrice : 'No Offer' %></p>
+        <p class="card-text">Created At: <%= new Date(category.createdAt).toLocaleDateString() %></p>
+    </div>
+</div>
+
+<a href="/admin/categories" class="btn btn-secondary mt-3">Back to Categories</a>
+
+<%- include("../../views/partials/admin/footer") %>

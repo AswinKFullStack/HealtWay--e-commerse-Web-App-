@@ -38,4 +38,10 @@ router.post('/addCategory', adminAuth, categoryController.postAddCategory);
                       // Edit category
 router.get('/category/edit/:id', adminAuth, categoryController.getEditCategory);
 router.post('/category/edit/:id', adminAuth, categoryController.postEditCategory);
+                      //Deleting Category
+router.get('/category/delete/:id', adminAuth, categoryController.deleteCategory);
+                    //Viewing Single Category
+router.get('/category/view/:id', adminAuth, categoryController.viewCategoryDetails);
+
+
 module.exports = router
