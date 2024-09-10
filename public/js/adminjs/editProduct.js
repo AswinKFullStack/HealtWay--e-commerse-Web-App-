@@ -1,11 +1,12 @@
 // Ensure the image error message is hidden by default
 const imageErrorDiv = document.querySelector('#productImage + .invalid-feedback');
 imageErrorDiv.style.display = 'none';
+const submitButton = document.getElementById('submitProductBtn');
 
 submitButton.addEventListener('click', function (event) {
     var form = document.getElementById('editProductForm');
 
-    if (form.checkValidity() === false) {
+    if (!form.checkValidity()) {
         event.preventDefault();
         event.stopPropagation();
     } else {
@@ -26,19 +27,21 @@ submitButton.addEventListener('click', function (event) {
     form.classList.add('was-validated');
 });
 
-
 // Handle existing image removal
+function handleRemoveImageButtonClick() {
+    const imageName = this.getAttribute('data-image');
+    this.parentElement.remove(); // Remove the image preview element
+
+    // Mark the image for deletion on the server-side
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'imagesToDelete[]';
+    hiddenInput.value = imageName;
+    document.getElementById('editProductForm').appendChild(hiddenInput);
+}
+
 document.querySelectorAll('.remove-image-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const imageName = this.getAttribute('data-image');
-        this.parentElement.remove(); // Remove the image preview element
-        // Optionally, mark the image for deletion on the server-side
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'imagesToDelete[]';
-        hiddenInput.value = imageName;
-        document.getElementById('editProductForm').appendChild(hiddenInput);
-    });
+    button.addEventListener('click', handleRemoveImageButtonClick);
 });
 
 // Handle new image selection and cropping logic
@@ -84,17 +87,12 @@ document.getElementById('productImage').addEventListener('change', function(even
             cropBtn.classList.add('btn', 'btn-primary', 'btn-sm');
             imgContainer.appendChild(cropBtn);
 
-            // Prevent the form from submitting when "Crop" button is clicked
             cropBtn.addEventListener('click', function(event) {
                 event.preventDefault(); // Prevent form submission when cropping
 
-                const existingSaveBtn = imgContainer.querySelector('.btn-success');
-                if (existingSaveBtn) {
-                    // Prevent adding multiple save buttons
-                    return;
-                }
                 if (!window.FileReader || !window.Cropper) {
                     alert("Your browser does not support some features needed for this page. Please use a modern browser.");
+                    return;
                 }
                 
                 const cropper = new Cropper(img, {
@@ -111,7 +109,6 @@ document.getElementById('productImage').addEventListener('change', function(even
                 saveBtn.classList.add('btn', 'btn-success', 'btn-sm');
                 imgContainer.appendChild(saveBtn);
 
-                // Prevent the form from submitting when "Save Crop" is clicked
                 saveBtn.addEventListener('click', function (event) {
                     event.preventDefault(); // Prevent form submission when saving the cropped image
                 
@@ -130,22 +127,18 @@ document.getElementById('productImage').addEventListener('change', function(even
                 
                         const croppedFile = new File([blob], `cropped_${file.name}`, { type: blob.type });
                         
-                        // ... [rest of the code for handling cropped images]
-                  
-                
-                        
-                        // Remove any previously saved cropped image before adding the new one
-                        const previousCroppedImg = imgContainer.querySelector('.cropped-preview');
-                        if (previousCroppedImg) {
-                            imgContainer.removeChild(previousCroppedImg);
-                        }
-
                         // Create a new image element for the cropped version
                         const croppedImgURL = URL.createObjectURL(croppedFile);
                         const previewImg = document.createElement('img');
                         previewImg.src = croppedImgURL;
                         previewImg.style.maxWidth = '200px';
                         previewImg.classList.add('cropped-preview'); // Add a class to easily identify this element
+
+                        // Remove any previously saved cropped image before adding the new one
+                        const previousCroppedImg = imgContainer.querySelector('.cropped-preview');
+                        if (previousCroppedImg) {
+                            imgContainer.removeChild(previousCroppedImg);
+                        }
 
                         // Append the new cropped image
                         imgContainer.appendChild(previewImg);
@@ -158,3 +151,9 @@ document.getElementById('productImage').addEventListener('change', function(even
         reader.readAsDataURL(file);
     });
 });
+
+
+
+
+
+

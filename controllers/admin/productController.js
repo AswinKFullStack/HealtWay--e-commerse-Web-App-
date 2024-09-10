@@ -145,25 +145,84 @@ const getEditProduct = async (req, res) => {
 };
 
 
-// Handle category update
+// Handle  product update
+
 const postEditProduct = async (req, res) => {
     try {
-        const categoryId = req.params.id;
-        const { name, description, status } = req.body;
-        await Category.findByIdAndUpdate(categoryId, { name, description, status });
-        res.redirect('/admin/categories');
+        const productId = req.params.id; // Get the product ID from the URL parameters
+
+        // Fetch the existing product from the database
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Extract data from the request body
+        const { productName, description, brand, category, regularPrice, salePrice, weight, quantity } = req.body;
+        console.log(req.body);
+        console.log( 'productName=',productName, 'description=',description,'brand=', brand, 'category=',category, 'regularPrice=',regularPrice, 'salePrice=',salePrice,'weight=', weight, 'quantity=',quantity)
+        // Server-side validation for required field
+        if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
+            return res.status(400).send('All fields are required.');
+        }
+
+        // Handle deletion of images if any
+        if (req.body.imagesToDelete) {
+            const imagesToDelete = Array.isArray(req.body.imagesToDelete) ? req.body.imagesToDelete : [req.body.imagesToDelete];
+            
+            imagesToDelete.forEach(imageName => {
+                const imagePath = path.join(__dirname, "../public/uploads/re-image", imageName);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath); // Delete the image file from the 're-image' directory
+                }
+                // Remove the image from the product's image array
+                const index = product.productImages.indexOf(imageName);
+                if (index > -1) {
+                    product.productImages.splice(index, 1);
+                }
+            });
+        }
+
+        // Process new images uploaded
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => file.filename);
+            product.productImages.push(...newImages); // Add new images to the existing list
+        }
+
+        // Ensure there are at least 3 images in total
+        if (product.productImages.length < 3) {
+            return res.status(400).send('Please ensure there are at least three images in total.');
+        }
+
+        // Update the product with new data
+        product.productName = productName;
+        product.description = description;
+        product.brand = brand;
+        product.category = category;
+        product.regularPrice = regularPrice;
+        product.salePrice = salePrice;
+        product.weight = weight;
+        product.quantity = quantity;
+
+        // Save the updated product to the database
+        await product.save();
+
+        // Redirect to the product list or another appropriate page
+        res.redirect('/admin/products'); // Adjust the redirect path as needed
     } catch (error) {
-        console.error('Error updating category:', error);
-        res.status(500).send('Error updating category');
+        console.error('Error editing product:', error);
+        res.redirect('/pageerror');
     }
 };
+
 
 
 module.exports = {
     getProductAddPage,
     postAddProduct,
     getProducts,
-    getEditProduct
+    getEditProduct,
+    postEditProduct
 };
 
 

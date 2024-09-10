@@ -1,6 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 
 <h2 class="mt-4">Edit Product</h2>
 <form id="editProductForm" class="needs-validation" novalidate action="/admin/product/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
@@ -84,12 +84,14 @@
     <div id="imagePreviewContainer" class="form-row">
         <% product.productImages.forEach((image, index) => { %>
             <div class="col-md-3 mb-3">
-                <img src="/uploads/products/<%= image %>" class="img-preview mb-2" style="max-width: 100%;" alt="Product Image <%= index + 1 %>">
+                <img src="/uploads/re-image/<%= image %>" class="img-preview mb-2" style="max-width: 100%;" alt="Product Image <%= index + 1 %>">
                 <input type="hidden" name="existingImages[]" value="<%= image %>">
-                <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image="<%= image %>">Remove</button>
+                <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image="<%= image %>" aria-label="Remove image <%= index + 1 %>">Remove</button>
             </div>
         <% }); %>
     </div>
+    
+
     <div class="form-row">
         <div class="col-md-12 mb-3">
             <label for="productDescription">Description</label>
@@ -102,6 +104,6 @@
     <button id="submitProductBtn" class="btn btn-primary" type="submit">Update Product</button>
     <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
 </form>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script src="/js/adminJs/editProduct.js"></script>
 <%- include("../../views/partials/admin/footer") %>
