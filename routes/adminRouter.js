@@ -77,5 +77,6 @@ router.post('/product/edit/:id', adminAuth,upload.array('productImage', 5), prod
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);
                          // Soft delete product route
 router.get('/product/delete/:id',adminAuth, productController.softDeleteProduct);
-
+router.get('/product/block/:id',adminAuth,productController.blockProduct);
+router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
 module.exports = router

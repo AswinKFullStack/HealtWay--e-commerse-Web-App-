@@ -289,6 +289,32 @@ const softDeleteProduct = async (req, res) => {
 // };
 
 
+const unblockProduct = async (req, res) => {
+    const productId = req.params.id;
+    try {
+      await Product.findByIdAndUpdate(productId, { isBlocked: false });
+      res.redirect('/admin/products');
+    } catch (error) {
+      console.error('Error listing products:', error);
+      res.status(500).send('Error listing products');
+    }
+};
+  
+  // Change category status to 'Unlisted'
+const blockProduct = async (req, res) => {
+    const productId = req.params.id;
+    try {
+      await Product.findByIdAndUpdate(productId, { isBlocked: true });
+      res.redirect('/admin/products');
+    } catch (error) {
+      console.error('Error listing products:', error);
+      res.status(500).send('Error listing products');
+    }
+};
+
+
+
+
 
 
 module.exports = {
@@ -298,7 +324,9 @@ module.exports = {
     getEditProduct,
     postEditProduct,
     getProductDetails,
-    softDeleteProduct
+    softDeleteProduct,
+    blockProduct,
+    unblockProduct
 };
 
 
