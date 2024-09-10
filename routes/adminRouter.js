@@ -73,5 +73,6 @@ router.post('/addProduct', adminAuth, upload.array('productImage', 5), productCo
 router.get("/products",adminAuth,productController.getProducts);
 router.get('/product/edit/:id', adminAuth, productController.getEditProduct);
 router.post('/product/edit/:id', adminAuth,upload.array('productImage', 5), productController.postEditProduct);
-
+                        // Route to view product details
+router.get('/product/view/:id',adminAuth, productController.getProductDetails);
 module.exports = router

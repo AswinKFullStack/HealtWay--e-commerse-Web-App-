@@ -216,13 +216,36 @@ const postEditProduct = async (req, res) => {
 };
 
 
+const getProductDetails = async (req, res) => {
+    try {
+        const productId = req.params.id; // Get product ID from URL parameters
+
+        // Fetch the product details from the database
+        const product = await Product.findById(productId)
+            .populate('brand', 'brandName') // Populate brand data
+            .populate('category', 'name') // Populate category data
+            .exec();
+
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Render the product details view page
+        res.render('productView', { product });
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        res.redirect('/pageerror');
+    }
+};
+
 
 module.exports = {
     getProductAddPage,
     postAddProduct,
     getProducts,
     getEditProduct,
-    postEditProduct
+    postEditProduct,
+    getProductDetails
 };
 
 

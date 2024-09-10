@@ -1,0 +1,38 @@
+<%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="/css/adminCss/productView.css">
+
+<div class="container product-details-container">
+    <h2>Product Details</h2>
+
+    <div class="product-details-card">
+        <h5 class="card-title">Name: <%= product.productName %></h5>
+        <p class="card-text">Description: <%= product.description %></p>
+        <p class="card-text">Brand: <%= product.brand ? product.brand.brandName : 'N/A' %></p>
+        <p class="card-text">Category: <%= product.category ? product.category.name : 'N/A' %></p>
+        <p class="card-text">Regular Price: <%= product.regularPrice %></p>
+        <p class="card-text">Sale Price: <%= product.salePrice %></p>
+        <p class="card-text">Offer Price: <%= product.productOffer ? product.productOffer : 'No Offer' %></p>
+        <p class="card-text">Weight: <%= product.weight ? product.weight : 'N/A' %></p>
+        <p class="card-text">Quantity: <%= product.quantity %></p>
+        <p class="card-text">Status: <%= product.status %></p>
+        <p class="card-text">Created At: <%= new Date(product.createdAt).toLocaleDateString() %></p>
+    </div>
+
+    <!-- Display Product Images -->
+    <div class="row product-image-row">
+        <% if (product.productImages && product.productImages.length > 0) { %>
+            <% product.productImages.forEach(function(image) { %>
+                <div class="product-image-card">
+                    <img src="/uploads/re-image/<%= image %>" alt="Product Image">
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No images available</p>
+        <% } %>
+    </div>
+
+    <a href="/admin/products" class="btn btn-secondary mt-3">Back to Products</a>
+</div>
+
+<%- include("../../views/partials/admin/footer") %>
+
