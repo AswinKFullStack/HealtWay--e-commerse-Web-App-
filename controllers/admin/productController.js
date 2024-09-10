@@ -16,10 +16,11 @@ const getProducts = async (req, res) => {
         const searchTerm = req.query.search || '';
 
         // Build the search query based on the search term
-        let query = {};
+        let query = {isDeleted: false};
         if (searchTerm) {
             query = {
-                productName: { $regex: searchTerm, $options: 'i' }, // case-insensitive search
+                productName: { $regex: searchTerm, $options: 'i' },
+                 isDeleted: false // case-insensitive search
             };
         }
 
@@ -239,13 +240,65 @@ const getProductDetails = async (req, res) => {
 };
 
 
+const softDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+
+        // Find the product by ID and update the isDeleted field to true
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { isDeleted: true },
+            { new: true }
+        );
+
+        if (!product) {
+            return res.status(404).send('Product not found.');
+        }
+
+        // Redirect back to the product list page with a success message
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).send('An error occurred while deleting the product.');
+    }
+};
+
+
+
+//this is for restore the deleted product
+
+// const restoreProduct = async (req, res) => {
+//     try {
+//         const productId = req.params.id;
+
+//         const product = await Product.findByIdAndUpdate(
+//             productId,
+//             { isDeleted: false },
+//             { new: true }
+//         );
+
+//         if (!product) {
+//             return res.status(404).send('Product not found.');
+//         }
+
+//         res.redirect('/admin/products');
+//     } catch (error) {
+//         console.error('Error restoring product:', error);
+//         res.status(500).send('An error occurred while restoring the product.');
+//     }
+// };
+
+
+
+
 module.exports = {
     getProductAddPage,
     postAddProduct,
     getProducts,
     getEditProduct,
     postEditProduct,
-    getProductDetails
+    getProductDetails,
+    softDeleteProduct
 };
 
 

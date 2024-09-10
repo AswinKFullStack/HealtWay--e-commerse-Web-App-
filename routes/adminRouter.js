@@ -75,4 +75,7 @@ router.get('/product/edit/:id', adminAuth, productController.getEditProduct);
 router.post('/product/edit/:id', adminAuth,upload.array('productImage', 5), productController.postEditProduct);
                         // Route to view product details
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);
+                         // Soft delete product route
+router.get('/product/delete/:id',adminAuth, productController.softDeleteProduct);
+
 module.exports = router
