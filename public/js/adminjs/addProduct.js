@@ -100,14 +100,20 @@ document.getElementById('productImage').addEventListener('change', function(even
                         }
                         const croppedFile = new File([blob], `cropped_${file.name}`, { type: blob.type });
                         
-                        // You can now use `croppedFile` to upload or display the cropped image.
-                        console.log('Cropped image file:', croppedFile);
-                        
-                        // Optionally preview the cropped image
+                        // Remove any previously saved cropped image before adding the new one
+                        const previousCroppedImg = imgContainer.querySelector('.cropped-preview');
+                        if (previousCroppedImg) {
+                            imgContainer.removeChild(previousCroppedImg);
+                        }
+
+                        // Create a new image element for the cropped version
                         const croppedImgURL = URL.createObjectURL(croppedFile);
                         const previewImg = document.createElement('img');
                         previewImg.src = croppedImgURL;
                         previewImg.style.maxWidth = '200px';
+                        previewImg.classList.add('cropped-preview'); // Add a class to easily identify this element
+
+                        // Append the new cropped image
                         imgContainer.appendChild(previewImg);
                     });
                 });
