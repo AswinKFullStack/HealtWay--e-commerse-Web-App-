@@ -6,6 +6,44 @@ const fs = require("fs");
 const sharp = require('sharp');
 const path = require("path");
 
+//Loading Products list
+
+const getProducts = async (req, res) => {
+    try {
+        // Extract page and search query parameters from request
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3; // Number of products per page
+        const searchTerm = req.query.search || '';
+
+        // Build the search query based on the search term
+        let query = {};
+        if (searchTerm) {
+            query = {
+                productName: { $regex: searchTerm, $options: 'i' }, // case-insensitive search
+            };
+        }
+
+        // Find the total number of products for pagination
+        const totalProducts = await Product.countDocuments(query);
+
+        // Fetch the products with pagination and search
+        const products = await Product.find(query)
+            .populate('category')
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        // Render the product listing page with products, pagination, and search term
+        res.render('product-list', {
+            products,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit),
+            searchTerm,
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.redirect('/pageerror');
+    }
+};
 
 
 
@@ -92,9 +130,12 @@ const postAddProduct = async (req, res) => {
     }
 };
 
+
+
 module.exports = {
     getProductAddPage,
-    postAddProduct
+    postAddProduct,
+    getProducts
 };
 
 

@@ -69,5 +69,7 @@ router.get('/addProduct',adminAuth,productController.getProductAddPage);
 // Product management
 router.get('/addProduct', adminAuth, productController.getProductAddPage);
 router.post('/addProduct', adminAuth, upload.array('productImage', 5), productController.postAddProduct);
+                                //listing product
+router.get("/products",adminAuth,productController.getProducts);
 
 module.exports = router

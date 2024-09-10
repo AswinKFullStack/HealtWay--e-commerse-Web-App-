@@ -1,0 +1,85 @@
+<%- include("../../views/partials/admin/header") %>
+
+<link rel="stylesheet" href="/css/adminCss/customers.css">
+
+<h2 class="my-4">Product Management</h2>
+
+<!-- Search bar for products -->
+<div class="form-group mb-4">
+    <input type="text" class="form-control" id="searchProduct" placeholder="Search products" value="<%= searchTerm %>">
+</div>
+
+<!-- Product Table -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Image</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Sale Price</th>
+            <th>Offer Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% products.forEach(function(product) { %>
+            <tr>
+                <td><%= product.productName %></td>
+                <td>
+                    <% if (product.productImages && product.productImages.length > 0) { %>
+                        <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" width="50" height="50">
+                    <% } else { %>
+                        No image
+                    <% } %>
+                </td>
+                <td><%= product.brand %></td>
+                <td><%= product.category ? product.category.name : "N/A" %></td>
+                <td><%= product.salePrice %></td>
+                <td><%= product.productOffer %></td>
+                <td>
+                    <% if (product.isBlocked) { %>
+                        <span class="text-danger">Blocked</span>
+                    <% } else { %>
+                        <span class="text-success">Available</span>
+                    <% } %>
+                </td>
+                <td>
+                    <!-- Actions -->
+                    <button class="btn btn-primary btn-sm" onclick="location.href='/admin/product/edit/<%= product._id %>'">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="location.href='/admin/product/delete/<%= product._id %>'">
+                        <i class="bi bi-trash-fill"></i> Delete
+                    </button>
+                    <button class="btn btn-info btn-sm" onclick="location.href='/admin/product/view/<%= product._id %>'">
+                        <i class="bi bi-eye"></i> View
+                    </button>
+                    <% if (product.isBlocked) { %>
+                        <button class="btn btn-warning btn-sm" onclick="location.href='/admin/product/unblock/<%= product._id %>'">
+                            <i class="bi bi-unlock-fill"></i> Unblock
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-success btn-sm" onclick="location.href='/admin/product/block/<%= product._id %>'">
+                            <i class="bi bi-lock-fill"></i> Block
+                        </button>
+                    <% } %>
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>
+
+<!-- Pagination Controls -->
+<nav>
+    <ul class="pagination justify-content-center" id="paginationControls">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= encodeURIComponent(searchTerm) %>"><%= i %></a>
+            </li>
+        <% } %>
+    </ul>
+</nav>
+
+<script src="/js/adminJs/products.js"></script>
