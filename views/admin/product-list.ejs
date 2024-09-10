@@ -34,7 +34,8 @@
                         No image
                     <% } %>
                 </td>
-                <td><%= product.brand %></td>
+                
+                <td><%= product.brand ? product.brand.brandName : "N/A" %></td>
                 <td><%= product.category ? product.category.name : "N/A" %></td>
                 <td><%= product.salePrice %></td>
                 <td><%= product.productOffer %></td>
@@ -83,3 +84,10 @@
 </nav>
 
 <script src="/js/adminJs/products.js"></script>
+
+<script>
+    
+    
+    
+</script>
+

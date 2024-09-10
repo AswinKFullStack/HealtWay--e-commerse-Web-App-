@@ -28,10 +28,13 @@ const getProducts = async (req, res) => {
 
         // Fetch the products with pagination and search
         const products = await Product.find(query)
-            .populate('category')
-            .skip((page - 1) * limit)
-            .limit(limit);
-
+        .populate('category')
+        .populate('brand')
+        .skip((page - 1) * limit)
+        .limit(limit);
+      
+           
+        
         // Render the product listing page with products, pagination, and search term
         res.render('product-list', {
             products,

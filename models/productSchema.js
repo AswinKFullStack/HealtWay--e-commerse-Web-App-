@@ -12,7 +12,8 @@
         required:true
     },
     brand :{
-        type:String,
+        type:Schema.Types.ObjectId,
+        ref:"Brand",
         required:true
     },
     category:{
