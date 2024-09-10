@@ -3,7 +3,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
 const fs = require("fs");
-const shart = require("sharp");
+const sharp = require('sharp');
 const path = require("path");
 
 
@@ -25,6 +25,7 @@ const getProductAddPage = async (req,res)=>{
 
 const postAddProduct = async (req, res) => {
     try {
+        console.log( req.files.length ,"this in sider try") 
         // Validate that at least 3 images were uploaded
         if (!req.files || req.files.length < 3) {
             return res.status(400).send('Please upload at least three images.');
@@ -37,11 +38,36 @@ const postAddProduct = async (req, res) => {
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
             return res.status(400).send('All fields are required.');
         }
+        console.log("the conditon checked in try")
+        // Directory where processed images will be saved
+        const outputDir = path.join(__dirname, "../public/uploads/re-image");
 
-        // Process the images
-        const productImages = req.files.map(file => file.filename);
+        // Ensure the directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
 
-        // Create new product
+        // Array to store filenames of processed images
+        const productImages = [];
+        console.log("the conditon checked in array created for saving image")
+        // Process each image using sharp
+        for (const file of req.files) {
+            const outputFileName = `${Date.now()}_${file.originalname}`;
+
+            // Crop and resize the image using sharp
+            await sharp(file.path)
+                .resize(500, 500) // Resize to 500x500, you can adjust the size
+                .toFile(path.join(outputDir, outputFileName));
+
+            // Add the processed image to productImages array
+            productImages.push(outputFileName);
+             // Delay unlinking to ensure sharp is finished
+            
+        
+           
+        }
+
+        // Create new product with processed images
         const newProduct = new Product({
             productName,
             description,
@@ -51,14 +77,16 @@ const postAddProduct = async (req, res) => {
             salePrice,
             weight,
             quantity,
-            productImages
+            productImages // Save the processed image filenames
         });
 
         await newProduct.save();
 
+
         // Redirect to add product page after successful submission
         res.redirect('/admin/addProduct');
     } catch (error) {
+        console.log(req.files , req.files.length ,"this in sider catch") 
         console.error('Error adding product:', error);
         res.redirect('/pageerror');
     }

@@ -1,5 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <h2 class="mt-4">Add New Product</h2>
 <form id="addProductForm" class="needs-validation" novalidate action="/admin/addProduct" method="POST" enctype="multipart/form-data">
     <div class="form-row">
@@ -73,12 +74,16 @@
             </div>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="productImage">Product Images</label>
-            <input type="file" class="form-control-file" id="productImage" name="productImage" multiple required>
+            <label for="productImage">Product Images (min. 3)</label>
+            <input type="file" class="form-control-file" id="productImage" name="productImage" multiple required accept="image/*">
             <div class="invalid-feedback">
                 Please upload at least three product images.
             </div>
         </div>
+    </div>
+        <!-- Preview and cropping section -->
+    <div id="imagePreviewContainer" class="form-row">
+        <!-- Dynamically generated previews will be placed here -->
     </div>
     <div class="form-row">
         <div class="col-md-12 mb-3">
@@ -89,7 +94,7 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-primary" type="submit">Add Product</button>
+    <button id="submitProductBtn" class="btn btn-primary" type="submit">Add Product</button>
     <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
 </form>
 
