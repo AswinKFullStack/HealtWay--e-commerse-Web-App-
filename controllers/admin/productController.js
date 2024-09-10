@@ -88,26 +88,7 @@ const postAddProduct = async (req, res) => {
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
-        // Array to store filenames of processed images
-        // const productImages = [];
-        // console.log("the conditon checked in array created for saving image")
-        // // Process each image using sharp
-        // for (const file of req.files) {
-        //     const outputFileName = `${Date.now()}_${file.originalname}`;
-
-        //     // Crop and resize the image using sharp
-        //     await sharp(file.path)
-        //         .resize(500, 500) // Resize to 500x500, you can adjust the size
-        //         .toFile(path.join(outputDir, outputFileName));
-
-        //     // Add the processed image to productImages array
-        //     productImages.push(outputFileName);
-        //      // Delay unlinking to ensure sharp is finished
-            
-        
-           
-        // }
-
+       
 
           // Process the images
           const productImages = req.files.map(file => file.filename);
@@ -138,11 +119,51 @@ const postAddProduct = async (req, res) => {
 };
 
 
+// Get category data for editing
+// Get product data for editing
+const getEditProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        
+        // Fetch the product data by ID
+        const product = await Product.findById(productId).populate('category').populate('brand');
+        
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Fetch all categories and brands for the dropdown lists
+        const categories = await Category.find({});
+        const brands = await Brand.find({});
+
+        // Render the edit product page with product, categories, and brands data
+        res.render('editProduct', { product, categories, brands });
+    } catch (error) {
+        console.error('Error fetching product for editing:', error);
+        res.status(500).send('Error fetching product for editing');
+    }
+};
+
+
+// Handle category update
+const postEditProduct = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const { name, description, status } = req.body;
+        await Category.findByIdAndUpdate(categoryId, { name, description, status });
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.error('Error updating category:', error);
+        res.status(500).send('Error updating category');
+    }
+};
+
 
 module.exports = {
     getProductAddPage,
     postAddProduct,
-    getProducts
+    getProducts,
+    getEditProduct
 };
 
 

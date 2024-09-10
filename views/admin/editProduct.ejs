@@ -1,0 +1,107 @@
+<%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<h2 class="mt-4">Edit Product</h2>
+<form id="editProductForm" class="needs-validation" novalidate action="/admin/product/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label for="productName">Product Name</label>
+            <input type="text" class="form-control" id="productName" name="productName" value="<%= product.productName %>" required>
+            <div class="invalid-feedback">
+                Please provide a valid product name.
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="productCategory">Category</label>
+            <select class="custom-select" id="productCategory" name="category" required>
+                <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>" <%= product.category.equals(category._id) ? 'selected' : '' %>><%= category.name %></option>
+                <% }); %>
+            </select>
+            <div class="invalid-feedback">
+                Please select a valid category.
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label for="productBrand">Brand</label>
+            <select class="custom-select" id="productBrand" name="brand" required>
+                <% brands.forEach(brand => { %>
+                    <option value="<%= brand._id %>" <%= product.brand.equals(brand._id) ? 'selected' : '' %>><%= brand.brandName %></option>
+                <% }); %>
+            </select>
+            <div class="invalid-feedback">
+                Please provide a valid brand.
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="regularPrice">Regular Price</label>
+            <input type="number" class="form-control" id="regularPrice" name="regularPrice" value="<%= product.regularPrice %>" required>
+            <div class="invalid-feedback">
+                Please provide a valid regular price.
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label for="salePrice">Sale Price</label>
+            <input type="number" class="form-control" id="salePrice" name="salePrice" value="<%= product.salePrice %>" required>
+            <div class="invalid-feedback">
+                Please provide a valid sale price.
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="productQuantity">Quantity</label>
+            <input type="number" class="form-control" id="productQuantity" name="quantity" value="<%= product.quantity %>" required>
+            <div class="invalid-feedback">
+                Please select a valid quantity.
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label for="productWeight">Weight</label>
+            <select class="custom-select" id="productWeight" name="weight">
+                <option selected disabled value="">Choose weight...</option>
+                <option value="500g" <%= product.weight === '500g' ? 'selected' : '' %>>500g</option>
+                <option value="1000g (1kg)" <%= product.weight === '1000g (1kg)' ? 'selected' : '' %>>1000g (1kg)</option>
+            </select>
+            <div class="invalid-feedback">
+                Please select a valid weight.
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="productImage">Product Images (min. 3)</label>
+            <input type="file" class="form-control-file" id="productImage" name="productImage" multiple accept="image/*">
+            <div class="invalid-feedback">
+                Please upload at least three product images.
+            </div>
+        </div>
+    </div>
+    <!-- Preview and cropping section for existing and new images -->
+    <div id="imagePreviewContainer" class="form-row">
+        <% product.productImages.forEach((image, index) => { %>
+            <div class="col-md-3 mb-3">
+                <img src="/uploads/products/<%= image %>" class="img-preview mb-2" style="max-width: 100%;" alt="Product Image <%= index + 1 %>">
+                <input type="hidden" name="existingImages[]" value="<%= image %>">
+                <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image="<%= image %>">Remove</button>
+            </div>
+        <% }); %>
+    </div>
+    <div class="form-row">
+        <div class="col-md-12 mb-3">
+            <label for="productDescription">Description</label>
+            <textarea class="form-control" id="productDescription" name="description" rows="3" required><%= product.description %></textarea>
+            <div class="invalid-feedback">
+                Please provide a description.
+            </div>
+        </div>
+    </div>
+    <button id="submitProductBtn" class="btn btn-primary" type="submit">Update Product</button>
+    <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
+</form>
+
+<script src="/js/adminJs/editProduct.js"></script>
+<%- include("../../views/partials/admin/footer") %>

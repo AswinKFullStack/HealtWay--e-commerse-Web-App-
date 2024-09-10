@@ -71,5 +71,6 @@ router.get('/addProduct', adminAuth, productController.getProductAddPage);
 router.post('/addProduct', adminAuth, upload.array('productImage', 5), productController.postAddProduct);
                                 //listing product
 router.get("/products",adminAuth,productController.getProducts);
+router.get('/product/edit/:id', adminAuth, productController.getEditProduct);
 
 module.exports = router
