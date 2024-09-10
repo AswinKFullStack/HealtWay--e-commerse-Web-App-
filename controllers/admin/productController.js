@@ -111,7 +111,7 @@ const postAddProduct = async (req, res) => {
 
 
         // Redirect to add product page after successful submission
-        res.redirect('/admin/addProduct');
+        res.redirect('/admin/products');
     } catch (error) {
         console.log(req.files , req.files.length ,"this in sider catch") 
         console.error('Error adding product:', error);
