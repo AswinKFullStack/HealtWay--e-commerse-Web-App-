@@ -89,24 +89,28 @@ const postAddProduct = async (req, res) => {
         }
 
         // Array to store filenames of processed images
-        const productImages = [];
-        console.log("the conditon checked in array created for saving image")
-        // Process each image using sharp
-        for (const file of req.files) {
-            const outputFileName = `${Date.now()}_${file.originalname}`;
+        // const productImages = [];
+        // console.log("the conditon checked in array created for saving image")
+        // // Process each image using sharp
+        // for (const file of req.files) {
+        //     const outputFileName = `${Date.now()}_${file.originalname}`;
 
-            // Crop and resize the image using sharp
-            await sharp(file.path)
-                .resize(500, 500) // Resize to 500x500, you can adjust the size
-                .toFile(path.join(outputDir, outputFileName));
+        //     // Crop and resize the image using sharp
+        //     await sharp(file.path)
+        //         .resize(500, 500) // Resize to 500x500, you can adjust the size
+        //         .toFile(path.join(outputDir, outputFileName));
 
-            // Add the processed image to productImages array
-            productImages.push(outputFileName);
-             // Delay unlinking to ensure sharp is finished
+        //     // Add the processed image to productImages array
+        //     productImages.push(outputFileName);
+        //      // Delay unlinking to ensure sharp is finished
             
         
            
-        }
+        // }
+
+
+          // Process the images
+          const productImages = req.files.map(file => file.filename);
 
         // Create new product with processed images
         const newProduct = new Product({
