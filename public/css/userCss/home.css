@@ -34,26 +34,6 @@
     color: #e74c3c;
 }
 
-/* Footer Styles */
-footer {
-    background-color: #E0F4D2;
-}
-
-footer .text-uppercase {
-    font-weight: bold;
-}
-
-footer .text-dark {
-    color: #343a40;
-}
-
-footer .list-unstyled {
-    padding-left: 0;
-}
-
-footer .list-unstyled li {
-    margin-bottom: 0.5rem;
-}
 
 .card-body a.custom-link {
     color: #000; /* Replace with your desired color */
