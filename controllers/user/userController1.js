@@ -22,74 +22,71 @@ const pageNotFound = async (req,res)=>{
 
 const loadHomepage = async (req, res) => {
     try {
-      const user = req.session.user;
-      const userData = await User.findOne({ _id: user });
-  
-      // For "Our Products"
-      const productPage = parseInt(req.query.productPage) || 1;
-      const productLimit = 3; // Number of products per page
-      const searchTerm = req.query.search || '';
-  
-      let productQuery = { isDeleted: false };
-      if (searchTerm) {
-        productQuery = {
-          productName: { $regex: searchTerm, $options: 'i' },
-          isDeleted: false,
-        };
-      }
-  
-      // Fetch paginated "Our Products"
-      const totalProducts = await Product.countDocuments(productQuery);
-      const products = await Product.find(productQuery)
-        .populate('category')
-        .populate('brand')
-        .skip((productPage - 1) * productLimit)
-        .limit(productLimit);
-  
-      // For Categories - We will paginate products for each category
-      const categories = await Category.find(); // Fetch all categories
-      let categoryProducts = {};
-  
-      for (let category of categories) {
-        const categoryPage = parseInt(req.query[`categoryPage_${category._id}`]) || 1;
-        const categoryLimit = 3; // Number of products per page per category
-  
-        const categoryQuery = {
-          category: category._id,
-          isDeleted: false,
-        };
-  
-        const totalCategoryProducts = await Product.countDocuments(categoryQuery);
-        const productsInCategory = await Product.find(categoryQuery)
-          .populate('category')
-          .populate('brand')
-          .skip((categoryPage - 1) * categoryLimit)
-          .limit(categoryLimit);
-  
-        categoryProducts[category.name] = {
-          products: productsInCategory,
-          currentPage: categoryPage,
-          totalPages: Math.ceil(totalCategoryProducts / categoryLimit),
-        };
-      }
-  
-      // Render the homepage with paginated products and category products
-      res.render("home", {
-        user: userData,
-        products, // Our Products
-        productCurrentPage: productPage,
-        productTotalPages: Math.ceil(totalProducts / productLimit),
-        searchTerm,
-        categories,
-        categoryProducts,
-        title: 'Home Page'  // Paginated products for each category
-      });
+        const user = req.session.user;
+        const userData = await User.findOne({ _id: user });
+
+        // For "Our Products"
+        const productPage = parseInt(req.query.productPage) || 1;
+        const productLimit = 3; // Number of products per page
+        const searchTerm = req.query.search || '';
+
+        let productQuery = { isDeleted: false };
+        if (searchTerm) {
+            productQuery = {
+                productName: { $regex: searchTerm, $options: 'i' },
+                isDeleted: false,
+            };
+        }
+
+        // Fetch paginated "Our Products"
+        const totalProducts = await Product.countDocuments(productQuery);
+        const products = await Product.find(productQuery)
+            .populate('category')
+            .populate('brand')
+            .skip((productPage - 1) * productLimit)
+            .limit(productLimit);
+
+        // For Categories - We will paginate products for each category
+        const categories = await Category.find();
+        const categoryProducts = {};
+
+        const categoryPromises = categories.map(async (category) => {
+            const categoryPage = parseInt(req.query[`categoryPage_${category._id}`]) || 1;
+            const categoryLimit = 3;
+            const categoryQuery = { category: category._id, isDeleted: false };
+
+            const productsInCategory = await Product.find(categoryQuery)
+                .populate('category')
+                .populate('brand')
+                .skip((categoryPage - 1) * categoryLimit)
+                .limit(categoryLimit);
+
+            categoryProducts[category._id] = {
+                products: productsInCategory,
+                currentPage: categoryPage,
+                totalPages: Math.ceil(await Product.countDocuments(categoryQuery) / categoryLimit),
+            };
+        });
+
+        await Promise.all(categoryPromises);
+
+        // Render the homepage with paginated products and category products
+        res.render("home", {
+            user: userData,
+            products, // Our Products
+            productCurrentPage: productPage,
+            productTotalPages: Math.ceil(totalProducts / productLimit),
+            searchTerm,
+            categories,
+            categoryProducts,
+            title: 'Home Page'  // Paginated products for each category
+        });
     } catch (error) {
-      console.log("Home page not found", error);
-      res.status(500).send("Server error");
+        console.log("Home page not found", error);
+        res.status(500).send("Server error");
     }
-  };
-  
+};
+
 
 const loadSignup = async(req,res)=>{
     try{

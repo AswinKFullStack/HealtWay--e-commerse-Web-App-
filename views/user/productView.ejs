@@ -18,9 +18,18 @@
   .product-image:hover .zoom-img {
     cursor: zoom-in;
   }
+  .card-body a.custom-link {
+    color: #000; /* Replace with your desired color */
+    text-decoration: none;
+}
+
+.card-body a.custom-link:hover {
+    color: #000; /* Maintain color on hover */
+}
+
 </style>
 
-<title><%= product && product.productName ? product.productName : 'Product' %> Details</title>
+<title><%= product ? product.productName : 'Product' %> | My E-Commerce Store</title>
 <link rel="stylesheet" href="/css/userCss/productView.css">
 
 <!-- Product Details -->
@@ -97,12 +106,14 @@
       </p>
 
       <!-- Add to Cart and Wishlist Buttons -->
-      <% if (product && product._id) { %>
-        <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
-        <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-          <i class="bi bi-heart"></i> Add to Wishlist
-        </button>
-      <% } %>
+<% if (product && product._id) { %>
+    <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+    <button class="btn btn-success" onclick="location.href='/product/buyNow/<%= product._id %>'">Buy Now</button>
+    <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+        <i class="bi bi-heart"></i> Add to Wishlist
+    </button>
+<% } %>
+
     </div>
   </div>
 
@@ -127,6 +138,61 @@
     <% } %>
   </div>
 </div>
+
+<!-- Related Products Section -->
+<div class="container mt-4">
+    <h2 class="text-center">Related Products</h2>
+    <div class="row">
+        <% if (relatedProducts.length === 0) { %>
+            <div class="alert alert-warning">No related products found.</div>
+        <% } %>
+        
+        <% relatedProducts.forEach(function(product) { %> 
+        <div class="col-md-4">
+            <div class="card position-relative">
+                <% if (product.productImages && product.productImages.length > 0) { %>
+                <a href="/product/view/<%= product._id %>">
+                    <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
+                </a>
+                <% } else { %>
+                <a href="/product/view/<%= product._id %>">
+                    <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
+                </a>
+                <% } %>
+
+                <div class="position-absolute top-0 end-0 p-2">
+                    <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body">
+                    <a href="/product/view/<%= product._id %>" class="custom-link">
+                        <h5 class="card-title"><%= product.productName %></h5>
+                    </a>
+                    
+                    <p class="card-text">₹<%= product.salePrice %></p>
+                    <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+
+    <!-- Pagination for Related Products -->
+    <div class="container text-center mt-4">
+        <nav aria-label="Related Products Page navigation">
+            <ul class="pagination justify-content-center">
+                <% for (let i = 1; i <= relatedProductTotalPages; i++) { %>
+                <li class="page-item <%= relatedProductCurrentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?relatedPage=<%= i %>"><%= i %></a>
+                </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
+</div>
+
 
 <script>
   function changeImage(image) {

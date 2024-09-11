@@ -54,3 +54,12 @@ footer .list-unstyled {
 footer .list-unstyled li {
     margin-bottom: 0.5rem;
 }
+
+.card-body a.custom-link {
+    color: #000; /* Replace with your desired color */
+    text-decoration: none;
+}
+
+.card-body a.custom-link:hover {
+    color: #000; /* Maintain color on hover */
+}

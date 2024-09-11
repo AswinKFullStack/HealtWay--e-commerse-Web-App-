@@ -14,35 +14,39 @@
 <div class="container mt-4">
     <h2 class="text-center">Our Products</h2>
     <div class="row">
-        <% products.forEach(function(product) { %> 
-        <div class="col-md-4">
-            <div class="card position-relative">
-                <% if (product.productImages && product.productImages.length > 0) { %>
-                <a href="/product/view/<%= product._id %>">
-                    <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
-                </a>
-                <% } else { %>
-                <a href="/product/view/<%= product._id %>">
-                    <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
-                </a>
-                <% } %>
+        <% if (products.length === 0) { %>
+            <div class="alert alert-warning">No products found for your search.</div>
+        <% } else { %>
+            <% products.forEach(function(product) { %> 
+            <div class="col-md-4 mb-4">
+                <div class="card position-relative">
+                    <% if (product.productImages && product.productImages.length > 0) { %>
+                        <a href="/product/view/<%= product._id %>">
+                            <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
+                        </a>
+                    <% } else { %>
+                        <a href="/product/view/<%= product._id %>">
+                            <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
+                        </a>
+                    <% } %>
 
-                <div class="position-absolute top-0 end-0 p-2">
-                    <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-                        <i class="bi bi-heart"></i>
-                    </button>
-                </div>
-                
-                <div class="card-body">
-                    <a href="/product/view/<%= product._id %>">
-                        <h5 class="card-title"><%= product.productName %></h5>
-                    </a>
-                    <p class="card-text">₹<%= product.salePrice %></p>
-                    <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="card-body">
+                        <a href="/product/view/<%= product._id %>" class="custom-link">
+                            <h5 class="card-title"><%= product.productName %></h5>
+                        </a>
+                        <p class="card-text">₹<%= product.salePrice %></p>
+                        <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <% }); %>
+            <% }); %>
+        <% } %>
     </div>
 </div>
 
@@ -51,9 +55,9 @@
     <nav aria-label="Product Page navigation">
         <ul class="pagination justify-content-center">
             <% for (let i = 1; i <= productTotalPages; i++) { %>
-            <li class="page-item <%= productCurrentPage === i ? 'active' : '' %>">
-                <a class="page-link" href="?productPage=<%= i %>&search=<%= searchTerm %>"><%= i %></a>
-            </li>
+                <li class="page-item <%= productCurrentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?productPage=<%= i %>&search=<%= searchTerm %>"><%= i %></a>
+                </li>
             <% } %>
         </ul>
     </nav>
@@ -63,40 +67,48 @@
 <div class="container my-5">
     <h2 class="text-center">Product Categories</h2>
 
-    <% Object.keys(categoryProducts).forEach(function(categoryName) { %>
-        <h3 class="my-4"><%= categoryName %></h3>
+    <% categories.forEach(function(category) { %>
+        <h3 class="my-4"><%= category.name %></h3>
         <div class="row">
-            <% categoryProducts[categoryName].products.forEach(function(product) { %>
-            <div class="col-md-4">
-                <div class="card position-relative">
-                    <a href="/product/view/<%= product._id %>">
-                        <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %> Image">
-                    </a>
-                    <div class="position-absolute top-0 end-0 p-2">
-                        <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-                            <i class="bi bi-heart"></i>
-                        </button>
+            <% const catProducts = categoryProducts[category._id]; %>
+            <% if (catProducts && catProducts.products.length > 0) { %>
+                <% catProducts.products.forEach(function(product) { %>
+                    <div class="col-md-4 mb-4">
+                        <div class="card position-relative">
+                            <a href="/product/view/<%= product._id %>">
+                                <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %> Image">
+                            </a>
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <a href="/product/view/<%= product._id %>" class="custom-link">
+                                    <h5 class="card-title"><%= product.productName %></h5>
+                                </a>
+                                
+                                <p class="card-text">₹<%= product.salePrice %></p>
+                                <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <a href="/product/view/<%= product._id %>">
-                            <h5 class="card-title"><%= product.productName %></h5>
-                        </a>
-                        <p class="card-text">₹<%= product.salePrice %></p>
-                        <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
-                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="col-12">
+                    <div class="alert alert-warning">No products found for this category.</div>
                 </div>
-            </div>
-            <% }); %>
+            <% } %>
         </div>
 
         <!-- Pagination for each category -->
         <div class="container text-center mt-4">
             <nav aria-label="Category Page navigation">
                 <ul class="pagination justify-content-center">
-                    <% for (let i = 1; i <= categoryProducts[categoryName].totalPages; i++) { %>
-                    <li class="page-item <%= categoryProducts[categoryName].currentPage === i ? 'active' : '' %>">
-                        <a class="page-link" href="?categoryPage_<%= categoryProducts[categoryName].currentPage %>=<%= i %>"><%= i %></a>
-                    </li>
+                    <% for (let i = 1; i <= catProducts.totalPages; i++) { %>
+                        <li class="page-item <%= catProducts.currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?categoryPage_<%= category._id %>=<%= i %>"><%= i %></a>
+                        </li>
                     <% } %>
                 </ul>
             </nav>
