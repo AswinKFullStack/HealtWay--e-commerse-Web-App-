@@ -121,8 +121,8 @@ async function sendVerificationEmail(email, otp) {
             from: process.env.NODEMAILER_EMAIL,
             to: email,
             subject: "Verify your account",
-            text: `Your OTP is ${otp}`,
-            html: `<b>Your OTP: ${otp}</b>`
+            text: `Your OTP is ${otp}. This OTP will expire in 90 seconds.`,
+            html: `<b>Your OTP: ${otp}</b><br><small>This OTP will expire in 90 seconds.</small>`
         });
 
         return info.accepted.length > 0;
@@ -153,17 +153,22 @@ const signup = async (req, res) => {
         }
 
         const otp = generateOtp();
+        const otpExpiresAt = Date.now() + 90 * 1000; // OTP expires in 90 seconds
         const emailSent = await sendVerificationEmail(email, otp);
+       
+        
         if (!emailSent) {
             return res.render("signup", {
                 message: "Error sending OTP",
                 title: 'SignUp Page'
             });
         }
-
+        
         req.session.userOtp = otp;
+        req.session.otpExpiresAt = otpExpiresAt;
         req.session.userData = { name, phone, email, password };
         res.render("verify-otp");
+        console.log("OTP Sent ",otp);
     } catch (error) {
         console.error("Signup error", error);
         renderErrorPage(res, 500, "Signup Error", "An unexpected error occurred during signup.", '/signup');
@@ -184,6 +189,15 @@ const securePassword = async (password) => {
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
+        const currentTime = Date.now();
+        if (currentTime > req.session.otpExpiresAt) {
+            // OTP has expired
+            return res.status(400).json({
+                success: false,
+                message: "OTP Expired",
+                description: "The OTP has expired. Please request a new one."
+            });
+        }
 
         if (otp === req.session.userOtp) {
             const user = req.session.userData;
@@ -229,8 +243,12 @@ const resendOtp = async (req, res) => {
         }
 
         const otp = generateOtp();
+        const otpExpiresAt = Date.now() + 90 * 1000; // Reset expiration time
         req.session.userOtp = otp;
+        req.session.otpExpiresAt = otpExpiresAt; // Store new expiration time
         const emailSent = await sendVerificationEmail(email, otp);
+        console.log("OTP RE-Sent ",otp)
+      
         if (emailSent) {
             res.status(200).json({ success: true });
         } else {

@@ -1,61 +1,61 @@
 const User = require("../models/userSchema");
 
+// Centralized error rendering function
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
+    res.status(errorCode).render('admin-error-page', {
+        errorCode,
+        errorMessage,
+        errorDescription,
+        backLink
+    });
+};
 
-//User authentication
-const userAuth = (req,res,next)=>{
-    if(req.session.user){
-        User.findById(req.session.user)
-        .then(data=>{
-            if(data && !data.isBlocked){
-                console.log("authentication success");
-                
-                next();
-            }else{
-                console.log("Authentication failed");
-                res.redirect("/login");
+// User authentication middleware
+const userAuth = async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            const user = await User.findById(req.session.user);
+
+            if (user && !user.isBlocked) {
+                console.log("User authentication successful");
+                return next();
+            } else {
+                console.log("User authentication failed: Blocked or not found");
+                return renderErrorPage(res, 401, "Unauthorized", "Access denied. Please login.", "/login");
             }
-        }).catch(error =>{
-            console.log("Error in user Authentication middleware ");
-            res.status(500).send("Internal Server error")
-            
-        })
-    }else{
-        console.log("session not found");
-                res.redirect("/login");
+        } else {
+            console.log("Session not found");
+            return renderErrorPage(res, 401, "Unauthorized", "Session expired. Please login again.", "/login");
+        }
+    } catch (error) {
+        console.error("Error during user authentication:", error);
+        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during authentication.", "/");
     }
-}
+};
 
+// Admin authentication middleware
+const adminAuth = async (req, res, next) => {
+    try {
+        if (req.session.admin) {
+            const admin = await User.findOne({ _id: req.session.admin, isAdmin: true });
 
-//admin authentication
-
-const adminAuth = (req,res,next)=>{
-    if(req.session.admin){
-        User.findOne({isAdmin:true,_id:req.session.admin})
-        .then(data=>{
-            if(data){
-                console.log("Admin authentication success");
-                
-                next();
-            }else{
-                console.log("Admin Authentication failed");
-                res.redirect("/admin/login");
+            if (admin) {
+                console.log("Admin authentication successful");
+                return next();
+            } else {
+                console.log("Admin authentication failed");
+                return renderErrorPage(res, 401, "Unauthorized", "Admin access denied. Please login.", "/admin/login");
             }
-        }).catch(error =>{
-            console.log("Error in Admin Authentication middleware ");
-            res.status(500).send("Internal Server error")
-            
-        })
-    }else {
-        res.status(403).render('admin-error-page', {
-            errorCode: 403,
-            errorMessage: "Forbidden",
-            errorDescription: "You don't have permission to access this page."
-        });
+        } else {
+            return renderErrorPage(res, 403, "Forbidden", "You don't have permission to access this page.", "/admin/login");
+        }
+    } catch (error) {
+        console.error("Error during admin authentication:", error);
+        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during admin authentication.", "/admin/login");
     }
-
-}
+};
 
 module.exports = {
     userAuth,
-    adminAuth  
-}
+    adminAuth
+};
