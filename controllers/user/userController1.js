@@ -1,4 +1,7 @@
+const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
+const Product = require("../../models/productSchema");
+const Brand = require("../../models/brandSchema");
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -13,24 +16,79 @@ const pageNotFound = async (req,res)=>{
     }
 }
 
-const loadHomepage = async (req,res)=>{
-    try{
-        const user = req.session.user;
-        if(user){
-            
-            const userData = await User.findOne({_id:user});
-            res.render("home",{user:userData})
-            console.log("User in home page with session, req.session.user =",req.session.user)
-            console.log("User details :", userData)
-        }else{
-            return res.render("home");
-        }
-        
-    }catch(error){
-        console.log("Home page not found");
-        res.status(500).send("Server error");
+      
+
+
+
+const loadHomepage = async (req, res) => {
+    try {
+      const user = req.session.user;
+      const userData = await User.findOne({ _id: user });
+  
+      // For "Our Products"
+      const productPage = parseInt(req.query.productPage) || 1;
+      const productLimit = 3; // Number of products per page
+      const searchTerm = req.query.search || '';
+  
+      let productQuery = { isDeleted: false };
+      if (searchTerm) {
+        productQuery = {
+          productName: { $regex: searchTerm, $options: 'i' },
+          isDeleted: false,
+        };
+      }
+  
+      // Fetch paginated "Our Products"
+      const totalProducts = await Product.countDocuments(productQuery);
+      const products = await Product.find(productQuery)
+        .populate('category')
+        .populate('brand')
+        .skip((productPage - 1) * productLimit)
+        .limit(productLimit);
+  
+      // For Categories - We will paginate products for each category
+      const categories = await Category.find(); // Fetch all categories
+      let categoryProducts = {};
+  
+      for (let category of categories) {
+        const categoryPage = parseInt(req.query[`categoryPage_${category._id}`]) || 1;
+        const categoryLimit = 3; // Number of products per page per category
+  
+        const categoryQuery = {
+          category: category._id,
+          isDeleted: false,
+        };
+  
+        const totalCategoryProducts = await Product.countDocuments(categoryQuery);
+        const productsInCategory = await Product.find(categoryQuery)
+          .populate('category')
+          .populate('brand')
+          .skip((categoryPage - 1) * categoryLimit)
+          .limit(categoryLimit);
+  
+        categoryProducts[category.name] = {
+          products: productsInCategory,
+          currentPage: categoryPage,
+          totalPages: Math.ceil(totalCategoryProducts / categoryLimit),
+        };
+      }
+  
+      // Render the homepage with paginated products and category products
+      res.render("home", {
+        user: userData,
+        products, // Our Products
+        productCurrentPage: productPage,
+        productTotalPages: Math.ceil(totalProducts / productLimit),
+        searchTerm,
+        categories,
+        categoryProducts, // Paginated products for each category
+      });
+    } catch (error) {
+      console.log("Home page not found", error);
+      res.status(500).send("Server error");
     }
-}
+  };
+  
 
 const loadSignup = async(req,res)=>{
     try{

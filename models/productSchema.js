@@ -61,7 +61,7 @@
         default:"Available"
     },
 },
-{timestampe:true}
+{timestamps:true}
 );
 
 const Product = mongoose.model("Product",productSchema);
