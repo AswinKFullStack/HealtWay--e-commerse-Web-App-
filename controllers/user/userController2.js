@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const loadLogin = async (req,res)=>{
     try {
         if(!req.session.user){
-            return res.render("login");
+            return res.render("login" ,{title: 'Login Page'});
         }else{
             res.redirect("/");
         }
@@ -27,15 +27,15 @@ const login = async (req,res)=>{
         if(!findUser){
             
             console.log("user not finding");
-            return res.render("login",{message:"User not found"})
+            return res.render("login",{message:"User not found",title: 'Login Page'})
         }if(findUser.isBlocked){
             console.log("is blokect");
-            return res.render("login",{message:"User is blocked by admin"})
+            return res.render("login",{message:"User is blocked by admin",title: 'Login Page'})
         }
         const passwordMatch = await bcrypt.compare(password,findUser.password);
         if(!passwordMatch){
             console.log("password not matching");
-            return res.render("login",{message:"Incorret Password"})
+            return res.render("login",{message:"Incorret Password" , title: 'Login Page' })
         }
         req.session.user=findUser._id;
         res.redirect("/");
@@ -43,7 +43,7 @@ const login = async (req,res)=>{
     } catch (error) {
         console.error("Login error",error)
         console.log("inside catch");
-        res.render("Login",{message:"Login failed .Please try again later"})  
+        res.render("Login",{message:"Login failed .Please try again later" ,title: 'Login Page'})  
     }
 }
 

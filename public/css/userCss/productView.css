@@ -1,0 +1,52 @@
+.price {
+    font-size: 1.5rem;
+    color: #28a745;
+}
+
+.description {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.delivery-details {
+    margin-bottom: 20px;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px; /* Added gap between cards */
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+
+/* Related Products Section Styles */
+.related-products {
+    background-color: #f8f9fa; /* Light change to background color */
+    padding: 30px 0; /* Added gap to top and bottom */
+}

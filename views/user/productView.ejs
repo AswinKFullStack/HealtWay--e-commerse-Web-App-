@@ -1,0 +1,155 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+  /* Container for the image with zoom functionality */
+  .product-image {
+    position: relative;
+    width: 100%; /* Ensure the image container takes full width */
+    overflow: hidden; /* Hide the part of the image that overflows */
+  }
+
+  /* Zoomed image styling */
+  .zoom-img {
+    transition: transform 0.3s ease;
+    width: 100%;
+  }
+
+  /* Image zoom on hover */
+  .product-image:hover .zoom-img {
+    cursor: zoom-in;
+  }
+</style>
+
+<title><%= product && product.productName ? product.productName : 'Product' %> Details</title>
+<link rel="stylesheet" href="/css/userCss/productView.css">
+
+<!-- Product Details -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      <!-- Image with Zoom functionality -->
+      <div class="product-image">
+        <% if (product && product.productImages && product.productImages.length > 0) { %>
+          <img id="mainImage" src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %>" class="img-fluid zoom-img" style="width: 100%;">
+        <% } else { %>
+          <img src="/images/default-product.png" alt="No Image Available" class="img-fluid zoom-img" style="width: 100%;">
+        <% } %>
+      </div>
+
+      <!-- Additional images (thumbnail view) -->
+      <% if (product && product.productImages && product.productImages.length > 1) { %>
+        <div class="row mt-2">
+          <% product.productImages.forEach(function(image) { %>
+            <div class="col-3">
+              <img src="/uploads/re-image/<%= image %>" class="img-thumbnail" alt="Product Image" onclick="changeImage('<%= image %>')">
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="col-md-6">
+      <!-- Product Title and Rating -->
+      <h2><%= product && product.productName ? product.productName : 'Unnamed Product' %></h2>
+
+      <!-- Ratings -->
+      <% if (product && product.ratings) { %>
+        <div class="rating">
+          <span class="text-warning">
+            <% for(let i = 0; i < product.ratings; i++) { %>
+              <i class="bi bi-star-fill"></i>
+            <% } %>
+            <% for(let i = product.ratings; i < 5; i++) { %>
+              <i class="bi bi-star"></i>
+            <% } %>
+          </span>
+          <span>(<%= product.reviews ? product.reviews.length : 0 %> Reviews)</span>
+        </div>
+      <% } else { %>
+        <p>No ratings available</p>
+      <% } %>
+
+      <!-- Price, Discounts, and Coupons -->
+      <p class="price mt-3">
+        <% if (product && product.salePrice) { %>
+          <span class="text-danger">₹<%= product.salePrice %></span>
+          <% if (product.regularPrice) { %>
+            <del>₹<%= product.regularPrice %></del>
+          <% } %>
+        <% } else { %>
+          <span>Price not available</span>
+        <% } %>
+      </p>
+
+      <% if (product && product.productOffer) { %>
+        <p class="text-success">Discount Applied: <%= product.productOffer %>%</p>
+      <% } %>
+
+      <!-- Stock Information -->
+      <p class="stock-status">
+        <% if (product && product.status === 'Available') { %>
+          In Stock
+        <% } else if (product.status === 'Out of stock') { %>
+          Out of Stock
+        <% } else { %>
+          Discontinued
+        <% } %>
+      </p>
+
+      <!-- Add to Cart and Wishlist Buttons -->
+      <% if (product && product._id) { %>
+        <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+        <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+          <i class="bi bi-heart"></i> Add to Wishlist
+        </button>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="reviews mt-5">
+    <h4>Customer Reviews</h4>
+    <% if (product && product.reviews && product.reviews.length > 0) { %>
+      <% product.reviews.forEach(function(review) { %>
+        <div class="review">
+          <p><strong><%= review.user ? review.user : 'Anonymous' %></strong>: <%= review.comment ? review.comment : 'No comments' %></p>
+          <p>Rating:
+            <span class="text-warning">
+              <% for(let i = 0; i < review.rating; i++) { %>
+                <i class="bi bi-star-fill"></i>
+              <% } %>
+            </span>
+          </p>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No reviews yet.</p>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  function changeImage(image) {
+    document.getElementById('mainImage').src = '/uploads/re-image/' + image;
+  }
+
+  const productImage = document.querySelector('.product-image');
+  const zoomImage = document.querySelector('.zoom-img');
+
+  productImage.addEventListener('mousemove', function(e) {
+    const x = e.clientX - productImage.offsetLeft;
+    const y = e.clientY - productImage.offsetTop;
+
+    const xPercent = (x / productImage.offsetWidth) * 100;
+    const yPercent = (y / productImage.offsetHeight) * 100;
+
+    zoomImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+    zoomImage.style.transform = 'scale(2.5)'; // Adjust the scale for the zoom effect
+  });
+
+  productImage.addEventListener('mouseleave', function() {
+    zoomImage.style.transform = 'scale(1)'; // Reset the zoom when the mouse leaves
+  });
+</script>
+
+<%- include("../../views/partials/user/footer") %>

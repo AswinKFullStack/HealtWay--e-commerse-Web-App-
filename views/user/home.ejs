@@ -18,9 +18,13 @@
         <div class="col-md-4">
             <div class="card position-relative">
                 <% if (product.productImages && product.productImages.length > 0) { %>
-                <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
+                <a href="/product/view/<%= product._id %>">
+                    <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
+                </a>
                 <% } else { %>
-                <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
+                <a href="/product/view/<%= product._id %>">
+                    <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
+                </a>
                 <% } %>
 
                 <div class="position-absolute top-0 end-0 p-2">
@@ -30,7 +34,9 @@
                 </div>
                 
                 <div class="card-body">
-                    <h5 class="card-title"><%= product.productName %></h5>
+                    <a href="/product/view/<%= product._id %>">
+                        <h5 class="card-title"><%= product.productName %></h5>
+                    </a>
                     <p class="card-text">₹<%= product.salePrice %></p>
                     <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
                 </div>
@@ -63,14 +69,18 @@
             <% categoryProducts[categoryName].products.forEach(function(product) { %>
             <div class="col-md-4">
                 <div class="card position-relative">
-                    <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %> Image">
+                    <a href="/product/view/<%= product._id %>">
+                        <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %> Image">
+                    </a>
                     <div class="position-absolute top-0 end-0 p-2">
                         <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
                             <i class="bi bi-heart"></i>
                         </button>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title"><%= product.productName %></h5>
+                        <a href="/product/view/<%= product._id %>">
+                            <h5 class="card-title"><%= product.productName %></h5>
+                        </a>
                         <p class="card-text">₹<%= product.salePrice %></p>
                         <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
                     </div>
@@ -95,5 +105,6 @@
 </div>
 
 <%- include("../../views/partials/user/footer") %>
+
 
 

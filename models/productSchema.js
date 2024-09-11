@@ -46,6 +46,18 @@
         required:true
 
     },
+    coupons: [{        // Added coupons field, referencing Coupon collection
+        type: Schema.Types.ObjectId,
+        ref: "Coupon"
+    }],
+    ratings: {         // Added ratings field, storing average rating
+        type: Number,
+        default: 0
+    },
+    reviews: [{        // Added coupons field, referencing Coupon collection
+        type: Schema.Types.ObjectId,
+        ref: "Review"
+    }], // Embedded review schema
     isBlocked:{
         type:Boolean,
         default:false

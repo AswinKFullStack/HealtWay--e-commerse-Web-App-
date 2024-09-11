@@ -81,7 +81,8 @@ const loadHomepage = async (req, res) => {
         productTotalPages: Math.ceil(totalProducts / productLimit),
         searchTerm,
         categories,
-        categoryProducts, // Paginated products for each category
+        categoryProducts,
+        title: 'Home Page'  // Paginated products for each category
       });
     } catch (error) {
       console.log("Home page not found", error);
@@ -92,7 +93,7 @@ const loadHomepage = async (req, res) => {
 
 const loadSignup = async(req,res)=>{
     try{
-        return res.render("signup");
+        return res.render("signup",{ title: 'SignUp Page' });
     }catch(error){
         console.log("Login page is not found",error);
         res.status(500).send("Server error");
@@ -135,11 +136,11 @@ const signup = async (req,res)=>{
        
         const {name,email,phone,password,confirmPassword} = req.body;
         if(password !== confirmPassword){
-            return res.render("signup",{message:"Password do not match"});
+            return res.render("signup",{message:"Password do not match" , title: 'SignUp Page' });
         }
         const findUser = await User.findOne({email});
         if(findUser){
-            return res.render("signup",{message:"User with email already exists"});
+            return res.render("signup",{message:"User with email already exists", title: 'SignUp Page' });
         }
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email,otp);
@@ -151,7 +152,7 @@ const signup = async (req,res)=>{
         req.session.userData = {name,phone,email,password};
         console.log( req.session.userData);
 
-        res.render("verify-otp");
+        res.render("verify-otp" );
         console.log("OTP Sent ",otp);
 
 

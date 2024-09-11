@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const userController1 = require("../controllers/user/userController1");
 const userController2 = require("../controllers/user/userController2");
+const productController = require("../controllers/user/productController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -33,6 +34,11 @@ router.post("/login",userController2.login);
 
 //logout
 router.get("/logout",userController2.logout);
+
+///Product 
+
+  ///view Product
+  router.get('/product/view/:id', productController.getProductView);
 
 module.exports = router
 
