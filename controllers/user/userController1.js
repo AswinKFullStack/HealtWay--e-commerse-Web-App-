@@ -20,8 +20,7 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // Load homepage
 const loadHomepage = async (req, res) => {
     try {
-        const user = req.session.user;
-        const userData = await User.findOne({ _id: user });
+        
 
         // For "Our Products"
         const productPage = parseInt(req.query.productPage) || 1;
@@ -69,10 +68,12 @@ const loadHomepage = async (req, res) => {
         });
 
         await Promise.all(categoryPromises);
+        // Check if the user is logged in
+        const user = req.session.user ? await User.findById(req.session.user) : null;
 
         // Render the homepage with paginated products and category products
         res.render("home", {
-            user: userData,
+            user,
             products, // Our Products
             productCurrentPage: productPage,
             productTotalPages: Math.ceil(totalProducts / productLimit),

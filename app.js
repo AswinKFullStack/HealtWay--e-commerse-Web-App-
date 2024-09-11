@@ -14,16 +14,25 @@ db();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(session({
-    secret:process.env.SESSION_SECRET,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        secure:false,
-        httpOnly:true,
-        maxAge:72*60*60*1000
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 72 * 60 * 60 * 1000
     }
+}));
 
-}))
+// Middleware to prevent caching for all pages
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+});
+
+
 
 app.use(passport.initialize());
 app.use(passport.session());
