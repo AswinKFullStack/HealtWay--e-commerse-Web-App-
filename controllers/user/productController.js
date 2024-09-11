@@ -3,11 +3,29 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
 const Review = require("../../models/reviewShema");
+const mongoose = require('mongoose');
 
+// Centralized error rendering function
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
+    res.status(errorCode).render('error-page', {
+        errorCode,
+        errorMessage,
+        errorDescription,
+        backLink
+    });
+};
+
+// Render the product view page
 const getProductView = async (req, res) => {
     try {
         const productId = req.params.id;
-        
+
+        // Validate product ID
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+            console.error("Invalid or missing Product ID");
+            return renderErrorPage(res, 400, "Bad Request", "Product ID is required and must be valid.", req.headers.referer || '/');
+        }
+
         // Fetch the product details
         const product = await Product.findById(productId)
             .populate('brand', 'brandName')
@@ -17,31 +35,44 @@ const getProductView = async (req, res) => {
                 populate: { path: 'user', select: 'name' }
             })
             .exec();
-        
+
+        // Check if product was found
         if (!product) {
-            return res.status(404).send("Product not found");
+            console.error(`Product with ID ${productId} not found`);
+            return renderErrorPage(res, 404, "Product Not Found", "The product you are looking for does not exist.", req.headers.referer || '/');
         }
 
-        // Fetch related products
-        const relatedProducts = await Product.find({ category: product.category._id, _id: { $ne: productId } })
+        // Fetch related products with pagination
+        const page = parseInt(req.query.page) || 1;
+        const itemsPerPage = 6;
+        const relatedProductsQuery = Product.find({ category: product.category._id, _id: { $ne: productId } })
             .populate('category')
             .populate('brand')
-            .limit(6); // Adjust the limit as needed
+            .skip((page - 1) * itemsPerPage)
+            .limit(itemsPerPage);
 
+        const totalRelatedProducts = await Product.countDocuments({ category: product.category._id, _id: { $ne: productId } });
+        const relatedProducts = await relatedProductsQuery;
+
+        // Calculate total pages for pagination
+        const totalPages = Math.ceil(totalRelatedProducts / itemsPerPage);
+       
+        
         res.render('productView', {
+            
             product: product,
             relatedProducts: relatedProducts,
-            relatedProductCurrentPage: 1, // Default to page 1
-            relatedProductTotalPages: 1, // Calculate the total pages based on related products count
+            relatedProductCurrentPage: page,
+            relatedProductTotalPages: totalPages,
             title: product.productName || 'Product Details'
         });
     } catch (error) {
         console.error("Error fetching product details:", error);
-        res.status(500).send("Server error");
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching product details. Please try again later.", req.headers.referer || '/');
     }
 };
 
-module.exports = { 
-    getProductView, 
+module.exports = {
+    getProductView,
 };
 

@@ -1,48 +1,52 @@
-
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
-const mongoose = require("mongoose");
 
+// Function to handle rendering an error page with details
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
+    res.status(errorCode).render("admin-error-page", {
+        errorCode,
+        errorMessage,
+        errorDescription,
+        backLink
+    });
+};
 
-
+// Fetch and Render Category Information
 const categoryInfo = async (req, res) => {
     try {
-      const searchTerm = req.query.search || ""; // Search term from query string
-      const currentPage = Math.max(1, parseInt(req.query.page)); // Current page number from query string
-      const itemsPerPage = 3; // Number of categories per page
-  
-      // Filter categories by search term (case-insensitive) and exclude deleted categories
-      const searchQuery = {
-        ...((searchTerm && { name: { $regex: new RegExp(searchTerm, "i") } }) || {}),
-        isDeleted: false, // Exclude categories marked as deleted
-      };
-  
-      // Count total categories for pagination
-      const totalCategories = await Category.countDocuments(searchQuery);
-  
-      // Fetch the categories for the current page
-      const categories = await Category.find(searchQuery)
-        .skip((currentPage - 1) * itemsPerPage)
-        .limit(itemsPerPage);
-  
-      // Calculate total pages
-      const totalPages = Math.ceil(totalCategories / itemsPerPage);
-  
-      // Render the category management page with fetched data
-      res.render("categories", {
-        data: categories,
-        totalpages: totalPages,
-        currentPage: currentPage,
-        searchTerm: searchTerm, // Pass this for prefilling the search box
-      });
+        const searchTerm = req.query.search || ""; // Search term from query string
+        const currentPage = Math.max(1, parseInt(req.query.page) || 1); // Current page number with default as 1
+        const itemsPerPage = 3; // Number of categories per page
+
+        // Filter categories by search term (case-insensitive) and exclude deleted categories
+        const searchQuery = {
+            ...((searchTerm && { name: { $regex: new RegExp(searchTerm, "i") } }) || {}),
+            isDeleted: false, // Exclude categories marked as deleted
+        };
+
+        // Count total categories for pagination
+        const totalCategories = await Category.countDocuments(searchQuery);
+
+        // Fetch the categories for the current page
+        const categories = await Category.find(searchQuery)
+            .skip((currentPage - 1) * itemsPerPage)
+            .limit(itemsPerPage);
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCategories / itemsPerPage);
+
+        // Render the category management page with fetched data
+        res.render("categories", {
+            data: categories,
+            totalpages: totalPages,
+            currentPage: currentPage,
+            searchTerm: searchTerm, // Pass this for prefilling the search box
+        });
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Server Error when listing categories");
+        console.error("Error fetching category information:", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while listing categories.", '/admin/categories');
     }
-  };
-  
-
-
+};
 
 // Add offer to a category
 const addCategoryOffer = async (req, res) => {
@@ -77,8 +81,8 @@ const addCategoryOffer = async (req, res) => {
 
         res.redirect(`/admin/categories?page=${req.query.page || 1}`);
     } catch (error) {
-        console.error('Error when adding category offer:', error);
-        res.status(500).send('Error when adding category offer');
+        console.error("Error adding category offer:", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while adding the category offer.", '/admin/categories');
     }
 };
 
@@ -108,12 +112,10 @@ const removeCategoryOffer = async (req, res) => {
 
         res.redirect(`/admin/categories?page=${req.query.page || 1}`);
     } catch (error) {
-        console.error('Error when removing category offer:', error);
-        res.status(500).send('Error when removing category offer');
+        console.error('Error removing category offer:', error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while removing the category offer.", '/admin/categories');
     }
 };
-
-
 
 // Render add category form
 const getAddCategory = (req, res) => {
@@ -129,10 +131,9 @@ const postAddCategory = async (req, res) => {
         res.redirect('/admin/categories');
     } catch (error) {
         console.error('Error adding new category:', error);
-        res.status(500).send('Error adding new category');
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while adding a new category.", '/admin/categories');
     }
 };
-
 
 // Get category data for editing
 const getEditCategory = async (req, res) => {
@@ -140,12 +141,12 @@ const getEditCategory = async (req, res) => {
         const categoryId = req.params.id;
         const category = await Category.findById(categoryId);
         if (!category) {
-            return res.status(404).send('Category not found');
+            return renderErrorPage(res, 404, "Category Not Found", "The category you are trying to edit does not exist.", '/admin/categories');
         }
         res.render('editCategory', { category });
     } catch (error) {
         console.error('Error fetching category for editing:', error);
-        res.status(500).send('Error fetching category for editing');
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching the category for editing.", '/admin/categories');
     }
 };
 
@@ -158,26 +159,25 @@ const postEditCategory = async (req, res) => {
         res.redirect('/admin/categories');
     } catch (error) {
         console.error('Error updating category:', error);
-        res.status(500).send('Error updating category');
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while updating the category.", '/admin/categories');
     }
 };
 
 // Soft delete category controller function
 const deleteCategory = async (req, res) => {
     try {
-      const categoryId = req.params.id;
-  
-      // Perform a soft delete by setting isDeleted to true
-      await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
-  
-      // Redirect to the category list page after soft deletion
-      res.redirect("/admin/categories");
+        const categoryId = req.params.id;
+
+        // Perform a soft delete by setting isDeleted to true
+        await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
+
+        // Redirect to the category list page after soft deletion
+        res.redirect("/admin/categories");
     } catch (error) {
-      console.error("Error soft deleting category:", error);
-      res.status(500).send("Error soft deleting category");
+        console.error("Error soft deleting category:", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while soft deleting the category.", '/admin/categories');
     }
-  };
-  
+};
 
 // View single category details
 const viewCategoryDetails = async (req, res) => {
@@ -185,47 +185,38 @@ const viewCategoryDetails = async (req, res) => {
         const categoryId = req.params.id;
         const category = await Category.findById(categoryId);
         if (!category) {
-            return res.status(404).send('Category not found');
+            return renderErrorPage(res, 404, "Category Not Found", "The category you are trying to view does not exist.", '/admin/categories');
         }
         res.render('categoryDetails', { category });
     } catch (error) {
         console.error('Error fetching category details:', error);
-        res.status(500).send('Error fetching category details');
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching category details.", '/admin/categories');
     }
 };
-
-
-
-
-// categoryController.js
 
 // Change category status to 'Listed'
 const listCategory = async (req, res) => {
     const categoryId = req.params.id;
     try {
-      await Category.findByIdAndUpdate(categoryId, { status: 'Listed' });
-      res.redirect('/admin/categories');
+        await Category.findByIdAndUpdate(categoryId, { status: 'Listed' });
+        res.redirect('/admin/categories');
     } catch (error) {
-      console.error('Error listing category:', error);
-      res.status(500).send('Error listing category');
+        console.error('Error listing category:', error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while listing the category.", '/admin/categories');
     }
 };
-  
-  // Change category status to 'Unlisted'
+
+// Change category status to 'Unlisted'
 const unlistCategory = async (req, res) => {
     const categoryId = req.params.id;
     try {
-      await Category.findByIdAndUpdate(categoryId, { status: 'Unlisted' });
-      res.redirect('/admin/categories');
+        await Category.findByIdAndUpdate(categoryId, { status: 'Unlisted' });
+        res.redirect('/admin/categories');
     } catch (error) {
-      console.error('Error unlisting category:', error);
-      res.status(500).send('Error unlisting category');
+        console.error('Error unlisting category:', error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while unlisting the category.", '/admin/categories');
     }
 };
-  
-  
-
-
 
 module.exports = {
     categoryInfo,
@@ -239,5 +230,4 @@ module.exports = {
     viewCategoryDetails,
     listCategory,
     unlistCategory
-
 };

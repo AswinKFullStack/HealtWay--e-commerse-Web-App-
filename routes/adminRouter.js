@@ -13,8 +13,7 @@ const upload = require("../helpers/multer");
 
 
 
-//Errorpage
-router.get("/pageerror",adminController1.pageError);
+
 
 
 //Admin loging mnagment 
@@ -71,8 +70,10 @@ router.get('/addProduct', adminAuth, productController.getProductAddPage);
 router.post('/addProduct', adminAuth, upload.array('productImage', 5), productController.postAddProduct);
                                 //listing product
 router.get("/products",adminAuth,productController.getProducts);
-router.get('/product/edit/:id', adminAuth, productController.getEditProduct);
-router.post('/product/edit/:id', adminAuth,upload.array('productImage', 5), productController.postEditProduct);
+router.route('/product/edit/:id')
+    .get(adminAuth, productController.getEditProduct)
+    .post(adminAuth, upload.array('productImage', 5), productController.postEditProduct);
+
                         // Route to view product details
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);
                          // Soft delete product route

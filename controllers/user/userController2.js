@@ -3,82 +3,91 @@ const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
+// Centralized error rendering function
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
+    res.status(errorCode).render('error-page', {
+        errorCode,
+        errorMessage,
+        errorDescription,
+        backLink
+    });
+};
 
-//login management
-const loadLogin = async (req,res)=>{
+// Load login page
+const loadLogin = async (req, res) => {
     try {
-        if(!req.session.user){
-            return res.render("login" ,{title: 'Login Page'});
-        }else{
+        if (!req.session.user) {
+            return res.render("login", { title: 'Login Page' });
+        } else {
             res.redirect("/");
         }
     } catch (error) {
-        res.redirect("/pageNotFound")
+        console.error("Error loading login page:", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while trying to load the login page.", req.headers.referer || '/');
     }
-}
+};
 
-const login = async (req,res)=>{
+// Handle login
+const login = async (req, res) => {
     try {
-        console.log("inside try");
-        const {email,password} = req.body;
-        console.log("email ",email);
-        console.log("password ",password)
-        const findUser = await User.findOne({isAdmin:false,email:email})
-        if(!findUser){
-            
-            console.log("user not finding");
-            return res.render("login",{message:"User not found",title: 'Login Page'})
-        }if(findUser.isBlocked){
-            console.log("is blokect");
-            return res.render("login",{message:"User is blocked by admin",title: 'Login Page'})
+        const { email, password } = req.body;
+
+        // Validate email and password
+        if (!email || !password) {
+            return res.render("login", {
+                message: "Email and password are required.",
+                title: 'Login Page'
+            });
         }
-        const passwordMatch = await bcrypt.compare(password,findUser.password);
-        if(!passwordMatch){
-            console.log("password not matching");
-            return res.render("login",{message:"Incorret Password" , title: 'Login Page' })
+
+        // Check if user exists
+        const findUser = await User.findOne({ isAdmin: false, email: email });
+        if (!findUser) {
+            return res.render("login", { message: "User not found", title: 'Login Page' });
         }
-        req.session.user=findUser._id;
+
+        // Check if user is blocked
+        if (findUser.isBlocked) {
+            return res.render("login", { message: "User is blocked by admin", title: 'Login Page' });
+        }
+
+        // Validate password
+        const passwordMatch = await bcrypt.compare(password, findUser.password);
+        if (!passwordMatch) {
+            return res.render("login", { message: "Incorrect Password", title: 'Login Page' });
+        }
+
+        // User successfully logged in
+        req.session.user = findUser._id;
+        console.log("User login successful with req.session.user =", req.session.user);
         res.redirect("/");
-        console.log("User login successfull with  req.session.user =",req.session.user)
     } catch (error) {
-        console.error("Login error",error)
-        console.log("inside catch");
-        res.render("Login",{message:"Login failed .Please try again later" ,title: 'Login Page'})  
+        console.error("Login error:", error);
+        res.status(500).render("login", {
+            message: "Login failed. Please try again later.",
+            title: 'Login Page'
+        });
     }
-}
+};
 
-
-
-//logout user
-
-const logout = async (req,res)=>{
+// Handle logout
+const logout = async (req, res) => {
     try {
-        req.session.destroy((error)=>{
-            if(error){
-                console.log("Session destruction error",error);
-                return res.redirect("/pageNotFound");
+        req.session.destroy((error) => {
+            if (error) {
+                console.error("Session destruction error:", error);
+                return renderErrorPage(res, 500, "Server Error", "An error occurred while trying to log out. Please try again.", '/');
             }
-            return res.redirect("/login");
-        })
+            res.redirect("/login");
+        });
     } catch (error) {
-        console.error("Logout error(catch) ",error); 
-        return res.redirect("/pageNotFound");  
+        console.error("Logout error:", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while trying to log out.", '/');
     }
-}
-
-
-
-
-
-
-
-
-
-
-
+};
 
 module.exports = {
     loadLogin,
     login,
     logout
-}
+};

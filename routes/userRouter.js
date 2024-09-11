@@ -7,8 +7,7 @@ const productController = require("../controllers/user/productController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
-//page not found routes
-router.get("/pageNotFound",userController1.pageNotFound);
+
 
 //signup management 
 router.get("/",userController1.loadHomepage);
@@ -20,10 +19,11 @@ router.post("/resend-otp",userController1.resendOtp);
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 router.get('/auth/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/signup' }), 
-    (req, res) => {
+  passport.authenticate('google', { failureRedirect: '/signup', failureFlash: true }), 
+  (req, res) => {
       res.redirect('/');
-  });
+  }
+);
 
 
 //login routes

@@ -1,6 +1,14 @@
 <%- include("../../views/partials/user/header") %>
 <title><%= product ? product.productName : 'Product' %> | My E-Commerce Store</title>
 <link rel="stylesheet" href="/css/userCss/productView.css">
+ <!-- Breadcrumbs -->
+ <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/products">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= product.productName %></li>
+    </ol>
+</nav>
 <!-- Product Details -->
 <div class="container mt-4">
   <div class="row">

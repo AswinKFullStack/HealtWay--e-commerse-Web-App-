@@ -45,10 +45,14 @@ const adminAuth = (req,res,next)=>{
             res.status(500).send("Internal Server error")
             
         })
-    }else{
-        console.log("session not found");
-                res.redirect("/admin/login");
+    }else {
+        res.status(403).render('admin-error-page', {
+            errorCode: 403,
+            errorMessage: "Forbidden",
+            errorDescription: "You don't have permission to access this page."
+        });
     }
+
 }
 
 module.exports = {
