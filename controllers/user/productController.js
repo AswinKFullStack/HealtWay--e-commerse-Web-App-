@@ -25,7 +25,8 @@ const getProductView = async (req, res) => {
             console.error("Invalid or missing Product ID");
             return renderErrorPage(res, 400, "Bad Request", "Product ID is required and must be valid.", req.headers.referer || '/');
         }
-
+        // Fetch user data from the session
+        const user = req.session.user ? await User.findById(req.session.user) : null;
         // Fetch the product details
         const product = await Product.findById(productId)
             .populate('brand', 'brandName')
@@ -64,7 +65,8 @@ const getProductView = async (req, res) => {
             relatedProducts: relatedProducts,
             relatedProductCurrentPage: page,
             relatedProductTotalPages: totalPages,
-            title: product.productName || 'Product Details'
+            title: product.productName || 'Product Details',
+            user: user  // Pass the user data to the view
         });
     } catch (error) {
         console.error("Error fetching product details:", error);
