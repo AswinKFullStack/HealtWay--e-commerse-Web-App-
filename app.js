@@ -73,36 +73,36 @@ app.use((req, res, next) => {
 });
 
 // General error handling for other status codes
-app.use((err, req, res, next) => {
-    const statusCode = err.status || 500;
-    let errorMessage = "Internal Server Error";
-    let errorDescription = "We're experiencing technical difficulties. Please try again later.";
+// app.use((err, req, res, next) => {
+//     const statusCode = err.status || 500;
+//     let errorMessage = "Internal Server Error";
+//     let errorDescription = "We're experiencing technical difficulties. Please try again later.";
 
-    if (statusCode === 400) {
-        errorMessage = "Bad Request";
-        errorDescription = "The request could not be understood or was missing required parameters.";
-    } else if (statusCode === 403) {
-        errorMessage = "Forbidden";
-        errorDescription = "You don't have permission to access this page.";
-    }
+//     if (statusCode === 400) {
+//         errorMessage = "Bad Request";
+//         errorDescription = "The request could not be understood or was missing required parameters.";
+//     } else if (statusCode === 403) {
+//         errorMessage = "Forbidden";
+//         errorDescription = "You don't have permission to access this page.";
+//     }
 
-    // Different error handling for admin routes
-    if (req.originalUrl.startsWith('/admin')) {
-        res.status(statusCode).render('admin-error-page', {
-            errorCode: statusCode,
-            errorMessage,
-            errorDescription,
-            backLink: req.headers.referer || '/admin',
-        });
-    } else {
-        res.status(statusCode).render('error-page', {
-            errorCode: statusCode,
-            errorMessage,
-            errorDescription,
-            backLink: req.headers.referer || '/',
-        });
-    }
-});
+//     // Different error handling for admin routes
+//     if (req.originalUrl.startsWith('/admin')) {
+//         res.status(statusCode).render('admin-error-page', {
+//             errorCode: statusCode,
+//             errorMessage,
+//             errorDescription,
+//             backLink: req.headers.referer || '/admin',
+//         });
+//     } else {
+//         res.status(statusCode).render('error-page', {
+//             errorCode: statusCode,
+//             errorMessage,
+//             errorDescription,
+//             backLink: req.headers.referer || '/',
+//         });
+//     }
+// });
 
 
 

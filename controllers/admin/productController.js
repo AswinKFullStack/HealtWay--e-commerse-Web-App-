@@ -178,17 +178,20 @@ const postEditProduct = async (req, res) => {
 
 const getProductDetails = async (req, res) => {
     try {
-        const productId = req.params.id;
+        const productId = req.params.id; // Get product ID from URL parameters
+
+        // Fetch the product details from the database
         const product = await Product.findById(productId)
-            .populate('brand', 'brandName')
-            .populate('category', 'name')
+            .populate('brand', 'brandName') // Populate brand data
+            .populate('category', 'name') // Populate category data
             .exec();
 
         if (!product) {
-            return renderErrorPage(res, 404, "Product Not Found", "The product you are trying to view does not exist.", '/admin/products');
+            return res.status(404).send('Product not found');
         }
 
-        res.render('productView', { product });
+        // Render the product details view page
+        res.render('productDetails', { product });
     } catch (error) {
         console.error('Error fetching product details:', error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching product details.", '/admin/products');

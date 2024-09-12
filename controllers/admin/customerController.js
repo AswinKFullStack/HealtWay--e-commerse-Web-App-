@@ -2,55 +2,42 @@ const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-// Function to handle rendering an error page with details
-const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
-    res.status(errorCode).render("admin-error-page", {
-        errorCode,
-        errorMessage,
-        errorDescription,
-        backLink
-    });
-};
-
-// Fetch and Render Customer Information
-const customerInfo = async (req, res) => {
+const customerInfo = async (req,res)=>{
     try {
-        const search = req.query.search || ''; // Search term from query string
-        const page = Math.max(1, parseInt(req.query.page) || 1); // Current page number with default as 1
-        const sort = req.query.sort || 'newest'; // Sorting criteria
-        const usersPerPage = 3; // Number of users per page
+        const search = req.query.search || '';
+        const page = parseInt(req.query.page) || 1;
+        const sort = req.query.sort || 'newest';
+        const usersPerPage = 3;
 
-        // Query to filter out admin users and search by name
-        const query = {
-            name: new RegExp(search, 'i'), // Case-insensitive search by name
-            isAdmin: false
-        };
-        
-        // Determine sorting criteria
-        const sortCriteria = sort === 'newest' ? { createdAt: -1 } : { createdAt: 1 };
+        // Fetch users based on search and sort logic
+     // Query to filter out admin users and search by name
+     const query = { 
+        name: new RegExp(search, 'i'), 
+        isAdmin: false 
+    };
+    const sortCriteria = sort === 'newest' ? { createdAt: -1 } : { createdAt: 1 }; // example sorting by createdAt
 
-        // Fetch users based on search, pagination, and sort logic
-        const users = await User.find(query)
-            .sort(sortCriteria)
-            .skip((page - 1) * usersPerPage)
-            .limit(usersPerPage);
+   
 
-        const totalUsers = await User.countDocuments(query); // Count total users for pagination
-        const totalPages = Math.ceil(totalUsers / usersPerPage);
+    const users = await User.find(query)
+    .sort(sortCriteria)
+    .skip((page - 1) * usersPerPage)
+    .limit(usersPerPage);
 
-        // Render the customer information page with fetched data
-        res.render('customers', {
-            data: users,
-            totalPages,
+    const totalUsers = await User.countDocuments(query);
+    const totalpages = Math.ceil(totalUsers / usersPerPage);
+        res.render('customers',{
+            data: users, 
+            totalpages, 
             currentPage: page,
             search,
-            sort
-        });
+            sort });
+
     } catch (error) {
-        console.error("Error fetching customer information:", error);
-        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching customer information.", '/admin/users');
+        console.error("Admin custmers list controller ERROR  error",error);
+        res.status(500).send("Server error");
     }
-};
+}
 
 // Handle Blocking a Customer
 const customerBlocked = async (req, res) => {

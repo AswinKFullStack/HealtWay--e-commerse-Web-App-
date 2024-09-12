@@ -11,41 +11,41 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
     });
 };
 
-// Load the Brand Management Page
-const getBrandpage = async (req, res) => {
+const getBrandpage = async(req,res)=>{
   try {
-    const searchTerm = req.query.search || ""; // Search term from query string
-    const currentPage = Math.max(1, parseInt(req.query.page) || 1); // Current page number from query string
-    const itemsPerPage = 3; // Number of brands per page
-
-    // Filter brands by search term (case-insensitive)
-    const searchQuery = {
-      ...(searchTerm ? { brandName: { $regex: new RegExp(searchTerm, "i") } } : {})
-    };
-
-    // Count total brands for pagination
-    const totalBrands = await Brand.countDocuments(searchQuery);
-
-    // Fetch the brands for the current page
-    const brands = await Brand.find(searchQuery)
-      .skip((currentPage - 1) * itemsPerPage)
-      .limit(itemsPerPage);
-
-    // Calculate total pages
-    const totalPages = Math.ceil(totalBrands / itemsPerPage);
-
-    // Render the brand management page with fetched data
-    res.render("brands", {
-      data: brands,
-      totalPages,
-      currentPage,
-      searchTerm
-    });
-  } catch (error) {
-    console.error("Error fetching brand page:", error);
-    renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while loading the brand page.", '/admin/brands');
-  }
-};
+      const searchTerm = req.query.search || ""; // Search term from query string
+      const currentPage = Math.max(1, parseInt(req.query.page)); // Current page number from query string
+      const itemsPerPage = 3; // Number of categories per page
+  
+      // Filter categories by search term (case-insensitive) and exclude deleted categories
+      const searchQuery = {
+        ...((searchTerm && { brandName: { $regex: new RegExp(searchTerm, "i") } }) || {})
+       
+      };
+  
+      // Count total categories for pagination
+      const totalCategories = await Brand.countDocuments(searchQuery);
+  
+      // Fetch the categories for the current page
+      const brands = await Brand.find(searchQuery)
+        .skip((currentPage - 1) * itemsPerPage)
+        .limit(itemsPerPage);
+  
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCategories / itemsPerPage);
+  
+      // Render the category management page with fetched data
+      res.render("brands", {
+        data: brands,
+        totalpages: totalPages,
+        currentPage: currentPage,
+        searchTerm: searchTerm, // Pass this for prefilling the search box
+      });
+    } catch (error) {
+      console.error("Error fetching brand page:", error);
+      renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while loading the brand page.", '/admin/brands');
+    }
+  };
 
 // Render the Add Brand Page
 const getAddBrand = (req, res) => {
