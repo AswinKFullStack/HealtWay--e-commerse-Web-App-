@@ -38,51 +38,54 @@ const customerInfo = async (req,res)=>{
         res.status(500).send("Server error");
     }
 }
- 
-const customerBlocked = async (req,res)=>{
+
+// Handle Blocking a Customer
+const customerBlocked = async (req, res) => {
     try {
         const userId = req.query.id; // Get the user ID from the query parameters
         
+        // Update the user's blocked status
         const user = await User.findByIdAndUpdate(
             userId,
             { isBlocked: true },
             { new: true }
         );
+
         if (!user) {
-            return res.status(404).send("User not found");
+            return renderErrorPage(res, 404, "User Not Found", "The user you are trying to block does not exist.", '/admin/users');
         }
-        res.redirect('/admin/users'); // Redirect to the user list page
+        res.redirect('/admin/users'); // Redirect to the user list page after blocking
     } catch (error) {
         console.error("Error blocking user:", error);
-        res.status(500).send("Server error");
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while blocking the user.", '/admin/users');
     }
-}
+};
 
-const customerUnblocked = async (req,res)=>{
+// Handle Unblocking a Customer
+const customerUnblocked = async (req, res) => {
     try {
         const userId = req.query.id; // Get the user ID from the query parameters
+        
+        // Update the user's blocked status
         const user = await User.findByIdAndUpdate(
             userId,
             { isBlocked: false },
             { new: true }
         );
+
         if (!user) {
-            return res.status(404).send("User not found");
+            return renderErrorPage(res, 404, "User Not Found", "The user you are trying to unblock does not exist.", '/admin/users');
         }
-        res.redirect('/admin/users'); // Redirect to the user list page
+        res.redirect('/admin/users'); // Redirect to the user list page after unblocking
     } catch (error) {
         console.error("Error unblocking user:", error);
-        res.status(500).send("Server error");
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while unblocking the user.", '/admin/users');
     }
-}
-
-
-
-
-///////////////////
+};
 
 module.exports = {
     customerInfo,
     customerBlocked,
     customerUnblocked
-}
+};
+

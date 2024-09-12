@@ -1,37 +1,14 @@
 <%- include("../../views/partials/user/header") %>
-
-<style>
-  /* Container for the image with zoom functionality */
-  .product-image {
-    position: relative;
-    width: 100%; /* Ensure the image container takes full width */
-    overflow: hidden; /* Hide the part of the image that overflows */
-  }
-
-  /* Zoomed image styling */
-  .zoom-img {
-    transition: transform 0.3s ease;
-    width: 100%;
-  }
-
-  /* Image zoom on hover */
-  .product-image:hover .zoom-img {
-    cursor: zoom-in;
-  }
-  .card-body a.custom-link {
-    color: #000; /* Replace with your desired color */
-    text-decoration: none;
-}
-
-.card-body a.custom-link:hover {
-    color: #000; /* Maintain color on hover */
-}
-
-</style>
-
 <title><%= product ? product.productName : 'Product' %> | My E-Commerce Store</title>
 <link rel="stylesheet" href="/css/userCss/productView.css">
-
+ <!-- Breadcrumbs -->
+ <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/products">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= product.productName %></li>
+    </ol>
+</nav>
 <!-- Product Details -->
 <div class="container mt-4">
   <div class="row">
@@ -194,28 +171,6 @@
 </div>
 
 
-<script>
-  function changeImage(image) {
-    document.getElementById('mainImage').src = '/uploads/re-image/' + image;
-  }
 
-  const productImage = document.querySelector('.product-image');
-  const zoomImage = document.querySelector('.zoom-img');
-
-  productImage.addEventListener('mousemove', function(e) {
-    const x = e.clientX - productImage.offsetLeft;
-    const y = e.clientY - productImage.offsetTop;
-
-    const xPercent = (x / productImage.offsetWidth) * 100;
-    const yPercent = (y / productImage.offsetHeight) * 100;
-
-    zoomImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-    zoomImage.style.transform = 'scale(2.5)'; // Adjust the scale for the zoom effect
-  });
-
-  productImage.addEventListener('mouseleave', function() {
-    zoomImage.style.transform = 'scale(1)'; // Reset the zoom when the mouse leaves
-  });
-</script>
-
+<script src="/js/userJs/productView.js"></script>
 <%- include("../../views/partials/user/footer") %>

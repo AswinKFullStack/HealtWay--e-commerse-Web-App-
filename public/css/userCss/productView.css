@@ -50,3 +50,33 @@
     background-color: #f8f9fa; /* Light change to background color */
     padding: 30px 0; /* Added gap to top and bottom */
 }
+
+
+
+
+  /* Container for the image with zoom functionality */
+  .product-image {
+    position: relative;
+    width: 100%; /* Ensure the image container takes full width */
+    overflow: hidden; /* Hide the part of the image that overflows */
+  }
+
+  /* Zoomed image styling */
+  .zoom-img {
+    transition: transform 0.3s ease;
+    width: 100%;
+  }
+
+  /* Image zoom on hover */
+  .product-image:hover .zoom-img {
+    cursor: zoom-in;
+  }
+  .card-body a.custom-link {
+    color: #000; /* Replace with your desired color */
+    text-decoration: none;
+}
+
+.card-body a.custom-link:hover {
+    color: #000; /* Maintain color on hover */
+}
+
