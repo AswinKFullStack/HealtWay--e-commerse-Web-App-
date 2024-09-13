@@ -19,10 +19,11 @@ async (accessToken, refreshToken, profile, done)=>{
         }else{
             user = new User({
                 name:profile.displayName,
-                email:profile.id,
+                email:profile.emails[0].value,
                 googleId:profile.id,
             });
             await user.save();
+           
             return done(null,user);
         }
     } catch (error) {

@@ -1,0 +1,21 @@
+.thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.thumbnails-container div {
+    margin: 5px;
+    position: relative;
+}
+
+.remove-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    color: red;
+    font-size: 20px;
+    background: white;
+    border-radius: 50%;
+    padding: 2px;
+}
