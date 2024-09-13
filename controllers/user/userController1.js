@@ -68,8 +68,13 @@ const loadHomepage = async (req, res) => {
         });
 
         await Promise.all(categoryPromises);
-        // Check if the user is logged in
-        const user = req.session.user ? await User.findById(req.session.user) : null;
+        // Check if the user is logged in using either session or Passport
+       const user = req.session.user 
+                  ? await User.findById(req.session.user) 
+                  : req.user 
+                  ? await User.findById(req.user._id) 
+                  : null;
+
 
         // Render the homepage with paginated products and category products
         res.render("home", {
