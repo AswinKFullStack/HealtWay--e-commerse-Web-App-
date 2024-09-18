@@ -44,6 +44,8 @@ router.get('/product/view/:id', productController.getProductView);
 
   //profile view 
 router.get('/profileview/:id',userAuth, profileController.getProfileView);
+router.get('/editUser/:id',userAuth,profileController.getEditUser);
+router.post('/editUser/:id',userAuth,profileController.postEditUser);
 
 
 module.exports = router

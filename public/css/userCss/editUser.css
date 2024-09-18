@@ -1,0 +1,49 @@
+/* Container styling */
+.container {
+    background-color: #E0F4D2;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+}
+
+h2 {
+    color: #5CB85C;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control:focus {
+    border-color: #5CB85C;
+    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: red;
+}
+
+/* Button Styling */
+.btn-success {
+    background-color: #5CB85C;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #4cae4c;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}

@@ -53,7 +53,61 @@ const getProfileView = async (req,res) => {
         renderErrorPage(res, 500, "Server Error", "An error occurred while trying to load the profile page.", req.headers.referer || '/');
     }   
 }
+const getEditUser = async (req,res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        res.render('editUser', {
+            user,
+            title: 'User Edit Form',
+        });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        renderErrorPage(res, 500, "Server Error", "An error occurred while trying to load the edit profile form page.", req.headers.referer || '/');
+        
 
+    }
+}
+
+const postEditUser = async (req,res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        const { name, email, phone } = req.body;
+        if (!name || !email || !phone) {
+            return res.status(400).render('editUser', {
+                user,
+                title: 'User Edit Form',
+                errorMessage: 'All fields are required.'
+            });
+        }
+
+        const existingUser = await User.findOne({ email: email, _id: { $ne: userId } });
+        if (existingUser) {
+            return res.status(400).render('editUser', {
+                user,
+                title: 'User Edit Form',
+                errorMessage: 'Email already exists. Please use a different email.'
+            });
+        }
+
+        const editedUser = await User.findByIdAndUpdate(userId, {
+            name: name,
+            email: email,
+            phone: phone
+        }, { new: true });
+        
+        if (!editedUser) {
+            return res.status(404).send('User not found');
+        }
+        res.redirect(`/profileview/${userId}`);
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        renderErrorPage(res, 500, "Server Error", "An error occurred while trying to update the profile.", req.headers.referer || '/');
+    }
+}
 module.exports ={
-    getProfileView
+    getProfileView,
+    getEditUser,
+    postEditUser
 }

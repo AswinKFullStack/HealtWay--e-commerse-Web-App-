@@ -1,8 +1,9 @@
 const User = require("../models/userSchema");
 
 // Centralized error rendering function
-const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
-    res.status(errorCode).render('admin-error-page', {
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink, isAdmin = false) => {
+    const template = isAdmin ? 'admin-error-page' : 'error-page';
+    res.status(errorCode).render(template, {
         errorCode,
         errorMessage,
         errorDescription,
@@ -21,15 +22,15 @@ const userAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("User authentication failed: Blocked or not found");
-                return renderErrorPage(res, 401, "Unauthorized", "Access denied. Please login.", "/login");
+                return renderErrorPage(res, 401, "Unauthorized", "Access denied. Please login.", "/login", false);
             }
         } else {
             console.log("Session not found");
-            return renderErrorPage(res, 401, "Unauthorized", "Session expired. Please login again.", "/login");
+            return renderErrorPage(res, 401, "Unauthorized", "Session expired. Please login again.", "/login", false);
         }
     } catch (error) {
         console.error("Error during user authentication:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during authentication.", "/");
+        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during authentication.", "/", false);
     }
 };
 
@@ -44,14 +45,14 @@ const adminAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("Admin authentication failed");
-                return renderErrorPage(res, 401, "Unauthorized", "Admin access denied. Please login.", "/admin/login");
+                return renderErrorPage(res, 401, "Unauthorized", "Admin access denied. Please login.", "/admin/login" ,true);
             }
         } else {
-            return renderErrorPage(res, 403, "Forbidden", "You don't have permission to access this page.", "/admin/login");
+            return renderErrorPage(res, 403, "Forbidden", "You don't have permission to access this page.", "/admin/login" ,true);
         }
     } catch (error) {
         console.error("Error during admin authentication:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during admin authentication.", "/admin/login");
+        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during admin authentication.", "/admin/login" ,true);
     }
 };
 
