@@ -35,17 +35,14 @@
         type:Boolean,
         default:false
     },
-    cart:[
-        {
-            type:Schema.Types.ObjectId,//it is for a referance id  for cart collection
-            ref:"Cart",
-            
-        }
-    ],
-    wallet:[{
-        type:Schema.Types.ObjectId,
-        ref:"Wishlist"
-    }],
+    cart: {
+        type: Schema.Types.ObjectId,
+        ref: "Cart"
+    },
+    wallet: {
+        type: Schema.Types.ObjectId,
+        ref: "Wallet"
+    },
     orderHistory:[{
         type:Schema.Types.ObjectId,
         ref:"Order"
@@ -60,7 +57,8 @@
          required:false
     },
     redeemed:{
-        type:Boolean
+        type:Boolean,
+        default: false
     },
     redeemUser:[{
         type:Schema.Types.ObjectId,
@@ -79,8 +77,10 @@
             type:Date,
             default:Date.now
         }
-   }]
- })
+   }],
+ }, {
+    timestamps: true
+})
 
 
  const User = mongoose.model("User", userSchema);

@@ -43,5 +43,5 @@
     }]
  })
 
- const Address = mongoose.model("Addess",addrssSchema)
+ const Address = mongoose.model("Address",addressSchema)
  module.exports = Address;

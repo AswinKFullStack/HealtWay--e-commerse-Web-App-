@@ -24,7 +24,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Shop</a>
@@ -62,7 +62,7 @@
                         <i class="bi bi-person-circle"></i> <%= locals.user.name %>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="/userProfile"><i class="bi bi-person"></i> Profile</a>
+                        <a class="dropdown-item" href="/profileview/<%= locals.user._id %>"><i class="bi bi-person"></i> Profile</a>
                         <a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>
                 </li>

@@ -4,6 +4,7 @@ const passport = require("passport");
 const userController1 = require("../controllers/user/userController1");
 const userController2 = require("../controllers/user/userController2");
 const productController = require("../controllers/user/productController");
+const profileController = require("../controllers/user/profileController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -38,8 +39,12 @@ router.get("/logout",userController2.logout);
 
 ///Product 
 
-  ///view Product
-  router.get('/product/view/:id', productController.getProductView);
+///view Product
+router.get('/product/view/:id', productController.getProductView);
+
+  //profile view 
+router.get('/profileview/:id',userAuth, profileController.getProfileView);
+
 
 module.exports = router
 
