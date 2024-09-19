@@ -22,7 +22,8 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 router.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/signup', failureFlash: true }), 
   (req, res) => {
-     
+      req.session.user = req.user._id;
+      console.log("User session established after login/signup:", req.session.user);
       res.redirect('/');
   }
 );
@@ -47,6 +48,10 @@ router.get('/profileview/:id',userAuth, profileController.getProfileView);
 router.get('/editUser/:id',userAuth,profileController.getEditUser);
 router.post('/editUser/:id',userAuth,profileController.postEditUser);
 
+
+//router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
+//router.get('/cart/:id',userAuth, profileController.getCartView);
+//router.get('/orders/:id',userAuth, profileController.getOrdersView);
 
 module.exports = router
 

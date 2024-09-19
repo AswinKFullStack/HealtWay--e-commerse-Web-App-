@@ -22,15 +22,34 @@ const userAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("User authentication failed: Blocked or not found");
-                return renderErrorPage(res, 401, "Unauthorized", "Access denied. Please login.", "/login", false);
+                return renderErrorPage(
+                    res, 
+                    401, 
+                    "Unauthorized", 
+                    "Access denied. Please login.", 
+                    "/login", 
+                    false);
             }
         } else {
             console.log("Session not found");
-            return renderErrorPage(res, 401, "Unauthorized", "Session expired. Please login again.", "/login", false);
+            return renderErrorPage(
+                res, 
+                401, 
+                "Unauthorized", 
+                "Session expired. Please login again.", 
+                "/login", 
+                false
+            );
         }
     } catch (error) {
         console.error("Error during user authentication:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during authentication.", "/", false);
+        return renderErrorPage(
+            res, 
+            500, 
+            "Internal Server Error", 
+            "An error occurred during authentication.", 
+            "/", 
+            false);
     }
 };
 

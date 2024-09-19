@@ -105,7 +105,4 @@ function validatePassword(password){
     return passwordRegex.test(password);
 }
 
-// Function for "Sign Up with Google"
-function signupWithGoogle() {
-    //alert('Google signup functionality is not yet implemented.');
-}
+

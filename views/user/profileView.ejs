@@ -63,6 +63,28 @@
                 <% if (totalOrders === 0) { %>
                     <p>No orders have been placed yet.</p>
                 <% } %>
+                <!-- Billing Address -->
+                <div class="mb-4">
+                    <h4>Last Added Address</h4>
+                    <% if (addresses && addresses.length > 0) { %>
+                        <p id="billingAddress">
+                            <strong>Type:</strong> <%= addresses[0].addressType %><br>
+                            <strong>Name:</strong> <%= addresses[0].name || "Name not provided" %><br>
+                            <strong>Landmark:</strong> <%= addresses[0].landMark || "Landmark not provided" %><br>
+                            <strong>City:</strong> <%= addresses[0].city || "City not provided" %><br>
+                            <strong>State:</strong> <%= addresses[0].state || "State not provided" %><br>
+                            <strong>Pincode:</strong> <%= addresses[0].pincode || "Pincode not provided" %><br>
+                            <strong>Phone:</strong> <%= addresses[0].phone || "Phone not provided" %><br>
+                            <% if (addresses[0].altPhone) { %>
+                                <strong>Alternate Phone:</strong> <%= addresses[0].altPhone %><br>
+                            <% } %>
+                        </p>
+                        <button class="btn btn-primary" onclick="location.href='/editAddress/<%= addresses[0]._id %>'">Edit Address</button>
+                    <% } else { %>
+                        <p id="billingAddress">No Address Available</p>
+                        <button class="btn btn-primary" onclick="location.href='/addAddress'">Add Address</button>
+                    <% } %>
+                </div>
                 <!-- Account Information -->
                 <div class="mb-4">
                     <h4>Account Information</h4>

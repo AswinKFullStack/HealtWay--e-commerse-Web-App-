@@ -8,9 +8,10 @@
         required:true
     },
     address:[{
-        addressType:{
-            type:String,
-            required:true
+        addressType: {
+            type: String,
+            enum: ['Home', 'Work', 'Other'],  // Optional: pre-defined values for address type
+            required: true
         },
         name:{
             type:String,
@@ -28,20 +29,35 @@
             type:String,
             required:true
         },
-        pincode:{
-            type:Number,
-            required:true
+        pincode: {
+            type: Number,
+            required: true,
+            min: 100000,  
+            max: 999999
         },
-        phone:{
-            type:String,
-            required:true
+        phone: {
+            type: String,
+            required: true,
+            validate: {
+                validator: function (v) {
+                    return /\d{10}/.test(v);  
+                },
+                message: props => `${props.value} is not a valid phone number!`
+            }
         },
-        altPhone:{
-            type:String,
-            require:true
+        altPhone: {
+            type: String,
+            required: false,
+            validate: {
+                validator: function (v) {
+                    return /\d{10}/.test(v); 
+                },
+                message: props => `${props.value} is not a valid alternate phone number!`
+            }
         }
     }]
- })
+
+ },{ timestamps: true })
 
  const Address = mongoose.model("Address",addressSchema)
  module.exports = Address;
