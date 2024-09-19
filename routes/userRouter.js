@@ -5,6 +5,7 @@ const userController1 = require("../controllers/user/userController1");
 const userController2 = require("../controllers/user/userController2");
 const productController = require("../controllers/user/productController");
 const profileController = require("../controllers/user/profileController");
+const passwordController = require("../controllers/user/passwordController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -34,7 +35,14 @@ router.get('/auth/google/callback',
 router.get("/login",userController2.loadLogin);
 router.post("/login",userController2.login);
 
+//forgot password
 
+router.get("/forgot-password", passwordController.getForgotPassword);
+router.post("/forgot-password", passwordController.postForgotPassword);
+router.post("/forgotPasswordVerify-otp",passwordController.forgotPasswordVerify);
+router.post("/resendforgotPasswordVerify-otp",passwordController.resendOtpForgotPasswordVerify);
+router.get("/resetPassword",userAuth,passwordController.getResetPassword);
+router.post("/resetPassword",userAuth,passwordController.postResetPassword);
 //logout
 router.get("/logout",userController2.logout);
 
