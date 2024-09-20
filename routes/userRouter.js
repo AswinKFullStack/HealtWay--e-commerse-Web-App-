@@ -6,6 +6,7 @@ const userController2 = require("../controllers/user/userController2");
 const productController = require("../controllers/user/productController");
 const profileController = require("../controllers/user/profileController");
 const passwordController = require("../controllers/user/passwordController");
+const addressController = require("../controllers/user/addressController"); 
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -55,6 +56,11 @@ router.get('/product/view/:id', productController.getProductView);
 router.get('/profileview/:id',userAuth, profileController.getProfileView);
 router.get('/editUser/:id',userAuth,profileController.getEditUser);
 router.post('/editUser/:id',userAuth,profileController.postEditUser);
+
+
+
+//address managment
+router.get('/addresses/:userId',userAuth, addressController.getAddressesView);
 
 
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);

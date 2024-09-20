@@ -8,6 +8,7 @@
         required:true
     },
     address:[{
+        _id: { type: Schema.Types.ObjectId, auto: true },  // Unique ID for each address
         addressType: {
             type: String,
             enum: ['Home', 'Work', 'Other'],  // Optional: pre-defined values for address type
@@ -17,6 +18,9 @@
             type:String,
             required:true,
         },
+        houseName: { 
+            type: String, 
+            required: true },
         city:{
             type:String,
             required:true
@@ -40,7 +44,7 @@
             required: true,
             validate: {
                 validator: function (v) {
-                    return /\d{10}/.test(v);  
+                    return /^\d{10}$/.test(v);  
                 },
                 message: props => `${props.value} is not a valid phone number!`
             }
@@ -50,11 +54,12 @@
             required: false,
             validate: {
                 validator: function (v) {
-                    return /\d{10}/.test(v); 
+                    return /^\d{10}$/.test(v);  // Enforce 10 digits
                 },
                 message: props => `${props.value} is not a valid alternate phone number!`
             }
         }
+        
     }]
 
  },{ timestamps: true })

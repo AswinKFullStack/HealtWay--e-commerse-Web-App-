@@ -1,0 +1,81 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/addresses.css">
+<div class="container mt-4">
+    <h2 class="text-center mb-4">My Addresses</h2>
+
+    <!-- Address List -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="list-group">
+                <% if (addresses && addresses.length > 0) { %>
+                    <% addresses.forEach(function(addressObj) { %>
+                        <% addressObj.address.forEach(function(address) { %> <!-- Loop through address array -->
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1"><%= address.name %></h5>
+                                    <p class="mb-1">
+                                        House Name: <%= address.houseName %><br>
+                                        Address: <%= address.city %>, <%= address.state %>, <%= address.pincode %><br>
+                                        Landmark: <%= address.landMark %><br>
+                                        Phone: <%= address.phone %>
+                                    </p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editAddressModal-<%= address._id %>">Edit</button>
+                                    <form action="/users/<%= userId %>/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                
+                            <!-- Edit Modal for Each Address -->
+                            <div class="modal fade" id="editAddressModal-<%= address._id %>" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <form action="/users/<%= userId %>/addresses/edit/<%= address._id %>" method="POST">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Address</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="userId" value="<%= userId %>">
+                                                <!-- Include other fields like name, city, phone etc. for editing -->
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% }) %>
+                <% } else { %>
+                    <div class="alert alert-info">No addresses found.</div>
+                <% } %>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <% if(currentPage > 1) { %>
+                <a href="/addresses/<%= userId %>?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
+            <% } %>
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a href="/addresses/<%= userId %>?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+            <% } %>
+            <% if(currentPage < totalPages) { %>
+                <a href="/addresses/<%= userId %>?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
+            <% } %>
+            
+        </div>
+    </div>
+</div>
+
+
+<%-include("../../views/partials/user/footer")%>
