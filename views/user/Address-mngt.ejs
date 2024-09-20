@@ -15,6 +15,7 @@
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/orders/<%= user._id %>'">Orders</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'account details') ? 'active' : '' %>" onclick="location.href='/userDetails/<%= user._id %>'">Account Details</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'address management') ? 'active' : '' %>" onclick="location.href='/addresses/<%= user._id %>'">Address Management</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'addAddress') ? 'active' : '' %>" onclick="location.href='/addAddress'">Add New Address</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'coupons') ? 'active' : '' %>" onclick="location.href='/coupons/<%= user._id %>'">Coupons</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'order history') ? 'active' : '' %>" onclick="location.href='/orderHistory/<%= user._id %>'">Order History</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'track order') ? 'active' : '' %>" onclick="location.href='/trackOrder/<%= user._id %>'">Track Order</button>
@@ -45,7 +46,7 @@
                                         </div>
                                         <div>
                                             <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editAddressModal-<%= address._id %>">Edit</button>
-                                            <form action="/users/<%= userId %>/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
+                                            <form action="/users/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
                                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </div>
@@ -55,7 +56,7 @@
                                     <div class="modal fade" id="editAddressModal-<%= address._id %>" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
-                                                <form action="/users/<%= userId %>/addresses/edit/<%= address._id %>" method="POST">
+                                                <form action="/users/addresses/edit/<%= address._id %>" method="POST">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Edit Address</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -87,13 +88,13 @@
             <div class="row mt-4">
                 <div class="col-md-12 text-center">
                     <% if(currentPage > 1) { %>
-                        <a href="/addresses/<%= userId %>?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
+                        <a href="/addresses/<%= user._id %>?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
                     <% } %>
                     <% for(let i = 1; i <= totalPages; i++) { %>
-                        <a href="/addresses/<%= userId %>?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                        <a href="/addresses/<%= user._id %>?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
                     <% } %>
                     <% if(currentPage < totalPages) { %>
-                        <a href="/addresses/<%= userId %>?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
+                        <a href="/addresses/<%= user._id %>?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
                     <% } %>
                 </div>
             </div>

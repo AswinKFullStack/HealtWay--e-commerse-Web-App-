@@ -1,0 +1,28 @@
+/* /public/css/userCss/addAddress.css */
+
+.add-address-form {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-address-form .form-label {
+    font-weight: 600;
+}
+
+.add-address-form .btn-success {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+@media (max-width: 576px) {
+    .add-address-form {
+        padding: 15px;
+    }
+
+    .add-address-form .btn-success {
+        font-size: 14px;
+    }
+}

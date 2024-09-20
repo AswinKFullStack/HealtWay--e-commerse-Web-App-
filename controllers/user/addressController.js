@@ -39,6 +39,30 @@ const getAddressesView = async (req,res) => {
     }
 }
 
+
+const getAddAddress = async (req,res) => {
+    try {
+        const user =await User.findById(req.session.user)
+        res.render('addAddress',{
+            title :"Add Address",
+            activePage :'addAddress',
+            user,
+        })
+    } catch (error) {
+        console.error("Error loading add address page(getAddAddress)", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while load Add addresses page", req.headers.referer || `/profileview/${req.params.userId}`);
+    }
+}
+
+const postAddAddress = async (req,res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 module.exports={
-    getAddressesView
+    getAddressesView,
+    getAddAddress,
+    postAddAddress
 }
