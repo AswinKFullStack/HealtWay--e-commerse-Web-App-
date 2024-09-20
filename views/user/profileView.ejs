@@ -6,8 +6,8 @@
             <!-- Sidebar -->
             <div class="col-md-3 mb-4">
                 <div class="list-group">
-                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'dashboard') ? 'active' : '' %>">
-                        Dashboard
+                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'dashboard') ? 'active' : '' %>" onclick="location.href='/profileview/<%= user._id %>'">
+                        My Profile
                     </button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'wishlist') ? 'active' : '' %>" onclick="location.href='/wishlist/<%= user._id %>'">Wishlists</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'cart') ? 'active' : '' %>" onclick="location.href='/cart/<%= user._id %>'">Cart</button>

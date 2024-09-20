@@ -14,6 +14,7 @@ const getAddressesView = async (req,res) => {
     try {
         const { page = 1, limit = 5 } = req.query;
         const userId = req.params.userId;
+        
         const addresses = await Address.find({ userId })
             .select('address') // This gets all the addresses for the user
             .skip((page - 1) * limit)
@@ -22,8 +23,11 @@ const getAddressesView = async (req,res) => {
         const totalAddresses = await Address.countDocuments({ userId });
 
         const totalPages = Math.ceil(totalAddresses / limit);
-        res.render('addresses', {
+        const user =await User.findById(req.session.user);
+        res.render('Address-mngt', {
             title: 'Address management',
+            activePage :'address management',
+            user,
             addresses: addresses, 
             userId,
             currentPage:page, 
