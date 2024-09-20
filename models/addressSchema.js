@@ -54,11 +54,13 @@
             required: false,
             validate: {
                 validator: function (v) {
+                    if (v == null || v.trim() === '') return true; 
                     return /^\d{10}$/.test(v);  // Enforce 10 digits
                 },
                 message: props => `${props.value} is not a valid alternate phone number!`
             }
         }
+        
         
     }]
 

@@ -62,6 +62,7 @@ router.post('/editUser/:id',userAuth,profileController.postEditUser);
 //address managment
 router.get('/addAddress',userAuth,addressController.getAddAddress);
 router.post('/addAddress',userAuth,addressController.postAddAddress);
+                //view all address
 router.get('/addresses/:userId',userAuth, addressController.getAddressesView);
 
 

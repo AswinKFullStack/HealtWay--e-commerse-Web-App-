@@ -1,12 +1,12 @@
 <%- include("../../views/partials/user/header") %>
 <link rel="stylesheet" href="/css/userCss/profileView.css">
 
-
 <div class="container mt-4">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-3 mb-4">
             <div class="list-group">
+                <!-- Sidebar buttons remain unchanged -->
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'dashboard') ? 'active' : '' %>" onclick="location.href='/profileview/<%= user._id %>'">
                     My Profile
                 </button>
@@ -25,83 +25,168 @@
 
         <!-- Main Content Area -->
         <div class="col-md-9">
-            <h2 class="text-center mb-4">My Addresses</h2>
+            <h2 class="text-center mb-4">Address Management</h2>
+
+            <!-- Display Success Message -->
+            <% if (typeof message !== 'undefined' && message) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= message %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <% } %>
 
             <!-- Address List -->
             <div class="row">
                 <div class="col-md-12">
                     <div class="list-group">
                         <% if (addresses && addresses.length > 0) { %>
-                            <% addresses.forEach(function(addressObj) { %>
-                                <% addressObj.address.forEach(function(address) { %> <!-- Loop through address array -->
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-1"><%= address.name %></h5>
-                                            <p class="mb-1">
-                                                House Name: <%= address.houseName %><br>
-                                                Address: <%= address.city %>, <%= address.state %>, <%= address.pincode %><br>
-                                                Landmark: <%= address.landMark %><br>
-                                                Phone: <%= address.phone %>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editAddressModal-<%= address._id %>">Edit</button>
-                                            <form action="/users/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <% addresses.forEach(function(address) { %> <!-- Iterating directly over addresses array -->
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1"><%= address.addressType %> Address</h5> <!-- Display Address Type -->
+                                        <p class="mb-1">
+                                            <strong>Name:</strong> <%= address.name %><br>
+                                            <strong>House/Apartment:</strong> <%= address.houseName %><br>
+                                            <strong>Landmark:</strong> <%= address.landMark %><br>
+                                            <strong>City:</strong> <%= address.city %><br>
+                                            <strong>State:</strong> <%= address.state %><br>
+                                            <strong>Pincode:</strong> <%= address.pincode %><br>
+                                            <strong>Phone:</strong> <%= address.phone %><br>
+                                            <% if (address.altPhone) { %>
+                                                <strong>Alternate Phone:</strong> <%= address.altPhone %><br>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <!-- Edit Button triggers the modal -->
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editAddressModal-<%= address._id %>">Edit</button>
+                                        
+                                        <!-- Delete Form -->
+                                        <form action="/users/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Edit Modal for Each Address -->
+                                <div class="modal fade" id="editAddressModal-<%= address._id %>" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel-<%= address._id %>" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <form action="/users/addresses/edit/<%= address._id %>" method="POST">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editAddressModalLabel-<%= address._id %>">Edit Address</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Hidden User ID (optional, if needed) -->
+                                                    <input type="hidden" name="userId" value="<%= userId %>">
+
+                                                    <!-- Address Type -->
+                                                    <div class="form-group">
+                                                        <label for="addressType-<%= address._id %>">Address Type</label>
+                                                        <select id="addressType-<%= address._id %>" name="addressType" class="form-control" required>
+                                                            <option value="">Select Type</option>
+                                                            <option value="Home" <%= address.addressType === 'Home' ? 'selected' : '' %>>Home</option>
+                                                            <option value="Work" <%= address.addressType === 'Work' ? 'selected' : '' %>>Work</option>
+                                                            <option value="Other" <%= address.addressType === 'Other' ? 'selected' : '' %>>Other</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Name -->
+                                                    <div class="form-group">
+                                                        <label for="name-<%= address._id %>">Full Name</label>
+                                                        <input type="text" id="name-<%= address._id %>" name="name" class="form-control" value="<%= address.name %>" required>
+                                                    </div>
+
+                                                    <!-- House/Apartment Name -->
+                                                    <div class="form-group">
+                                                        <label for="houseName-<%= address._id %>">House/Apartment Name</label>
+                                                        <input type="text" id="houseName-<%= address._id %>" name="houseName" class="form-control" value="<%= address.houseName %>" required>
+                                                    </div>
+
+                                                    <!-- Landmark -->
+                                                    <div class="form-group">
+                                                        <label for="landMark-<%= address._id %>">Landmark</label>
+                                                        <input type="text" id="landMark-<%= address._id %>" name="landMark" class="form-control" value="<%= address.landMark %>" required>
+                                                    </div>
+
+                                                    <!-- City -->
+                                                    <div class="form-group">
+                                                        <label for="city-<%= address._id %>">City</label>
+                                                        <input type="text" id="city-<%= address._id %>" name="city" class="form-control" value="<%= address.city %>" required>
+                                                    </div>
+
+                                                    <!-- State -->
+                                                    <div class="form-group">
+                                                        <label for="state-<%= address._id %>">State</label>
+                                                        <input type="text" id="state-<%= address._id %>" name="state" class="form-control" value="<%= address.state %>" required>
+                                                    </div>
+
+                                                    <!-- Pincode -->
+                                                    <div class="form-group">
+                                                        <label for="pincode-<%= address._id %>">Pincode</label>
+                                                        <input type="number" id="pincode-<%= address._id %>" name="pincode" class="form-control" value="<%= address.pincode %>" min="100000" max="999999" required>
+                                                    </div>
+
+                                                    <!-- Phone -->
+                                                    <div class="form-group">
+                                                        <label for="phone-<%= address._id %>">Phone Number</label>
+                                                        <input type="text" id="phone-<%= address._id %>" name="phone" class="form-control" value="<%= address.phone %>" pattern="^\d{10}$" required>
+                                                    </div>
+
+                                                    <!-- Alternate Phone -->
+                                                    <div class="form-group">
+                                                        <label for="altPhone-<%= address._id %>">Alternate Phone Number</label>
+                                                        <input type="text" id="altPhone-<%= address._id %>" name="altPhone" class="form-control" value="<%= address.altPhone %>" pattern="^\d{10}$">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
-
-                                    <!-- Edit Modal for Each Address -->
-                                    <div class="modal fade" id="editAddressModal-<%= address._id %>" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <form action="/users/addresses/edit/<%= address._id %>" method="POST">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Edit Address</h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <input type="hidden" name="userId" value="<%= userId %>">
-                                                        <!-- Include other fields like name, city, phone etc. for editing -->
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            <% }) %>
+                                </div>
+                            <% }); %> <!-- End of addresses.forEach -->
                         <% } else { %>
-                            <div class="alert alert-info">No addresses found.</div>
+                            <div class="alert alert-info">No addresses found. <a href="/addAddress" class="btn btn-primary btn-sm">Add a new address</a></div>
                         <% } %>                
                     </div>
                 </div>
             </div>
 
             <!-- Pagination -->
-            <div class="row mt-4">
-                <div class="col-md-12 text-center">
-                    <% if(currentPage > 1) { %>
-                        <a href="/addresses/<%= user._id %>?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
-                    <% } %>
-                    <% for(let i = 1; i <= totalPages; i++) { %>
-                        <a href="/addresses/<%= user._id %>?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
-                    <% } %>
-                    <% if(currentPage < totalPages) { %>
-                        <a href="/addresses/<%= user._id %>?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
-                    <% } %>
+            <% if(totalPages > 1) { %> <!-- Only show pagination if there's more than one page -->
+                <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                        <!-- Previous Button -->
+                        <% if(currentPage > 1) { %>
+                            <a href="/addresses/<%= userId %>?page=<%= currentPage - 1 %>&limit=<%= limit || 5 %>" class="btn btn-secondary">Previous</a>
+                        <% } else { %>
+                            <button class="btn btn-secondary" disabled>Previous</button>
+                        <% } %>
+                        
+                        <!-- Page Numbers -->
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <a href="/addresses/<%= userId %>?page=<%= i %>&limit=<%= limit || 5 %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                        <% } %>
+                        
+                        <!-- Next Button -->
+                        <% if(currentPage < totalPages) { %>
+                            <a href="/addresses/<%= userId %>?page=<%= currentPage + 1 %>&limit=<%= limit || 5 %>" class="btn btn-secondary">Next</a>
+                        <% } else { %>
+                            <button class="btn btn-secondary" disabled>Next</button>
+                        <% } %>
+                    </div>
                 </div>
-            </div>
+            <% } %>
         </div>
     </div>
 </div>
 
-
-
-<%-include("../../views/partials/user/footer")%>
+<%- include("../../views/partials/user/footer") %>

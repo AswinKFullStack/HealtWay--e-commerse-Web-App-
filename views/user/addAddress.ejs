@@ -27,16 +27,33 @@
         <!-- Main Content Area -->
         <div class="col-md-9">
             <h2 class="mb-4">Add New Address</h2>
+             <!-- Display Success Message -->
+             <% if (typeof message !== 'undefined' && message) { %>
+                <div class="alert alert-success">
+                    <%= message %>
+                </div>
+            <% } %>
+
+            <!-- Display Validation Errors -->
+            <% if (errors && errors.length > 0) { %>
+                <div class="alert alert-danger">
+                    <ul>
+                        <% errors.forEach(function(error) { %>
+                            <li><%= error %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
 
             <!-- Add Address Form -->
             <form id="addAddressForm" class="add-address-form" action="/addAddress" method="POST" novalidate>
                 <div class="form-group mb-3">
                     <label for="addressType" class="form-label">Address Type <span class="text-danger">*</span></label>
                     <select id="addressType" name="addressType" class="form-control" required>
-                        <option value="">Select Type</option>
-                        <option value="Home">Home</option>
-                        <option value="Work">Work</option>
-                        <option value="Other">Other</option>
+                         <option value="">Select Type</option>
+                        <option value="Home" <%= formData.addressType === 'Home' ? 'selected' : '' %>>Home</option>
+                        <option value="Work" <%= formData.addressType === 'Work' ? 'selected' : '' %>>Work</option>
+                        <option value="Other" <%= formData.addressType === 'Other' ? 'selected' : '' %>>Other</option>
                     </select>
                     <div class="invalid-feedback">
                         Please select an address type.
@@ -45,7 +62,7 @@
 
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" value="<%= formData.name || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter your name.
                     </div>
@@ -53,7 +70,7 @@
 
                 <div class="form-group mb-3">
                     <label for="houseName" class="form-label">House/Apartment Name <span class="text-danger">*</span></label>
-                    <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name" required>
+                    <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name" value="<%= formData.houseName || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter your house or apartment name.
                     </div>
@@ -61,7 +78,7 @@
 
                 <div class="form-group mb-3">
                     <label for="landMark" class="form-label">Landmark <span class="text-danger">*</span></label>
-                    <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark" required>
+                    <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark" value="<%= formData.landMark || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter a landmark.
                     </div>
@@ -69,7 +86,7 @@
 
                 <div class="form-group mb-3">
                     <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-                    <input type="text" id="city" name="city" class="form-control" placeholder="Enter city" required>
+                    <input type="text" id="city" name="city" class="form-control" placeholder="Enter city" value="<%= formData.city || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter your city.
                     </div>
@@ -77,7 +94,7 @@
 
                 <div class="form-group mb-3">
                     <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-                    <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" required>
+                    <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= formData.state || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter your state.
                     </div>
@@ -85,7 +102,7 @@
 
                 <div class="form-group mb-3">
                     <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-                    <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" min="100000" max="999999" required>
+                    <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" min="100000" max="999999" value="<%= formData.pincode || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter a valid 6-digit pincode.
                     </div>
@@ -93,15 +110,16 @@
 
                 <div class="form-group mb-3">
                     <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number" pattern="^\d{10}$" required>
+                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number" pattern="^\d{10}$" value="<%= formData.phone || '' %>" required>
                     <div class="invalid-feedback">
                         Please enter a valid 10-digit phone number.
                     </div>
                 </div>
 
                 <div class="form-group mb-4">
-                    <label for="altPhone" class="form-label">Alternate Phone Number</label>
-                    <input type="text" id="altPhone" name="altPhone" class="form-control" placeholder="Enter alternate phone number" pattern="^\d{10}$">
+                    <label for="altPhone">Alternate Phone Number</label>
+                    <input type="text" id="altPhone" name="altPhone" class="form-control" pattern="^\d{10}$" value="<%= formData.altPhone || '' %>">
+                    <small class="form-text text-muted">Optional. Must be a 10-digit number.</small>
                     <div class="invalid-feedback">
                         Please enter a valid 10-digit alternate phone number.
                     </div>
