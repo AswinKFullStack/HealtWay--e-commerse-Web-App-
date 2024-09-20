@@ -14,10 +14,10 @@ const getAddressesView = async (req,res) => {
     try {
         const { page = 1, limit = 3 } = req.query;
         const userId = req.params.userId;
-        
-        const addressDoc = await Address.findOne({ userId }).select('address');
+        const message = req.query.message; // Check if message is passed in query
+        const addressDoc = await Address.findOne({ userId }).select('address').lean();
 
-        if (!addressDoc) {
+        if (!addressDoc || addressDoc.address.length === 0) {
             return res.render('Address-mngt', {
                 title: 'Address management',
                 activePage: 'address management',
@@ -30,14 +30,22 @@ const getAddressesView = async (req,res) => {
             });
         }
 
-        const totalAddresses = addressDoc.address.length;
+        
+         // Sort the addresses in descending order based on createdAt (latest first)
+         const sortedAddresses = addressDoc.address.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt) : a._id.getTimestamp();
+            const dateB = b.createdAt ? new Date(b.createdAt) : b._id.getTimestamp();
+            return dateB - dateA;
+        });
+
+        const totalAddresses = sortedAddresses.length;
         const totalPages = Math.ceil(totalAddresses / limit);
         const currentPage = parseInt(page, 10) > totalPages ? totalPages : parseInt(page, 10);
 
         const startIndex = (currentPage - 1) * limit;
         const endIndex = startIndex + parseInt(limit, 10);
 
-        const paginatedAddresses = addressDoc.address.slice(startIndex, endIndex);
+        const paginatedAddresses = sortedAddresses.slice(startIndex, endIndex);
 
         const user =await User.findById(req.session.user);
         res.render('Address-mngt', {
@@ -49,7 +57,8 @@ const getAddressesView = async (req,res) => {
             currentPage, 
             totalPages,
             totalAddresses,
-            limit});
+            limit,
+        message});
 
     } catch (error) {
         console.error("Error fetching addresses(getAddressesView)", error);
@@ -162,8 +171,8 @@ const postAddAddress = async (req,res) => {
             });
         }
         await addressDoc.save();
-       
-        res.redirect(`/addresses/${user._id}?message=Address added successfully`);
+        const message = "Address added successfully!";
+        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
 
     } catch (error) {
         console.error("Error saving address (postAddAddress)", error);

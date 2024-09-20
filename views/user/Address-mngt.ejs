@@ -6,7 +6,6 @@
         <!-- Sidebar -->
         <div class="col-md-3 mb-4">
             <div class="list-group">
-                <!-- Sidebar buttons remain unchanged -->
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'dashboard') ? 'active' : '' %>" onclick="location.href='/profileview/<%= user._id %>'">
                     My Profile
                 </button>
@@ -57,13 +56,20 @@
                                             <% if (address.altPhone) { %>
                                                 <strong>Alternate Phone:</strong> <%= address.altPhone %><br>
                                             <% } %>
+                                            <small class="text-muted">
+                                                Added on: 
+                                                <% if (address.createdAt) { %>
+                                                    <%= new Date(address.createdAt).toDateString() %>
+                                                <% } else if (address._id) { %>
+                                                    <%= address._id.getTimestamp().toDateString() %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </small>
                                         </p>
                                     </div>
                                     <div>
-                                        <!-- Edit Button triggers the modal -->
                                         <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editAddressModal-<%= address._id %>">Edit</button>
-                                        
-                                        <!-- Delete Form -->
                                         <form action="/users/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</button>
                                         </form>
@@ -158,35 +164,35 @@
                         <% } %>                
                     </div>
                 </div>
-            </div>
 
-            <!-- Pagination -->
-            <% if(totalPages > 1) { %> <!-- Only show pagination if there's more than one page -->
-                <div class="row mt-4">
-                    <div class="col-md-12 text-center">
-                        <!-- Previous Button -->
-                        <% if(currentPage > 1) { %>
-                            <a href="/addresses/<%= userId %>?page=<%= currentPage - 1 %>&limit=<%= limit || 5 %>" class="btn btn-secondary">Previous</a>
-                        <% } else { %>
-                            <button class="btn btn-secondary" disabled>Previous</button>
-                        <% } %>
-                        
-                        <!-- Page Numbers -->
-                        <% for(let i = 1; i <= totalPages; i++) { %>
-                            <a href="/addresses/<%= userId %>?page=<%= i %>&limit=<%= limit || 5 %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
-                        <% } %>
-                        
-                        <!-- Next Button -->
-                        <% if(currentPage < totalPages) { %>
-                            <a href="/addresses/<%= userId %>?page=<%= currentPage + 1 %>&limit=<%= limit || 5 %>" class="btn btn-secondary">Next</a>
-                        <% } else { %>
-                            <button class="btn btn-secondary" disabled>Next</button>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-        </div>
-    </div>
-</div>
+                 <!-- Pagination -->
+                 <% if(totalPages > 1) { %> <!-- Only show pagination if there's more than one page -->
+                 <div class="row mt-4">
+                     <div class="col-md-12 text-center">
+                         <!-- Previous Button -->
+                         <% if(currentPage > 1) { %>
+                             <a href="/addresses/<%= userId %>?page=<%= currentPage - 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Previous</a>
+                         <% } else { %>
+                             <button class="btn btn-secondary" disabled>Previous</button>
+                         <% } %>
+                         
+                         <!-- Page Numbers -->
+                         <% for(let i = 1; i <= totalPages; i++) { %>
+                             <a href="/addresses/<%= userId %>?page=<%= i %>&limit=<%= limit || 3 %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                         <% } %>
+                         
+                         <!-- Next Button -->
+                         <% if(currentPage < totalPages) { %>
+                             <a href="/addresses/<%= userId %>?page=<%= currentPage + 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Next</a>
+                         <% } else { %>
+                             <button class="btn btn-secondary" disabled>Next</button>
+                         <% } %>
+                     </div>
+                 </div>
+             <% } %>
+         </div>
+     </div>
+ </div>
 
-<%- include("../../views/partials/user/footer") %>
+ <%- include("../../views/partials/user/footer") %>
+

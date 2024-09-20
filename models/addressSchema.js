@@ -1,14 +1,7 @@
  const mongoose = require("mongoose");
  const {Schema} = mongoose;
 
- const addressSchema = new Schema({
-    userId:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    },
-    address:[{
-        _id: { type: Schema.Types.ObjectId, auto: true },  // Unique ID for each address
+ const individualAddressSchema = new mongoose.Schema({
         addressType: {
             type: String,
             enum: ['Home', 'Work', 'Other'],  // Optional: pre-defined values for address type
@@ -60,11 +53,15 @@
                 message: props => `${props.value} is not a valid alternate phone number!`
             }
         }
-        
-        
-    }]
+    },{ timestamps: true });
 
- },{ timestamps: true })
+    const addressSchema = new mongoose.Schema({
+        userId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'User', 
+            required: true },
+        address: [individualAddressSchema] // Use the subschema here
+    }, { timestamps: true });
 
  const Address = mongoose.model("Address",addressSchema)
  module.exports = Address;
