@@ -69,9 +69,9 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addresses/edit/<%= address._id %>'">Edit</button>
+                                        <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addressEdit/<%= address._id %>'">Edit</button>
                                         
-                                        <form action="/addresses/delete/<%= address._id %>" method="POST" style="display: inline;">
+                                        <form action="/addressDelete/<%= address._id %>" method="POST" style="display: inline;">
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</button>
                                         </form>
                                     </div>

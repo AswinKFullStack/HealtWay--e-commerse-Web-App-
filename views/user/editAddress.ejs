@@ -46,8 +46,8 @@
             <% } %>
 
             <!-- Edit Address Form -->
-            <% if (address && address.length > 0) { %>                
-            <form id="editAddressForm" class="edit-address-form add-address-form" action="/users/addresses/edit/<%= address[0]._id %>" method="POST" novalidate>
+            <% if (address) { %>                
+            <form id="editAddressForm" class="edit-address-form add-address-form" action="/addressEdit/<%= address._id %>" method="POST" novalidate>
 
                            
                     <!-- Address Type -->
@@ -55,9 +55,9 @@
                         <label for="addressType" class="form-label">Address Type <span class="text-danger">*</span></label>
                         <select id="addressType" name="addressType" class="form-control" required>
                             <option value="">Select Type</option>
-                            <option value="Home" <%= address[0].addressType === 'Home' ? 'selected' : '' %>>Home</option>
-                            <option value="Work" <%= address[0].addressType === 'Work' ? 'selected' : '' %>>Work</option>
-                            <option value="Other" <%= address[0].addressType === 'Other' ? 'selected' : '' %>>Other</option>
+                            <option value="Home" <%= address.addressType === 'Home' ? 'selected' : '' %>>Home</option>
+                            <option value="Work" <%= address.addressType === 'Work' ? 'selected' : '' %>>Work</option>
+                            <option value="Other" <%= address.addressType === 'Other' ? 'selected' : '' %>>Other</option>
                         </select>
                         <div class="invalid-feedback">Please select an address type.</div>
                     </div>
@@ -67,7 +67,7 @@
                     <!-- Name -->
                     <div class="form-group mb-3">
                         <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                        <input type="text" id="name" name="name" class="form-control"  placeholder="Enter your full name" value="<%= address[0].name %>" required>
+                        <input type="text" id="name" name="name" class="form-control"  placeholder="Enter your full name" value="<%= address.name %>" required>
                         <div class="invalid-feedback">
                             Please enter your name.
                         </div>
@@ -76,49 +76,49 @@
                     <!-- House/Apartment Name -->
     <div class="form-group mb-3">
         <label for="houseName" class="form-label">House/Apartment Name <span class="text-danger">*</span></label>
-        <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name" value="<%= address[0].houseName %>" required>
+        <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name" value="<%= address.houseName %>" required>
         <div class="invalid-feedback">Please enter your house/apartment name.</div>
     </div>
 
     <!-- Landmark -->
     <div class="form-group mb-3">
         <label for="landMark" class="form-label">Landmark <span class="text-danger">*</span></label>
-        <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark" value="<%= address[0].landMark %>" required>
+        <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark" value="<%= address.landMark %>" required>
         <div class="invalid-feedback">Please enter a landmark.</div>
     </div>
 
     <!-- City -->
     <div class="form-group mb-3">
         <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-        <input type="text" id="city" name="city" class="form-control" placeholder="Enter city" value="<%= address[0].city %>" required>
+        <input type="text" id="city" name="city" class="form-control" placeholder="Enter city" value="<%= address.city %>" required>
         <div class="invalid-feedback">Please enter a city.</div>
     </div>
 
     <!-- State -->
     <div class="form-group mb-3">
         <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-        <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= address[0].state %>" required>
+        <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= address.state %>" required>
         <div class="invalid-feedback">Please enter a state.</div>
     </div>
 
     <!-- Pincode -->
     <div class="form-group mb-3">
         <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-        <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" value="<%= address[0].pincode %>" min="100000" max="999999" required>
+        <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" value="<%= address.pincode %>" min="100000" max="999999" required>
         <div class="invalid-feedback">Please enter a valid pincode (6 digits).</div>
     </div>
 
     <!-- Phone Number -->
     <div class="form-group mb-3">
         <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
-        <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter phone number" value="<%= address[0].phone %>" pattern="^\d{10}$" required>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter phone number" value="<%= address.phone %>" pattern="^\d{10}$" required>
         <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
     </div>
 
     <!-- Alternate Phone Number -->
     <div class="form-group mb-3">
         <label for="altPhone" >Alternate Phone Number</label>
-        <input type="tel" id="altPhone" name="altPhone" class="form-control" value="<%= address[0].altPhone %>" pattern="^\d{10}$">
+        <input type="tel" id="altPhone" name="altPhone" class="form-control" value="<%= address.altPhone %>" pattern="^\d{10}$">
         <small class="form-text text-muted">Optional. Must be a 10-digit number.</small>
         <div class="invalid-feedback">Must be a 10-digit number if provided</div>
     </div>
@@ -126,8 +126,9 @@
     <!-- Submit Button -->
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="location.href='/addresses/<%= user._id %>'">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        
     </div>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
 </form>
 
                         <% } else { %>

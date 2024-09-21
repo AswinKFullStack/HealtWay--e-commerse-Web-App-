@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const User = require("../../models/userSchema");
 const Address = require('../../models/addressSchema');
 
@@ -49,7 +48,8 @@ const getAddressesView = async (req,res) => {
         const endIndex = startIndex + parseInt(limit, 10);
 
         const paginatedAddresses = sortedAddresses.slice(startIndex, endIndex);
-        console.log(paginatedAddresses);
+        console.log("Address view:-",paginatedAddresses);
+        
         
 
         const user =await User.findById(req.session.user);
@@ -189,7 +189,7 @@ const postAddAddress = async (req,res) => {
 
 const getEditAddress = async (req,res) => {
     try {
-        // Fetch the user based on session
+        
         const user = await User.findById(req.session.user);
         const addressId = req.params.addressId;
 
@@ -199,7 +199,7 @@ const getEditAddress = async (req,res) => {
 
         console.log('Address ID:', addressId);
 
-        // Validate and convert addressId to ObjectId
+        // Validate  addressId 
         if (!mongoose.Types.ObjectId.isValid(addressId)) {
             return res.status(400).render('editAddress', {
                 title: 'Edit Address',
@@ -210,7 +210,7 @@ const getEditAddress = async (req,res) => {
         }
     
         const addressObjectId = new mongoose.Types.ObjectId(addressId);
-        const userId = new mongoose.Types.ObjectId(user._id);
+        const userId = user._id;
         const aggregationResult = await Address.aggregate([
             { $match: { userId} },
             { $unwind: '$address' }, // Unwind the address array to filter on individual addresses
@@ -229,7 +229,7 @@ const getEditAddress = async (req,res) => {
             });
         }
 
-        const address = aggregationResult; // Extract the address object
+        const address = aggregationResult[0]; // Extract the address object
 
         // Render the editAddress view with the found address
         res.render('editAddress', {
@@ -249,9 +249,120 @@ const getEditAddress = async (req,res) => {
     }
 };
 
+///  Edit address
+const postEditAddress = async (req,res)=>{
+    try {
+
+        const user = await User.findById(req.session.user);
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+        const addressId = req.params.addressId;
+        const {
+            addressType,
+            name,
+            houseName,
+            landMark,
+            city,
+            state,
+            pincode,
+            phone,
+            altPhone
+        } = req.body;
+
+        if (!addressType || !name || !houseName || !landMark || !city || !state || !pincode || !phone) {
+
+            const message = "All required fields must be filled.";
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        const pincodeNumber = Number(pincode);
+        if (isNaN(pincodeNumber) || pincodeNumber < 100000 || pincodeNumber > 999999) {
+           
+            const message = "Pincode must be a valid 6-digit number.";
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        const phonePattern = /^\d{10}$/;
+        if (!phonePattern.test(phone)) {
+            const message = "Phone number must be a valid 10-digit number.";
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        if (altPhone && !phonePattern.test(altPhone)) {
+            
+            const message = "Alternate phone number must be a valid 10-digit number.";
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        const updatedAddress = {
+            addressType,
+            name,
+            houseName,
+            landMark,
+            city,
+            state,
+            pincode: pincodeNumber,
+            phone,
+            ...(altPhone && { altPhone })
+        };
+       
+         // Validate and convert addressId to ObjectId
+         if (!mongoose.Types.ObjectId.isValid(addressId)) {
+            const message = "Invalid Address ID.";
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        const addressObjectId = new mongoose.Types.ObjectId(addressId);
+        const userId = user._id; // user._id is already an ObjectId
+        console.log(`Updating address for user ID: ${userId} and address ID: ${addressObjectId}`);
+        // Perform the update
+        const addressUpdateResult = await Address.updateOne(
+            { userId, 'address._id': addressObjectId }, // Match the user and the specific address
+            {
+                $set: {
+                    'address.$.addressType': addressType,
+                    'address.$.name': name,
+                    'address.$.houseName': houseName,
+                    'address.$.landMark': landMark,
+                    'address.$.city': city,
+                    'address.$.state': state,
+                    'address.$.pincode': pincodeNumber,
+                    'address.$.phone': phone,
+                    ...(altPhone && { 'address.$.altPhone': altPhone })
+                }
+            }
+        );
+
+        
+        console.log('Update Result:', addressUpdateResult);
+
+
+        // Check if any document was matched and modified
+        if (addressUpdateResult.matchedCount === 0) {
+            const message = "Address not found.";
+            return res.status(404).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+        }
+
+        if (addressUpdateResult.modifiedCount === 0) {
+            const message = "No changes were made to the address.";
+            return res.status(200).redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
+        }
+        
+        // Successful update
+        const successMessage = "Address edited successfully!";
+        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}`);
+
+    } catch (error) {
+        console.error("Error Editing address (postEditAddress)", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while Editing the address.", req.headers.referer || `/addAddress`);
+        
+    }
+}
 module.exports={
     getAddressesView,
     getAddAddress,
     postAddAddress,
-    getEditAddress
+    getEditAddress,
+    postEditAddress
 }
