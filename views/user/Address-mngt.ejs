@@ -71,8 +71,8 @@
                                     <div>
                                         <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addressEdit/<%= address._id %>'">Edit</button>
                                         
-                                        <form action="/addressDelete/<%= address._id %>" method="POST" style="display: inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this address?');">Delete</button>
+                                        <form action="/addressDelete/<%= address._id %>" method="POST" class="delete-form" style="display: inline;">
+                                            <button type="button" class="btn btn-danger btn-sm delete-btn">Delete</button>
                                         </form>
                                     </div>
                                 </div>
@@ -114,5 +114,9 @@
      </div>
  </div>
 
+ 
+ <script src="/js/userJs/address-mngt.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  <%- include("../../views/partials/user/footer") %>
+
 
