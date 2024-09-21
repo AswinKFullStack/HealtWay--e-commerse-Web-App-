@@ -20,20 +20,27 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 
 const getProfileView = async (req,res) => {
     try {
+        
         const userId = req.params.id;
-        const [user, orders = [], wishlists = [], cartItems = [], addresses] = await Promise.all([
+        const [user, orders = [], wishlists = [], cartItems = [], addressDoc] = await Promise.all([
             User.findById(userId),
             Order.find({ user: userId }),
             Wishlist.find({ user: userId }),
             Cart.find({ user: userId }),
-            Address.find({ userId }).sort({ 'updatedAt': -1 }) 
+            Address.findOne({ userId }).select('address')
 
         ]);
         if (!user) {
             return renderErrorPage(res, 404, "User Not Found", "The requested user profile could not be found.", '/');
         }
+        // Get the latest address from the address array (if it exists)
+        let sortedAddresses = [];
+        if (addressDoc && addressDoc.address.length > 0) {
+            // Sort addresses by createdAt in descending order to get the latest address first
+            sortedAddresses = addressDoc.address.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
 
-
+        let lastAddedAddress = sortedAddresses[0] || {};
         const totalOrders = orders.length;
         const pendingOrders = orders.filter(order => order.status === 'Pending').length;
         const completedOrders = orders.filter(order => order.status === 'Completed').length;
@@ -52,7 +59,7 @@ const getProfileView = async (req,res) => {
             orders, 
             wishlists: wishlists || [],
             cartItems: cartItems || [],
-            addresses: addresses || [],
+            lastAddedAddress,
            
          });
     } catch (error) {

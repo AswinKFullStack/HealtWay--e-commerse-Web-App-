@@ -67,20 +67,20 @@
                 <!-- Billing Address -->
                 <div class="mb-4">
                     <h4>Last Added Address</h4>
-                    <% if (addresses && addresses.length > 0) { %>
+                    <% if (lastAddedAddress) { %>
                         <p id="billingAddress">
-                            <strong>Type:</strong> <%= addresses[0].addressType %><br>
-                            <strong>Name:</strong> <%= addresses[0].name || "Name not provided" %><br>
-                            <strong>Landmark:</strong> <%= addresses[0].landMark || "Landmark not provided" %><br>
-                            <strong>City:</strong> <%= addresses[0].city || "City not provided" %><br>
-                            <strong>State:</strong> <%= addresses[0].state || "State not provided" %><br>
-                            <strong>Pincode:</strong> <%= addresses[0].pincode || "Pincode not provided" %><br>
-                            <strong>Phone:</strong> <%= addresses[0].phone || "Phone not provided" %><br>
-                            <% if (addresses[0].altPhone) { %>
-                                <strong>Alternate Phone:</strong> <%= addresses[0].altPhone %><br>
+                            <strong>Type:</strong> <%= lastAddedAddress.addressType %><br>
+                            <strong>Name:</strong> <%= lastAddedAddress.name || "Name not provided" %><br>
+                            <strong>Landmark:</strong> <%= lastAddedAddress.landMark || "Landmark not provided" %><br>
+                            <strong>City:</strong> <%= lastAddedAddress.city || "City not provided" %><br>
+                            <strong>State:</strong> <%= lastAddedAddress.state || "State not provided" %><br>
+                            <strong>Pincode:</strong> <%= lastAddedAddress.pincode || "Pincode not provided" %><br>
+                            <strong>Phone:</strong> <%= lastAddedAddress.phone || "Phone not provided" %><br>
+                            <% if (lastAddedAddress.altPhone) { %>
+                                <strong>Alternate Phone:</strong> <%= lastAddedAddress.altPhone %><br>
                             <% } %>
                         </p>
-                        <button class="btn btn-primary" onclick="location.href='/editAddress/<%= addresses[0]._id %>'">Edit Address</button>
+                        <button class="btn btn-primary" onclick="location.href='/editAddress/<%= lastAddedAddress._id %>'">Edit Address</button>
                     <% } else { %>
                         <p id="billingAddress">No Address Available</p>
                         <button class="btn btn-primary" onclick="location.href='/addAddress'">Add Address</button>
