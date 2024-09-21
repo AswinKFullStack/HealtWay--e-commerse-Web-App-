@@ -48,7 +48,7 @@ const getAddressesView = async (req,res) => {
         const endIndex = startIndex + parseInt(limit, 10);
 
         const paginatedAddresses = sortedAddresses.slice(startIndex, endIndex);
-        console.log("Address view:-",paginatedAddresses);
+        
         
         
 
@@ -359,10 +359,40 @@ const postEditAddress = async (req,res)=>{
         
     }
 }
+
+
+
+////////DELETE ADDRESS
+const deleteAddress = async (req,res) => {
+    try {
+        const user = await User.findById(req.session.user);
+        if(!user){
+            return res.status(404).send("User Not found");
+        }
+        const addressId = req.params.addressId;
+        const addressDoc = await Address.findOne({ userId :user._id, "address._id": addressId });
+        if(!addressDoc){
+            const message = "Address not found."
+            return res.status(404).redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
+        }
+        
+        await Address.updateOne(
+            { userId : user._id },
+            { $pull: { address: { _id: addressId } } }
+        );
+        // Successful update
+        const successMessage = "Address deleted successfully!";
+        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}`);
+    } catch (error) {
+        console.error("Error deleting address(deleteAddress)", error);
+        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while deleting the address.", req.headers.referer || `/addresses/${req.body.userId}`);
+    }
+}
 module.exports={
     getAddressesView,
     getAddAddress,
     postAddAddress,
     getEditAddress,
-    postEditAddress
+    postEditAddress,
+    deleteAddress
 }

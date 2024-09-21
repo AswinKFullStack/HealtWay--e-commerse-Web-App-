@@ -66,6 +66,7 @@ router.post('/addAddress',userAuth,addressController.postAddAddress);
 router.get('/addresses/:userId',userAuth, addressController.getAddressesView);
 router.get('/addressEdit/:addressId',userAuth, addressController.getEditAddress);
 router.post('/addressEdit/:addressId',userAuth, addressController.postEditAddress);
+router.post('/addressDelete/:addressId',userAuth, addressController.deleteAddress);
 
 
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
