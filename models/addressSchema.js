@@ -53,7 +53,7 @@
                 message: props => `${props.value} is not a valid alternate phone number!`
             }
         }
-    },{ timestamps: true });
+    },{ timestamps: true, _id: true });
 
     const addressSchema = new mongoose.Schema({
         userId: { 

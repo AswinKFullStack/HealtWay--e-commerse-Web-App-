@@ -1,5 +1,8 @@
+const mongoose = require('mongoose');
+
 const User = require("../../models/userSchema");
 const Address = require('../../models/addressSchema');
+
 
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
     res.status(errorCode).render('error-page', {
@@ -46,6 +49,8 @@ const getAddressesView = async (req,res) => {
         const endIndex = startIndex + parseInt(limit, 10);
 
         const paginatedAddresses = sortedAddresses.slice(startIndex, endIndex);
+        console.log(paginatedAddresses);
+        
 
         const user =await User.findById(req.session.user);
         res.render('Address-mngt', {
@@ -179,8 +184,74 @@ const postAddAddress = async (req,res) => {
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while saving the address.", req.headers.referer || `/addAddress`);
     }
 }
+
+
+
+const getEditAddress = async (req,res) => {
+    try {
+        // Fetch the user based on session
+        const user = await User.findById(req.session.user);
+        const addressId = req.params.addressId;
+
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+
+        console.log('Address ID:', addressId);
+
+        // Validate and convert addressId to ObjectId
+        if (!mongoose.Types.ObjectId.isValid(addressId)) {
+            return res.status(400).render('editAddress', {
+                title: 'Edit Address',
+                activePage: 'address management',
+                user,
+                errors: ['Invalid Address ID'],
+            });
+        }
+    
+        const addressObjectId = new mongoose.Types.ObjectId(addressId);
+        const userId = new mongoose.Types.ObjectId(user._id);
+        const aggregationResult = await Address.aggregate([
+            { $match: { userId} },
+            { $unwind: '$address' }, // Unwind the address array to filter on individual addresses
+            { $match: { 'address._id': addressObjectId } },
+            { $replaceRoot: { newRoot: '$address' } } // Replace the root with the address object
+        ]);
+
+        console.log('Aggregation Result:', aggregationResult);
+
+        if (!aggregationResult || aggregationResult.length === 0) {
+            return res.status(400).render('editAddress', {
+                title: 'Edit Address',
+                activePage: 'address management',
+                user,
+                errors: ['Address not found'],
+            });
+        }
+
+        const address = aggregationResult; // Extract the address object
+
+        // Render the editAddress view with the found address
+        res.render('editAddress', {
+            title: 'Edit Address',
+            activePage: 'address management',
+            user,
+            address, // Pass the single address object
+            errors: [],
+        });
+
+    }catch (error) {
+    console.error('Error in getEditAddress:', error); // Enhanced error logging
+
+    const backLink = req.headers.referer || `/addresses/${req.session.user}`;
+    renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred while loading the edit address page.", backLink);
+    
+    }
+};
+
 module.exports={
     getAddressesView,
     getAddAddress,
-    postAddAddress
+    postAddAddress,
+    getEditAddress
 }

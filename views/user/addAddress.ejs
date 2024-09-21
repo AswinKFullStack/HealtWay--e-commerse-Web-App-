@@ -16,7 +16,7 @@
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/orders/<%= user._id %>'">Orders</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'account details') ? 'active' : '' %>" onclick="location.href='/userDetails/<%= user._id %>'">Account Details</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'address management') ? 'active' : '' %>" onclick="location.href='/addresses/<%= user._id %>'">Address Management</button>
-                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'addAddress') ? 'active' : '' %>" onclick="location.href='/addAddresses'">Add New Address</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'addAddress') ? 'active' : '' %>" onclick="location.href='/addAddress'">Add New Address</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'coupons') ? 'active' : '' %>" onclick="location.href='/coupons/<%= user._id %>'">Coupons</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'order history') ? 'active' : '' %>" onclick="location.href='/orderHistory/<%= user._id %>'">Order History</button>
                 <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'track order') ? 'active' : '' %>" onclick="location.href='/trackOrder/<%= user._id %>'">Track Order</button>

@@ -1,0 +1,142 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/profileView.css">
+<link rel="stylesheet" href="/css/userCss/addAddress.css">
+
+<!-- Main Content -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'dashboard') ? 'active' : '' %>" onclick="location.href='/profileview/<%= user._id %>'">
+                    My Profile
+                </button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'wishlist') ? 'active' : '' %>" onclick="location.href='/wishlist/<%= user._id %>'">Wishlists</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'cart') ? 'active' : '' %>" onclick="location.href='/cart/<%= user._id %>'">Cart</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/orders/<%= user._id %>'">Orders</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'account details') ? 'active' : '' %>" onclick="location.href='/userDetails/<%= user._id %>'">Account Details</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'address management') ? 'active' : '' %>" onclick="location.href='/addresses/<%= user._id %>'">Address Management</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'addAddress') ? 'active' : '' %>" onclick="location.href='/addAddress'">Add New Address</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'coupons') ? 'active' : '' %>" onclick="location.href='/coupons/<%= user._id %>'">Coupons</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'order history') ? 'active' : '' %>" onclick="location.href='/orderHistory/<%= user._id %>'">Order History</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'track order') ? 'active' : '' %>" onclick="location.href='/trackOrder/<%= user._id %>'">Track Order</button>
+                <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'wallet') ? 'active' : '' %>" onclick="location.href='/wallet/<%= user._id %>'">Wallet</button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9">
+            <h2 class="mb-4">Edit Address</h2>
+             <!-- Display Success Message -->
+             <% if (typeof message !== 'undefined' && message) { %>
+                <div class="alert alert-success">
+                    <%= message %>
+                </div>
+            <% } %>
+
+            <!-- Display Validation Errors -->
+            <% if (errors && errors.length > 0) { %>
+                <div class="alert alert-danger">
+                    <ul>
+                        <% errors.forEach(function(error) { %>
+                            <li><%= error %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+
+            <!-- Edit Address Form -->
+            <% if (address && address.length > 0) { %>                
+            <form id="editAddressForm" class="edit-address-form add-address-form" action="/users/addresses/edit/<%= address[0]._id %>" method="POST" novalidate>
+
+                           
+                    <!-- Address Type -->
+                    <div class="form-group mb-3">
+                        <label for="addressType" class="form-label">Address Type <span class="text-danger">*</span></label>
+                        <select id="addressType" name="addressType" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="Home" <%= address[0].addressType === 'Home' ? 'selected' : '' %>>Home</option>
+                            <option value="Work" <%= address[0].addressType === 'Work' ? 'selected' : '' %>>Work</option>
+                            <option value="Other" <%= address[0].addressType === 'Other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                        <div class="invalid-feedback">Please select an address type.</div>
+                    </div>
+
+                    
+
+                    <!-- Name -->
+                    <div class="form-group mb-3">
+                        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" id="name" name="name" class="form-control"  placeholder="Enter your full name" value="<%= address[0].name %>" required>
+                        <div class="invalid-feedback">
+                            Please enter your name.
+                        </div>
+                    </div>
+
+                    <!-- House/Apartment Name -->
+    <div class="form-group mb-3">
+        <label for="houseName" class="form-label">House/Apartment Name <span class="text-danger">*</span></label>
+        <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name" value="<%= address[0].houseName %>" required>
+        <div class="invalid-feedback">Please enter your house/apartment name.</div>
+    </div>
+
+    <!-- Landmark -->
+    <div class="form-group mb-3">
+        <label for="landMark" class="form-label">Landmark <span class="text-danger">*</span></label>
+        <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark" value="<%= address[0].landMark %>" required>
+        <div class="invalid-feedback">Please enter a landmark.</div>
+    </div>
+
+    <!-- City -->
+    <div class="form-group mb-3">
+        <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+        <input type="text" id="city" name="city" class="form-control" placeholder="Enter city" value="<%= address[0].city %>" required>
+        <div class="invalid-feedback">Please enter a city.</div>
+    </div>
+
+    <!-- State -->
+    <div class="form-group mb-3">
+        <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+        <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= address[0].state %>" required>
+        <div class="invalid-feedback">Please enter a state.</div>
+    </div>
+
+    <!-- Pincode -->
+    <div class="form-group mb-3">
+        <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+        <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" value="<%= address[0].pincode %>" min="100000" max="999999" required>
+        <div class="invalid-feedback">Please enter a valid pincode (6 digits).</div>
+    </div>
+
+    <!-- Phone Number -->
+    <div class="form-group mb-3">
+        <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter phone number" value="<%= address[0].phone %>" pattern="^\d{10}$" required>
+        <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
+    </div>
+
+    <!-- Alternate Phone Number -->
+    <div class="form-group mb-3">
+        <label for="altPhone" >Alternate Phone Number</label>
+        <input type="tel" id="altPhone" name="altPhone" class="form-control" value="<%= address[0].altPhone %>" pattern="^\d{10}$">
+        <small class="form-text text-muted">Optional. Must be a 10-digit number.</small>
+        <div class="invalid-feedback">Must be a 10-digit number if provided</div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="location.href='/addresses/<%= user._id %>'">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+
+                        <% } else { %>
+                            <div class="alert alert-info">No address found. <a href="/addAddress" class="btn btn-primary btn-sm">Add a new address</a></div>
+                        <% } %> 
+        </div>
+    </div>
+</div>
+
+
+<%- include("../../views/partials/user/footer") %>
+<script src="/js/userJs/editAddress.js"></script>
