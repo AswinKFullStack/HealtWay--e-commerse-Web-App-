@@ -1,5 +1,5 @@
 // JavaScript for Form Validation
-
+clearValidationErrors();
 document.getElementById('editProfileForm').addEventListener('submit', function(event) {
     let isValid = true;
     const name = document.getElementById('name');

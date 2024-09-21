@@ -47,7 +47,7 @@
 
             <!-- Edit Address Form -->
             <% if (address) { %>                
-            <form id="editAddressForm" class="edit-address-form add-address-form" action="/addressEdit/<%= address._id %>" method="POST" novalidate>
+            <form id="editAddressForm" class="edit-address-form add-address-form" action="/addressEdit/<%= address._id %>?page=<%= currentPage %>" method="POST" novalidate>
 
                            
                     <!-- Address Type -->
@@ -125,7 +125,7 @@
 
     <!-- Submit Button -->
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="location.href='/addresses/<%= user._id %>'">Cancel</button>
+        <button type="button" class="btn btn-secondary" onclick="location.href='/addresses/<%= user._id %>?page=<%= currentPage %>'">Cancel</button>
         
     </div>
     <button type="submit" class="btn btn-primary">Save Changes</button>

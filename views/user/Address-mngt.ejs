@@ -69,11 +69,18 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addressEdit/<%= address._id %>'">Edit</button>
-                                        
-                                        <form action="/addressDelete/<%= address._id %>" method="POST" class="delete-form" style="display: inline;">
+                                        <% if(totalPages > 1) { %>
+                                        <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addressEdit/<%= address._id %>?page=<%= currentPage %>'">Edit</button>
+                                        <form action="/addressDelete/<%= address._id %>?page=<%= currentPage %>" method="POST" class="delete-form" style="display: inline;">
                                             <button type="button" class="btn btn-danger btn-sm delete-btn">Delete</button>
                                         </form>
+                                        <% } else { %>
+                                            <button type="button" class="btn btn-primary btn-sm"  onclick="location.href='/addressEdit/<%= address._id %>'">Edit</button>
+                                            <form action="/addressDelete/<%= address._id %>" method="POST" class="delete-form" style="display: inline;">
+                                                <button type="button" class="btn btn-danger btn-sm delete-btn">Delete</button>
+                                            </form>
+                                            <% } %>
+                                        
                                     </div>
                                 </div>
 
@@ -111,12 +118,13 @@
                  </div>
              <% } %>
          </div>
+        </div>
      </div>
  </div>
 
- 
+ <%- include("../../views/partials/user/footer") %>
  <script src="/js/userJs/address-mngt.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- <%- include("../../views/partials/user/footer") %>
+
 
 

@@ -189,7 +189,8 @@ const postAddAddress = async (req,res) => {
 
 const getEditAddress = async (req,res) => {
     try {
-        
+        const { page = 1} = req.query;
+        const currentPage = page;
         const user = await User.findById(req.session.user);
         const addressId = req.params.addressId;
 
@@ -236,8 +237,10 @@ const getEditAddress = async (req,res) => {
             title: 'Edit Address',
             activePage: 'address management',
             user,
-            address, // Pass the single address object
+            address,
+            currentPage, // Pass the single address object
             errors: [],
+
         });
 
     }catch (error) {
@@ -252,7 +255,8 @@ const getEditAddress = async (req,res) => {
 ///  Edit address
 const postEditAddress = async (req,res)=>{
     try {
-
+        const { page = 1} = req.query;
+        const currentPage = page;
         const user = await User.findById(req.session.user);
         if (!user) {
             return res.status(404).send('User not found.');
@@ -310,7 +314,7 @@ const postEditAddress = async (req,res)=>{
          // Validate and convert addressId to ObjectId
          if (!mongoose.Types.ObjectId.isValid(addressId)) {
             const message = "Invalid Address ID.";
-            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+            return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}&page=${currentPage}`);
         }
 
         const addressObjectId = new mongoose.Types.ObjectId(addressId);
@@ -344,17 +348,17 @@ const postEditAddress = async (req,res)=>{
         // Check if any document was matched and modified
         if (addressUpdateResult.matchedCount === 0) {
             const message = "Address not found.";
-            return res.status(404).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
+            return res.status(404).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}&page=${currentPage}`);
         }
 
         if (addressUpdateResult.modifiedCount === 0) {
             const message = "No changes were made to the address.";
-            return res.status(200).redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
+            return res.status(200).redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}&page=${currentPage}`);
         }
         
         // Successful update
         const successMessage = "Address edited successfully!";
-        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}`);
+        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
 
     } catch (error) {
         console.error("Error Editing address (postEditAddress)", error);
@@ -368,6 +372,8 @@ const postEditAddress = async (req,res)=>{
 ////////DELETE ADDRESS
 const deleteAddress = async (req,res) => {
     try {
+        const { page = 1} = req.query;
+        const currentPage = page;
         const user = await User.findById(req.session.user);
         if(!user){
             return res.status(404).send("User Not found");
@@ -385,7 +391,7 @@ const deleteAddress = async (req,res) => {
         );
         // Successful update
         const successMessage = "Address deleted successfully!";
-        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}`);
+        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
     } catch (error) {
         console.error("Error deleting address(deleteAddress)", error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while deleting the address.", req.headers.referer || `/addresses/${req.body.userId}`);

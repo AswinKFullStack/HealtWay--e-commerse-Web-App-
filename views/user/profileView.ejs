@@ -80,7 +80,7 @@
                                 <strong>Alternate Phone:</strong> <%= lastAddedAddress.altPhone %><br>
                             <% } %>
                         </p>
-                        <button class="btn btn-primary" onclick="location.href='/editAddress/<%= lastAddedAddress._id %>'">Edit Address</button>
+                        <button class="btn btn-primary" onclick="location.href='/addressEdit/<%= lastAddedAddress._id %>'">Edit Address</button>
                     <% } else { %>
                         <p id="billingAddress">No Address Available</p>
                         <button class="btn btn-primary" onclick="location.href='/addAddress'">Add Address</button>
