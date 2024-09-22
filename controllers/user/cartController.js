@@ -69,7 +69,7 @@ const addCart = async (req,res) => {
             console.log("User already added this product into cart collection .This product Quantity in items-Array before updating ", existingCartItem.quantity)
             if(cartItemQuantity >userBuyLimitInQuantity){
                 const message = `We are Sorry only ${userBuyLimitInQuantity} unit(s) allowed in each order of this product(${product.productName})` ;
-                return res.status(400).redirect(`/cardtView?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
             }else{
                 const cartUpdateResult = await Cart.updateOne(
                     { userId:user._id, 'items._id': existingCartItem._id }, // Match the user and the specific address
@@ -92,13 +92,13 @@ const addCart = async (req,res) => {
             
                     if (cartUpdateResult.modifiedCount === 0) {
                         const message = "No changes were made to the Cart.";
-                        return res.status(200).redirect(`/cardtView?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                        return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
                         
                     }
                     await cartDoc.updateTotal();
                     // Successful update
                     const successMessage = `We are added ${cartItemQuantity} unit(s) in cart of this product(${product.productName})`;
-                    return res.redirect(`/cardtView?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
+                    return res.redirect(`/cartView?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
             }
         }else{
             console.log("User going to push the new product in the cart document ");
