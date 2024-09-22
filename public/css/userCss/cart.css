@@ -1,0 +1,48 @@
+body {
+    background-color: #F4F4F9;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.quantity-control button {
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 20px;
+}
+
+.list-group-item {
+    border: none;
+}
+
+.list-group-item strong {
+    color: #333;
+}
+
+.order-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}

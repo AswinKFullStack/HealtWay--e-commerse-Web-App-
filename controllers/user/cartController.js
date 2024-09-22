@@ -130,6 +130,16 @@ const addCart = async (req,res) => {
 }
 
 
+const LoadCartPage = async (req,res) => {
+    try {
+        res.render('cartView',{
+            title: 'Cart management',});
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
-    addCart
+    addCart,
+    LoadCartPage
 }

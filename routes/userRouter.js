@@ -75,6 +75,7 @@ router.post('/addressDelete/:addressId',userAuth, addressController.deleteAddres
 
 //CART SECTION
 router.get('/product/addCart/:productId',userAuth,cartController.addCart);
+router.get('/cartView',userAuth,cartController.LoadCartPage);
 
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
 //router.get('/cart/:id',userAuth, profileController.getCartView);
