@@ -11,6 +11,11 @@
 </nav>
 <!-- Product Details -->
 <div class="container mt-4">
+  <% if (typeof message !== 'undefined' && message) { %>
+    <div class="alert alert-success">
+        <%= message %>
+    </div>
+<% } %>
   <div class="row">
     <div class="col-md-6">
       <!-- Image with Zoom functionality -->

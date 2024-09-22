@@ -2,7 +2,7 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
-const Review = require("../../models/reviewShema");
+const Review = require("../../models/reviewSchema");
 const mongoose = require('mongoose');
 
 // Centralized error rendering function
@@ -18,8 +18,10 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // Render the product view page
 const getProductView = async (req, res) => {
     try {
-        const productId = req.params.id;
+        
 
+        const productId = req.params.productId;
+        const message = req.query.message || null ;
         // Validate product ID
         if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             console.error("Invalid or missing Product ID");
@@ -66,7 +68,8 @@ const getProductView = async (req, res) => {
             relatedProductCurrentPage: page,
             relatedProductTotalPages: totalPages,
             title: product.productName || 'Product Details',
-            user: user  // Pass the user data to the view
+            user: user,
+            message // Pass the user data to the view
         });
     } catch (error) {
         console.error("Error fetching product details:", error);

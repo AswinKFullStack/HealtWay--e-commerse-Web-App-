@@ -41,7 +41,12 @@ const login = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, admin.password);
             if (passwordMatch) {
                 req.session.admin = admin._id;
-                return res.redirect("/admin");
+
+                
+                // Redirect to the originally requested page (if available) or home page
+                const redirectTo = req.session.adminReturnTo || '/admin';
+                delete req.session.adminReturnTo;
+                return res.redirect(redirectTo);
             } else {
                 return res.render("admin-login", {
                     message: "Incorrect password. Please try again.",

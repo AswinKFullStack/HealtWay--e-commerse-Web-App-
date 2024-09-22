@@ -6,7 +6,8 @@ const userController2 = require("../controllers/user/userController2");
 const productController = require("../controllers/user/productController");
 const profileController = require("../controllers/user/profileController");
 const passwordController = require("../controllers/user/passwordController");
-const addressController = require("../controllers/user/addressController"); 
+const addressController = require("../controllers/user/addressController");
+const cartController = require("../controllers/user/cartController");  
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -50,7 +51,8 @@ router.get("/logout",userController2.logout);
 ///Product 
 
 ///view Product
-router.get('/product/view/:id', productController.getProductView);
+router.get('/product/view/:productId', productController.getProductView);
+
 
   //profile view 
 router.get('/profileview/:id',userAuth, profileController.getProfileView);
@@ -68,6 +70,11 @@ router.get('/addressEdit/:addressId',userAuth, addressController.getEditAddress)
 router.post('/addressEdit/:addressId',userAuth, addressController.postEditAddress);
 router.post('/addressDelete/:addressId',userAuth, addressController.deleteAddress);
 
+
+
+
+//CART SECTION
+router.get('/product/addCart/:productId',userAuth,cartController.addCart);
 
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
 //router.get('/cart/:id',userAuth, profileController.getCartView);
