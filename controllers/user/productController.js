@@ -2,7 +2,8 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
-const Review = require("../../models/reviewShema");
+const Review = require("../../models/reviewSchema");
+const Cart = require("../../models/cartSchema");
 const mongoose = require('mongoose');
 
 // Centralized error rendering function
@@ -18,8 +19,10 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // Render the product view page
 const getProductView = async (req, res) => {
     try {
-        const productId = req.params.id;
+        
 
+        const productId = req.params.productId;
+        const message = req.query.message || null ;
         // Validate product ID
         if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             console.error("Invalid or missing Product ID");
@@ -27,6 +30,22 @@ const getProductView = async (req, res) => {
         }
         // Fetch user data from the session
         const user = req.session.user ? await User.findById(req.session.user) : null;
+        let isCartItem = null;
+        if (user) {
+            // Check if cart contains the item
+             isCartItem = await Cart.findOne({
+                userId: user._id,
+                'items.productId': productId
+            }).lean();
+        
+            if (isCartItem) {
+                console.log("Item found in cart.");
+            } else {
+                console.log("Item not found in cart.");
+            }
+        } else {
+            console.log("No user found.");
+        }
         // Fetch the product details
         const product = await Product.findById(productId)
             .populate('brand', 'brandName')
@@ -66,7 +85,9 @@ const getProductView = async (req, res) => {
             relatedProductCurrentPage: page,
             relatedProductTotalPages: totalPages,
             title: product.productName || 'Product Details',
-            user: user  // Pass the user data to the view
+            user,
+            message,
+            isCartItem : isCartItem || null, // Pass the user data to the view
         });
     } catch (error) {
         console.error("Error fetching product details:", error);

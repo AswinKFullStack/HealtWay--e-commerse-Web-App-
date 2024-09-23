@@ -60,7 +60,13 @@ const login = async (req, res) => {
         // User successfully logged in
         req.session.user = findUser._id;
         console.log("User login successful with req.session.user =", req.session.user);
-        res.redirect("/");
+
+        // Redirect to the originally requested page (if available) or home page
+        const redirectTo = req.session.userReturnTo || '/';
+        delete req.session.userReturnTo; // Clear the stored URL after using it
+        res.redirect(redirectTo);
+        
+       
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).render("login", {

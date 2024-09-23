@@ -1,8 +1,9 @@
 const User = require("../models/userSchema");
 
 // Centralized error rendering function
-const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
-    res.status(errorCode).render('admin-error-page', {
+const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink, isAdmin = false) => {
+    const template = isAdmin ? 'admin-error-page' : 'error-page';
+    res.status(errorCode).render(template, {
         errorCode,
         errorMessage,
         errorDescription,
@@ -13,6 +14,9 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // User authentication middleware
 const userAuth = async (req, res, next) => {
     try {
+        // Capture the current URL to use as the back link
+        const backLink = req.headers.referer || req.originalUrl;
+
         if (req.session.user) {
             const user = await User.findById(req.session.user);
 
@@ -21,21 +25,45 @@ const userAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("User authentication failed: Blocked or not found");
-                return renderErrorPage(res, 401, "Unauthorized", "Access denied. Please login.", "/login");
+                return renderErrorPage(
+                    res, 
+                    401, 
+                    "Unauthorized", 
+                    "Access denied. Please login.", 
+                    "/login"
+                );
             }
         } else {
             console.log("Session not found");
-            return renderErrorPage(res, 401, "Unauthorized", "Session expired. Please login again.", "/login");
+            // Store the original URL before redirecting to login
+            req.session.userReturnTo = req.originalUrl;
+
+            return renderErrorPage(
+                res, 
+                401, 
+                "Unauthorized", 
+                "Session expired. Please login again.", 
+                backLink 
+            );
         }
     } catch (error) {
         console.error("Error during user authentication:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during authentication.", "/");
+        return renderErrorPage(
+            res, 
+            500, 
+            "Internal Server Error", 
+            "An error occurred during authentication.", 
+            backLink 
+        );
     }
 };
 
 // Admin authentication middleware
 const adminAuth = async (req, res, next) => {
     try {
+        // Capture the current URL to use as the back link
+        const backLink = req.headers.referer || req.originalUrl;
+
         if (req.session.admin) {
             const admin = await User.findOne({ _id: req.session.admin, isAdmin: true });
 
@@ -44,14 +72,37 @@ const adminAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("Admin authentication failed");
-                return renderErrorPage(res, 401, "Unauthorized", "Admin access denied. Please login.", "/admin/login");
+                return renderErrorPage(
+                    res, 
+                    401, 
+                    "Unauthorized", 
+                    "Admin access denied. Please login.", 
+                    "/admin/login", 
+                    true
+                );
             }
         } else {
-            return renderErrorPage(res, 403, "Forbidden", "You don't have permission to access this page.", "/admin/login");
+            // Store the original URL before redirecting to login
+            req.session.adminReturnTo = req.originalUrl;
+            return renderErrorPage(
+                res, 
+                403, 
+                "Forbidden", 
+                "You don't have permission to access this page.", 
+                backLink, 
+                true
+            );
         }
     } catch (error) {
         console.error("Error during admin authentication:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An error occurred during admin authentication.", "/admin/login");
+        return renderErrorPage(
+            res, 
+            500, 
+            "Internal Server Error", 
+            "An error occurred during admin authentication.", 
+            backLink, 
+            true
+        );
     }
 };
 

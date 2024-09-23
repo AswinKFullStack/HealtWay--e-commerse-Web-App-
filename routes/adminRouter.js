@@ -5,6 +5,7 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const brandController = require("../controllers/admin/brandController");
+const orderController = require("../controllers/admin/orderController");
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
@@ -80,4 +81,8 @@ router.get('/product/view/:id',adminAuth, productController.getProductDetails);
 router.get('/product/delete/:id',adminAuth, productController.softDeleteProduct);
 router.get('/product/block/:id',adminAuth,productController.blockProduct);
 router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
+
+
+                                //listing orders
+router.get("/orders",adminAuth,orderController.getOrders);
 module.exports = router

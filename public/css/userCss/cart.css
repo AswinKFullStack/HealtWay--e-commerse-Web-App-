@@ -1,0 +1,67 @@
+body {
+    background-color: #F4F4F9;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.quantity-control button {
+    border-radius: 50%;
+    font-size: 1rem;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 20px;
+}
+
+.list-group-item {
+    border: none;
+}
+
+.list-group-item strong {
+    color: #333;
+}
+
+.order-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+
+/* Custom Remove Button Style */
+.custom-remove-btn {
+    background-color: #ffffff; /* White background */
+    color: rgb(150, 150, 150);; /* Soft gray color */
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: 2px solid rgb(143, 143, 143); /* Border on all sides */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-remove-btn:hover {
+    background-color: rgb(147, 145, 145);; /* Gray background on hover */
+    color: rgb(255, 255, 255); /* White text on hover */
+    border-color: rgb(178, 178, 178);; /* Keep border color same on hover */
+}
+

@@ -1,0 +1,61 @@
+/* User Profile Page CSS */
+
+/* General Styles */
+/* body {
+    background-color: #F9FBE7;
+} */
+
+.container {
+    background-color: #E0F4D2;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Sidebar Styles */
+.list-group-item {
+    border-radius: 0;
+}
+
+.list-group-item.active {
+    background-color: #5CB85C;
+    border-color: #5CB85C;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 8px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #5CB85C;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #4cae4c;
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #FFD700;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #f7c600;
+}

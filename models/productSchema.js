@@ -39,7 +39,7 @@
     },
     quantity:{
         type:Number,
-        default:true
+        default:1
     },
     productImages:{
         type:[String], //multiple images will be there,so that we deifine inside an array
@@ -68,10 +68,15 @@
     },
     status:{
         type:String,
-        enum:["Available","out of stock ","Discountinued"],
+        enum:["Available","Out of stock","Discountinued"],
         required:true,
         default:"Available"
     },
+    userBuyLimitInQuantity :{
+        type:Number,
+        required :false,
+        default:10
+    }
 },
 {timestamps:true}
 );
