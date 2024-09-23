@@ -1,23 +1,29 @@
-function updateQuantity(productId, change) {
-    const quantityInput = document.getElementById(productId);
-    let quantity = parseInt(quantityInput.value);
-
-    quantity += change;
-    if (quantity < 1) quantity = 1;
-
-    quantityInput.value = quantity;
-
-    updateTotalPrice();
+// Function to handle adding or subtracting quantity
+function updateQuantity(action, cartItemId) {
+    const quantityInput = document.getElementById(`quantity-${cartItemId}`);
+    let currentQuantity = parseInt(quantityInput.value) || 1;
+    
+    if (action === 'add') {
+      quantityInput.value = currentQuantity + 1;
+    } else if (action === 'subtract' && currentQuantity > 1) {
+      quantityInput.value = currentQuantity - 1;
+    }
+    
+    // Submit the form for the correct cart item
+    document.getElementById(`cart-form-${cartItemId}`).submit();
 }
 
-function updateTotalPrice() {
-    const product1Quantity = parseInt(document.getElementById('product1').value);
-    const product2Quantity = parseInt(document.getElementById('product2').value);
-    const product3Quantity = parseInt(document.getElementById('product3').value);
+let typingTimer;
+const doneTypingInterval = 1000; // 1 second
 
-    const subtotal = (25 * product1Quantity) + (45 * product2Quantity) + (60 * product3Quantity);
-    const tax = subtotal * 0.10;
-    const total = subtotal + tax;
+document.querySelectorAll('.quantity-input').forEach(input => {
+  const cartItemId = input.id.split('-')[1]; // Extract cartItemId from input's ID
+  input.addEventListener('input', function() {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      document.getElementById(`cart-form-${cartItemId}`).submit();
+    }, doneTypingInterval);
+  });
+});
 
-    document.getElementById('totalPrice').innerText = `$${total.toFixed(2)}`;
-}
+  
