@@ -264,7 +264,7 @@ const cartUpdate = async (req, res) => {
 
                 // Save the cart
                 await cartDoc.updateTotal();
-                await cartDoc.save();
+                
 
                 const successMessage = `Successfully updated ${cartItemNewQuantity} unit(s) of ${product.productName} in your cart.`;
                 return res.redirect(`/cartView?message=${encodeURIComponent(successMessage)}&page=${req.query.page || 1}`);
@@ -286,7 +286,7 @@ const cartUpdate = async (req, res) => {
             });
 
             await cartDoc.updateTotal();
-            await cartDoc.save();
+            
 
             const message = `Successfully added ${product.productName} to your cart.`;
             return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}`);
