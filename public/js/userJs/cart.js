@@ -13,23 +13,25 @@ document.querySelectorAll('.quantity-input').forEach(input => {
 });
 
   
-/// Script to hide message after 10 seconds -->
+/// Script to hide message after some seconds -->
 
     // Check if the message element exists
     const cartMessage = document.getElementById('cart-message');
     if (cartMessage) {
-        // Set a timeout to hide the message after 10 seconds (10000 milliseconds)
+        // Set a timeout to apply the fade-out effect after 5 seconds
         setTimeout(() => {
-            cartMessage.style.display = 'none';
-        }, 1000);
+            cartMessage.classList.add('fade-out');
+    
+            // Hide the element after the fade-out transition is complete
+            setTimeout(() => {
+                cartMessage.style.display = 'none';
+            }, 1000); // Match this timeout with the duration in your CSS transition
+        }, 5000); // Show for 5 seconds before starting to fade out
     }
+    
 
 
-    function confirmRemove(productId, cartItemId) {
-        if (confirm('Are you sure you want to remove this item from your cart?')) {
-            document.querySelector(`form[action='/cart/remove/${productId}/${cartItemId}']`).submit();
-        }
-    }
+   
 
 
 
@@ -46,7 +48,7 @@ document.querySelectorAll('.quantity-input').forEach(input => {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Perform AJAX request to remove item
-                fetch(`/cart/remove/${productId}/${cartItemId}`, {
+                fetch(`/cartView/remove/${productId}/${cartItemId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -56,18 +58,20 @@ document.querySelectorAll('.quantity-input').forEach(input => {
                       if (data.success) {
                           Swal.fire(
                               'Removed!',
-                              'Your item has been removed from the cart.',
+                              data.message,
                               'success'
                           ).then(() => {
                               // Reload the page to reflect the updated cart
                               location.reload();
                           });
                       } else {
-                          Swal.fire('Error', 'There was an issue removing the item.', 'error');
+                          Swal.fire('Error', data.message  || 'There was an issue removing the item.', 'error');
                       }
-                  }).catch(error => {
+                    }).catch(error => {
+                      
                       Swal.fire('Error', 'There was a problem connecting to the server.', 'error');
                   });
+                  
             }
         });
     }

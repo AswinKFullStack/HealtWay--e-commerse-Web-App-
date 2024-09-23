@@ -135,13 +135,17 @@ const LoadCartPage = async (req,res) => {
 
 
         const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
-        if (!cart || cart.items.length === 0) {
+        // Ensure cart is defined and has a totalCartPrice property
+        const isCartEmpty = !cart || !cart.items.length;
+        const cartData = isCartEmpty ? { items: [], totalCartPrice: 0 } : cart;
+
+        if (isCartEmpty) {
             console.log("User doesn't have products in the cart");
             const message = "Your cart is empty.";
             return res.render('cartView', {
                 title: 'Cart Management',
                 user,
-                cart: null,  
+                cart: cartData,
                 message,
                 currentPage: 1,
                 totalPages: 1
@@ -281,8 +285,56 @@ const cartUpdate = async (req, res) => {
     }
 };
 
+
+const removeCartItem = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { productId, cartItemId } = req.params;
+        
+
+        // Validate User ID
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: 'Invalid User ID.' });
+        }
+
+        // Find the user's cart
+        let cartDoc = await Cart.findOne({ userId });
+        if (!cartDoc) {
+            return res.status(404).json({ success: false, message: 'Cart not found.' });
+        }
+
+        // Check if the item exists in the cart
+        const itemIndex = cartDoc.items.findIndex(item => item._id.toString() === cartItemId && item.productId.toString() === productId);
+        if (itemIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Item not found in cart.' });
+        }
+
+        // Remove the item
+        cartDoc.items.splice(itemIndex, 1);
+        await cartDoc.updateTotal();
+
+        // If the cart is empty, delete it (optional)
+        if (cartDoc.items.length === 0) {
+            await Cart.deleteOne({ userId });
+            return res.status(200).json({ success: true, message: 'Cart is now empty.' });
+        }
+
+        // Save the updated cart
+        await cartDoc.save();
+
+        // Send a success response
+        return res.status(200).json({ success: true, message: 'Item removed from cart successfully!' });
+    } catch (error) {
+        console.error("Error in removeCartItem method:", error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
+
 module.exports = {
     addCart,
     LoadCartPage,
-    cartUpdate
+    cartUpdate,
+    removeCartItem
 };

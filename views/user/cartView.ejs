@@ -68,29 +68,30 @@
             </div>
         </div>
 
-        <!-- Order Summary -->
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Order Summary</h5>
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Subtotal</span>
-                            <strong>$<%= cart.totalCartPrice %></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Tax (10%)</span>
-                            <strong>$<%= (cart.totalCartPrice * 0.1).toFixed(2) %></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Total</span>
-                            <strong id="totalPrice">$<%= (cart.totalCartPrice * 1.1).toFixed(2) %></strong>
-                        </li>
-                    </ul>
-                    <button class="btn btn-primary btn-block">Proceed to Checkout</button>
-                </div>
-            </div>
+       <!-- Order Summary -->
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Order Summary</h5>
+            <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Subtotal</span>
+                    <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice : '0.00' %></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Tax (10%)</span>
+                    <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.1).toFixed(2) : '0.00' %></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Total</span>
+                    <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.1).toFixed(2) : '0.00' %></strong>
+                </li>
+            </ul>
+            <button class="btn btn-primary btn-block">Proceed to Checkout</button>
         </div>
+    </div>
+</div>
+
     </div>
 </div>
 
