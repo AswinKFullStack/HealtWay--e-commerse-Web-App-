@@ -160,6 +160,7 @@ const LoadCartPage = async (req,res) => {
             const message = "Your cart is empty.";
             return res.render('cartView', {
                 title: 'Cart Management',
+                user,
                 cart: null,  
                 message,
                 currentPage: 1,
@@ -181,6 +182,7 @@ const LoadCartPage = async (req,res) => {
 
         res.render('cartView', {
             title: 'Cart Management',
+            user,
             cart: {
                 items: paginatedItems,
                 totalCartPrice: cart.totalCartPrice // Assuming you have this field in your cart schema
