@@ -199,192 +199,108 @@ const LoadCartPage = async (req,res) => {
 }
 
 
-const cartUpdate = async (req,res) => {
+
+const cartUpdate = async (req, res) => {
     try {
-        const user = await User.findById(req.session.user);
-        const cartItemNewQuantity = parseInt(req.body.quantity, 10) || 1;
-        const currentPage = req.query.page || 1;
-        if(!user){
-            return res.status(404).send('User not found.'); 
+        const userId = req.session.user;
+        const { productId, cartItemId } = req.params;
+        const cartItemNewQuantity = parseInt(req.body.quantity, 10);
+
+        // Validate user ID and fetch user
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).send('Invalid user ID.');
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found.');
         }
 
-        const {productId ,cartItemId} = req.params;
-        console.log("Searching for product with ID:", productId);
-        console.log("Searching for cart item  with ID:", cartItemId);
-
-        if (!mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(cartItemId) ) {
-            const message = "Invalid Product ID. or cart ID";
-            
+        // Validate productId and cartItemId
+        if (!mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(cartItemId)) {
+            const message = "Invalid Product ID or Cart Item ID.";
             return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
         }
 
-
+        // Fetch product
         const product = await Product.findOne({ _id: productId, isDeleted: false });
-        
-
         if (!product) {
-            console.error("Product not found or marked as deleted with ID:", productId);
-            const message = `Product not found or has been deleted.`;
+            const message = "Product not found or has been deleted.";
             return res.status(404).redirect(`/cartView?message=${encodeURIComponent(message)}`);
         }
-        
 
-        console.log(product);
-        console.log(" Product  status = " ,product.status);
-        const userBuyLimitInQuantity = product.userBuyLimitInQuantity || 10;
-
-        
-        console.log("Number of quantity product = ",product.quantity );
-
-        const newCartItem = {
-            productId :product._id,
-            price : product.salePrice,
-            quantity:cartItemNewQuantity,
-
-        } 
-
-       
-        let cartDoc = await Cart.findOne({userId:user._id});
-    if(cartDoc){
-        console.log("User already have cart Documet in this  collection .Number items in the cart =",cartDoc.items.length)
-        const existingCartItem =  await Cart.findOne({userId:user._id, "items._id":cartItemId});
-        
-        if(existingCartItem){
-
-            console.log("This product Quantity in items-Array before updating ", existingCartItem.quantity)
-            //checking product stock out or not
-            if(product.quantity<1){
-                console.log("Product stock count  is too small = ",product.quantity)
-                const message = "Product not in stock";
-                const cartUpdateResult = await Cart.updateOne(
-                    { userId:user._id, 'items._id': existingCartItem._id }, // Match the user and the specific address
-                    {
-                        $set: {
-                            'items.$.price': product.salePrice,
-                            'items.$.quantity': 0,
-                            'items.$.totalPrice': 0 ,
-                            }
-                        }
-                    );
-
-                await cartUpdateResult.updateTotal();
-
-                await cartUpdateResult.save();
-                
-                return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-            }
-            if(cartItemNewQuantity < 1){
-                console.log("User updation Quantity is too 0 or negative number = ",product.quantity)
-                const message = `Updating Quntity cart Item ${product.productName} is too small -not modified `;
-                
-
-                
-                
-                return res.redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-            }
-
-            if(product.status !== "Available"){
-                console.log("Product status is not Available =" ,product.status);
-                const message = `This Product is ${product.status}` ;
-                
-                const cartUpdateResult = await Cart.updateOne(
-                    { userId:user._id, 'items._id': existingCartItem._id }, // Match the user and the specific address
-                    {
-                        $set: {
-                            'items.$.price': product.salePrice,
-                            'items.$.quantity': 0,
-                            'items.$.totalPrice': 0 ,
-                            }
-                        }
-                    );
-
-                await cartUpdateResult.updateTotal();
-
-                await cartUpdateResult.save();
-                
-                return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-                
-            }
-
-            if(cartItemNewQuantity >userBuyLimitInQuantity){
-                const message = `We are Sorry ,only ${userBuyLimitInQuantity} unit(s) allowed in each order of this product - ${product.productName}` ;
-                return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-            }else{
-                const cartUpdateResult = await Cart.updateOne(
-                    { userId:user._id, 'items._id': existingCartItem._id }, // Match the user and the specific address
-                    {
-                        $set: {
-                            'items.$.price': product.salePrice,
-                            'items.$.quantity': cartItemNewQuantity,
-                            'items.$.totalPrice': product.salePrice * cartItemNewQuantity ,
-                            }
-                        }
-                    );
-
-                    console.log('Existing Cart item Quantity Update Result:', cartUpdateResult);
-                    
-                    if (cartUpdateResult.matchedCount === 0) {
-                        const message = "cart not found.";
-                        return res.status(404).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-                        
-                    }
-            
-                    if (cartUpdateResult.modifiedCount === 0) {
-                        const message = "No changes were made to the Cart.";
-                        return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
-                        
-                    }
-                    
-                    await cartUpdateResult.updateTotal();
-
-                    await cartUpdateResult.save();
-                    // Successful update
-                    const successMessage = `We are added ${cartItemQuantity} unit(s) in cart of this product(${product.productName})`;
-                    return res.redirect(`/cartView?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
-            }
-        }else{
-            console.log("User going to push the new product in the cart document ");
-                cartDoc.items.push(newCartItem);
-                await cartDoc.updateTotal();
-
-                await cartDoc.save();
-                const message = `The Poduct ${product.productName} addedd successfully!`
-                return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}`);
-        }
-            
-    }else{
-        if(product.quantity<1){
-            console.log("Product stock count  is too small = ",product.quantity)
-            const message = "Product not in stock";
-            return res.status(400).redirect(`/product/view/${productId}?message=${encodeURIComponent(message)}`);
-        }
-        if(product.status !== "Available"){
-            console.log("Product status is not Available =" ,product.status);
-            const message = `This Product is ${product.status}` ;
+        // Validate product status and stock
+        if (product.status !== "Available") {
+            const message = `This product is currently ${product.status}.`;
             return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
         }
-        console.log("User first time adding a  product in cart")
-            cartDoc = new Cart({
-              userId:user._id,
-              items:[newCartItem]  
-            })
-        }
-        await cartDoc.updateTotal();
 
-        await cartDoc.save();
-        const message = `The Poduct ${product.productName} addedd successfully!`
-        return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+        if (product.quantity < 1) {
+            const message = "Product is out of stock.";
+            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+        }
+
+        // Validate new quantity
+        const userBuyLimitInQuantity = product.userBuyLimitInQuantity || 10;
+        if (cartItemNewQuantity < 1) {
+            const message = `Quantity cannot be less than 1 for ${product.productName}.`;
+            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+        }
+        if (cartItemNewQuantity > userBuyLimitInQuantity) {
+            const message = `Only ${userBuyLimitInQuantity} unit(s) allowed per order for ${product.productName}.`;
+            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${req.query.page || 1}`);
+        }
+
+        // Fetch user's cart
+        let cartDoc = await Cart.findOne({ userId: user._id });
+
+        if (cartDoc) {
+            // Find the specific cart item
+            const cartItem = cartDoc.items.id(cartItemId);
+            if (cartItem) {
+                // Update existing cart item
+                cartItem.price = product.salePrice;
+                cartItem.quantity = cartItemNewQuantity;
+                cartItem.totalPrice = cartItemNewQuantity * product.salePrice;
+
+                // Save the cart
+                await cartDoc.updateTotal();
+                await cartDoc.save();
+
+                const successMessage = `Successfully updated ${cartItemNewQuantity} unit(s) of ${product.productName} in your cart.`;
+                return res.redirect(`/cartView?message=${encodeURIComponent(successMessage)}&page=${req.query.page || 1}`);
+            } else {
+                // Cart exists but the item does not; optionally, handle this case
+                const message = "Cart item not found.";
+                return res.status(404).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${req.query.page || 1}`);
+            }
+        } else {
+            // Cart does not exist; create a new cart with the item
+            cartDoc = new Cart({
+                userId: user._id,
+                items: [{
+                    productId: product._id,
+                    price: product.salePrice,
+                    quantity: cartItemNewQuantity,
+                    totalPrice: cartItemNewQuantity * product.salePrice
+                }]
+            });
+
+            await cartDoc.updateTotal();
+            await cartDoc.save();
+
+            const message = `Successfully added ${product.productName} to your cart.`;
+            return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+        }
 
     } catch (error) {
-        console.error("Error in cartUpdate - method( updating Quantity -IN cart ) = ",error);
-
+        console.error("Error in cartUpdate:", error);
         const backLink = req.headers.referer || `/cartView`;
-        renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred while product  updating Quantity to cart", backLink);
+        renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred while updating the cart.", backLink);
     }
-}
+};
 
 module.exports = {
     addCart,
     LoadCartPage,
     cartUpdate
-}
+};
