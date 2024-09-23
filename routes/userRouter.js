@@ -8,6 +8,7 @@ const profileController = require("../controllers/user/profileController");
 const passwordController = require("../controllers/user/passwordController");
 const addressController = require("../controllers/user/addressController");
 const cartController = require("../controllers/user/cartController");  
+const shopController = require("../controllers/user/shopController");  
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -80,6 +81,14 @@ router.get('/cartView',userAuth,cartController.LoadCartPage);
 router.post('/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
 router.get('/cart/update/:productId',userAuth,cartController.LoadCartPage);
 router.post('/cartView/remove/:productId/:cartItemId',userAuth,cartController.removeCartItem);
+
+
+
+///SHOP SECTION
+
+router.get('/shop',shopController.viewAllProducts);
+
+
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
 //router.get('/cart/:id',userAuth, profileController.getCartView);
 //router.get('/orders/:id',userAuth, profileController.getOrdersView);
