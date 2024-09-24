@@ -9,6 +9,7 @@ const passwordController = require("../controllers/user/passwordController");
 const addressController = require("../controllers/user/addressController");
 const cartController = require("../controllers/user/cartController");  
 const shopController = require("../controllers/user/shopController");  
+const checkoutController = require("../controllers/user/checkoutController");  
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -89,6 +90,11 @@ router.post('/cartView/remove/:productId/:cartItemId',userAuth,cartController.re
 router.get('/shop',shopController.viewAllProducts);
 
 
+
+
+//CHECK OUT
+
+router.get('/checkout',userAuth,checkoutController.checkoutLoad);
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
 //router.get('/cart/:id',userAuth, profileController.getCartView);
 //router.get('/orders/:id',userAuth, profileController.getOrdersView);

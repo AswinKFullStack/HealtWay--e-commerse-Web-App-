@@ -1,0 +1,165 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/checkout.css">
+
+    <!-- Checkout Section -->
+    <div class="container mt-5">
+        <h2 class="text-center">Checkout</h2>
+        <form id="checkoutForm" onsubmit="return validateCheckoutForm()">
+            <!-- Address Section -->
+            <div class="card mb-4">
+                <div class="card-header">Shipping Address</div>
+                <div class="card-body">
+                    <!-- Saved Addresses -->
+                    <div id="savedAddresses">
+                        <h5>Select an Address:</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="address" id="savedAddress1" value="Address 1" checked>
+                            <label class="form-check-label" for="savedAddress1">
+                                1234 Main St, City, State, 10001
+                            </label>
+                            <button type="button" class="btn btn-link" onclick="editAddress()">Edit</button>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="address" id="savedAddress2" value="Address 2">
+                            <label class="form-check-label" for="savedAddress2">
+                                5678 Oak St, City, State, 20002
+                            </label>
+                            <button type="button" class="btn btn-link" onclick="editAddress()">Edit</button>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" onclick="addNewAddress()">Add New Address</button>
+                    </div>
+
+                    <!-- Add/Edit Address Form (Initially Hidden) -->
+                    <div id="addressForm" class="mt-4 d-none">
+                        <h5 id="addressFormTitle">Add New Address</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputAddress">Address</label>
+                                <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+                                <div class="invalid-feedback">Please enter your address.</div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputCity">City</label>
+                                <input type="text" class="form-control" id="inputCity" placeholder="City">
+                                <div class="invalid-feedback">Please enter your city.</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="inputState">State</label>
+                                <select id="inputState" class="form-control">
+                                    <option selected>Choose...</option>
+                                    <option>State 1</option>
+                                    <option>State 2</option>
+                                    <option>State 3</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a state.</div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputZip">Zip</label>
+                                <input type="text" class="form-control" id="inputZip" placeholder="Zip Code">
+                                <div class="invalid-feedback">Please enter your zip code.</div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="inputCountry">Country</label>
+                                <input type="text" class="form-control" id="inputCountry" placeholder="Country">
+                                <div class="invalid-feedback">Please enter your country.</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="saveAddress()">Save Address</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details Section -->
+            <div class="card mb-4">
+                <div class="card-header">Order Summary</div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Kashmeeri Mulak Podi</td>
+                                <td>₹200</td>
+                                <td>
+                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
+                                </td>
+                                <td class="product-total">₹200</td>
+                            </tr>
+                            <tr>
+                                <td>Malli Podi</td>
+                                <td>₹150</td>
+                                <td>
+                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
+                                </td>
+                                <td class="product-total">₹150</td>
+                            </tr>
+                            <tr>
+                                <td>Manjal</td>
+                                <td>₹180</td>
+                                <td>
+                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
+                                </td>
+                                <td class="product-total">₹180</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Subtotal:</th>
+                                <th id="subtotal">₹530</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-right">GST (5%):</th>
+                                <th id="gst">₹26.50</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3" class="text-right">Total:</th>
+                                <th id="total">₹556.50</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="card mb-4">
+                <div class="card-header">Payment Method</div>
+                <div class="card-body">
+                    <h5>Select Payment Method:</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="Credit Card" checked>
+                        <label class="form-check-label" for="creditCard">
+                            Credit Card
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="Debit Card">
+                        <label class="form-check-label" for="debitCard">
+                            Debit Card
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="Cash on Delivery">
+                        <label class="form-check-label" for="cod">
+                            Cash on Delivery
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-block mt-4" style="background-color: #FFD700;" onclick="location.href='/checkout'">Place Order</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+
+<%- include("../../views/partials/user/footer") %>
+
+<script src="/js/userJs/checkout.js"></script>
