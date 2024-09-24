@@ -35,3 +35,9 @@
     background-color: #28a745;  
     border-color: #9faa02; 
 }
+
+
+select.form-control {
+    height: auto; /* Ensures full content is visible */
+    overflow: visible; /* Ensures no content is hidden */
+}

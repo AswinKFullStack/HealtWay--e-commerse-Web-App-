@@ -76,6 +76,11 @@
         type:Number,
         required :false,
         default:10
+    },
+    popularity:{
+        type:Number,
+        required :false,
+        default:0   // number of orderderd count of this item
     }
 },
 {timestamps:true}

@@ -12,6 +12,8 @@
     <div class="row justify-content-between mb-3">
         <div class="col-md-4">
             <select class="form-control" id="sortOptions">
+                <option value="" <%= sort === '' ? 'selected' : '' %>>Sort by</option>
+
                 <option value="popularity" <%= sort === 'popularity' ? 'selected' : '' %>>Sort by Popularity</option>
                 <option value="price-high-low" <%= sort === 'price-high-low' ? 'selected' : '' %>>Price: High to Low</option>
                 <option value="price-low-high" <%= sort === 'price-low-high' ? 'selected' : '' %>>Price: Low to High</option>
@@ -81,7 +83,7 @@
 </div>
 
 
-<script src="/js/userJs/productView.js"></script>
+<script src="/js/userJs/shop.js"></script>
 <%- include("../../views/partials/user/footer") %>
 
 
