@@ -1,5 +1,5 @@
 .border-bottom-custom {
-    border-bottom: 3px solid #007bff;
+    border-bottom: 3px solid #28a745;
 }
 
 .position-absolute {
@@ -25,3 +25,13 @@
 
 
 
+/* My styling */
+.pagenstion-color {
+    color: #28a745;
+}
+
+
+.page-item.active .page-link{
+    background-color: #28a745;  
+    border-color: #9faa02; 
+}

@@ -4,79 +4,86 @@
 <link rel="stylesheet" href="/css/userCss/home.css">
 <link rel="stylesheet" href="/css/userCss/shop.css">
 
-<div class="container mt-4">
-    <h2 class="text-center">ALL Products</h2>
+ <!-- Main Content -->
+ <div class="container mt-4">
+    <h2 class="text-center">All Products</h2>
+
+    <!-- Sorting Dropdown -->
     <div class="row justify-content-between mb-3">
-        
         <div class="col-md-4">
             <select class="form-control" id="sortOptions">
-                <option value="popularity">Sort by Popularity</option>
-                <option value="price-high-low">Price: High to Low</option>
-                <option value="price-low-high">Price: Low to High</option>
-                <option value="ratings">Average Ratings</option>
-                <option value="featured">Featured</option>
-                <option value="new-arrivals">New Arrivals</option>
-                <option value="az">Name: A-Z</option>
-                <option value="za">Name: Z-A</option>
+                <option value="popularity" <%= sort === 'popularity' ? 'selected' : '' %>>Sort by Popularity</option>
+                <option value="price-high-low" <%= sort === 'price-high-low' ? 'selected' : '' %>>Price: High to Low</option>
+                <option value="price-low-high" <%= sort === 'price-low-high' ? 'selected' : '' %>>Price: Low to High</option>
+                <option value="ratings" <%= sort === 'ratings' ? 'selected' : '' %>>Average Ratings</option>
+                <option value="az" <%= sort === 'az' ? 'selected' : '' %>>Name: A-Z</option>
+                <option value="za" <%= sort === 'za' ? 'selected' : '' %>>Name: Z-A</option>
             </select>
         </div>
     </div>
 
-    <!-- Product Cards -->
+    <!-- Product Grid -->
     <div class="row" id="productGrid">
-        <!-- Example Product Cards -->
-        <div class="col-md-4" data-price="200" data-name="Kashmeeri Mulak Podi" data-popularity="4" data-ratings="4.5">
-            <div class="card position-relative">
-                <img src="images/kashmeeri-mulak.jpg" class="card-img-top" alt="Product 1">
-                <div class="position-absolute top-0 end-0 p-2">
-                    <button class="btn btn-light">
-                        <i class="bi bi-heart"></i>
-                    </button>
+        <% if (products.length > 0) { %>
+            <% products.forEach(product => { %>
+                <div class="col-md-4 mb-4" data-price="<%= product.regularPrice %>" data-name="<%= product.productName %>" data-popularity="<%= product.popularity %>" data-ratings="<%= product.ratings %>">
+                    <div class="card position-relative">
+                        <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %>">
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <button class="btn btn-light">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= product.productName %></h5>
+                            <p class="card-text">
+                                <strong>Price:</strong> $<%= product.regularPrice %><br>
+                                <strong>Ratings:</strong> <%= product.ratings %>/5
+                            </p>
+                            <a href="/product/view/<%= product._id %>" class="btn product-view-btn btn-success">View Details</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <h5 class="card-title">Kashmeeri Mulak Podi</h5>
-                    <p class="card-text">Price: ₹200</p>
-                    <p class="card-text">Ratings: 4.5</p>
-                    <button class="btn btn-success">Add to Cart</button>
-                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="col-12 text-center">
+                <p>No products found.</p>
             </div>
-        </div>
-        <div class="col-md-4" data-price="150" data-name="Malli Podi" data-popularity="2" data-ratings="4.2">
-            <div class="card position-relative">
-                <img src="images/malli-podi.jpg" class="card-img-top" alt="Product 2">
-                <div class="position-absolute top-0 end-0 p-2">
-                    <button class="btn btn-light">
-                        <i class="bi bi-heart"></i>
-                    </button>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Malli Podi</h5>
-                    <p class="card-text">Price: ₹150</p>
-                    <p class="card-text">Ratings: 4.2</p>
-                    <button class="btn btn-success">Add to Cart</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4" data-price="180" data-name="Manjal" data-popularity="5" data-ratings="4.8">
-            <div class="card position-relative">
-                <img src="images/manjal.jpg" class="card-img-top" alt="Product 3">
-                <div class="position-absolute top-0 end-0 p-2">
-                    <button class="btn btn-light">
-                        <i class="bi bi-heart"></i>
-                    </button>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Manjal</h5>
-                    <p class="card-text">Price: ₹180</p>
-                    <p class="card-text">Ratings: 4.8</p>
-                    <button class="btn btn-success">Add to Cart</button>
-                </div>
-            </div>
-        </div>
+        <% } %>
     </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <% if (productCurrentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link pagenstion-color" href="/shop?page=<%= productCurrentPage - 1 %>&sort=<%= sort %>&search=<%= searchTerm %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>Previous
+                    </a>
+                </li>
+            <% } %>
+
+            <% for (let i = 1; i <= productTotalPages; i++) { %>
+                <li class="page-item <%= productCurrentPage === i ? 'active' : '' %>">
+                    <a class="page-link pagenstion-color" href="/shop?page=<%= i %>&sort=<%= sort %>&search=<%= searchTerm %>"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (productCurrentPage < productTotalPages) { %>
+                <li class="page-item">
+                    <a class="page-link pagenstion-color" href="/shop?page=<%= productCurrentPage + 1 %>&sort=<%= sort %>&search=<%= searchTerm %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>Next
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
 </div>
 
-<script src="/js/userJs/shop.js"></script>
 
-
+<script src="/js/userJs/productView.js"></script>
 <%- include("../../views/partials/user/footer") %>
+
+
+
+
