@@ -18,7 +18,7 @@
                
 
                     <div class="card mb-4" id="addAddressCard">
-                        <div class="card-header">Add New Address</div>
+                        <div class="card-header" id="addOredit-Title">Add New Address</div>
                         <div class="card-body">
                            
 
@@ -60,11 +60,11 @@
             <div class="form-group col-md-4">
                 <label for="state" class="form-label">State <span class="text-danger">*</span></label>
                 <select  id="state" name="state" class="form-control" placeholder="Enter state"  required>
-                    <option >Choose...</option>
+                    <option value="">Choose...</option>
                     <!-- Add options for states here -->
-                    <option selected>Kerala</option>
-                    <option>Tamilnadu</option>
-                    <option>Karanadaka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Tamilnadu">Tamilnadu</option>
+                    <option value="Karanadaka">Karanadaka</option>
                 </select>
                 <div class="invalid-feedback">Please select a state.</div>
             </div>
@@ -168,7 +168,22 @@
                                         </small>
                                     </p>
                     
-                                    <button type="button" class="btn btn-link" onclick="editAddress('<%= address._id %>')">Edit</button>
+                                    <a  class="btn btn-success mt-3" onclick="editAddress('<%= address._id %>', 
+                             '<%= address.addressType %>', 
+                             '<%= address.name %>', 
+                             '<%= address.houseName %>', 
+                             '<%= address.landMark %>', 
+                             '<%= address.city %>', 
+                             '<%= address.state %>', 
+                             '<%= address.pincode %>', 
+                             '<%= address.phone %>', 
+                             '<%= currentPage %>',
+                             '<%= address.altPhone ? address.altPhone : null %>', 
+                             )">Edit</a>
+
+
+                            
+                                    
                                 </div>
                             </div>
                             <% }); %>
@@ -196,7 +211,7 @@
                                 <% if (currentPage < totalPages) { %>
                                     <a href="/checkout?page=<%= currentPage + 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Next</a>
                                 <% } else { %>
-                                    <button class="btn btn-secondary" disabled>Next</button>
+                                    <button class="btn btn-secondary d-none" disabled>Next</button>
                                 <% } %>
                             </div>
                         </div>

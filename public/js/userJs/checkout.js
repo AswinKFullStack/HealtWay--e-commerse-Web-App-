@@ -2,13 +2,36 @@
 function addNewAddress() {
     document.getElementById('UserSavedAddressCard').classList.add('d-none');
     document.getElementById('addAddressForm').classList.remove('d-none');
-   
+    document.getElementById('addOredit-Title').innerText = "Add New Address";
 }
 
-function editAddress() {
+
+
+
+function editAddress(addressId,addressType,name, houseName, landMark, city, state, pincode, phone,currentPage,altPhone = '') {
+
+    document.getElementById('addressType').value = addressType;
+    document.getElementById('name').value = name;
+    document.getElementById('houseName').value = houseName;
+    document.getElementById('landMark').value = landMark;
+    document.getElementById('city').value = city; 
+    document.getElementById('state').value = state;
+    document.getElementById('pincode').value = pincode;
+    document.getElementById('phone').value = phone;
+
+    
+
+
+    // Check if altPhone exists and is not empty
+    document.getElementById('altPhone').value = altPhone ? altPhone : '';
+
+    document.getElementById('addAddressForm').action = `/checkout/editAddress/${addressId}?page=${currentPage}`
+
     document.getElementById('UserSavedAddressCard').classList.add('d-none');
-    document.getElementById('addAddressCard').classList.remove('d-none');
-    document.getElementById('addressFormTitle').innerText = "Edit Address";
+    document.getElementById('addAddressForm').classList.remove('d-none');
+    document.getElementById('addOredit-Title').innerText = "Edit Address";
+    
+    
 }
 
 function CancelAddNewAddress(){
