@@ -4,70 +4,146 @@
     <!-- Checkout Section -->
     <div class="container mt-5">
         <h2 class="text-center">Checkout</h2>
-        <form id="checkoutForm" onsubmit="return validateCheckoutForm()">
+        <form id="checkoutForm" onsubmit="return validateCheckoutForm()"  method="POST" novalidate>
             <!-- Address Section -->
             <div class="card mb-4">
                 <div class="card-header">Shipping Address</div>
                 <div class="card-body">
-                    <!-- Saved Addresses -->
+                    <!-- Dynamic Saved Addresses -->
                     <div id="savedAddresses">
                         <h5>Select an Address:</h5>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="address" id="savedAddress1" value="Address 1" checked>
-                            <label class="form-check-label" for="savedAddress1">
-                                1234 Main St, City, State, 10001
-                            </label>
-                            <button type="button" class="btn btn-link" onclick="editAddress()">Edit</button>
+                    
+                        <% if (addresses && addresses.length > 0) { %>
+                            <% addresses.forEach(function(address, index) { %>
+                            <div class="form-check list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input class="form-check-input" type="radio" name="address" id="savedAddress<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                    
+                                    <h5 class="mb-1"><%= address.addressType %> Address</h5> <!-- Display Address Type -->
+                                    <p class="mb-1">
+                                        <strong>Name:</strong> <%= address.name %><br>
+                                        <strong>House/Apartment:</strong> <%= address.houseName %><br>
+                                        <strong>Landmark:</strong> <%= address.landMark %><br>
+                                        <strong>City:</strong> <%= address.city %><br>
+                                        <strong>State:</strong> <%= address.state %><br>
+                                        <strong>Pincode:</strong> <%= address.pincode %><br>
+                                        <strong>Phone:</strong> <%= address.phone %><br>
+                                        <% if (address.altPhone) { %>
+                                            <strong>Alternate Phone:</strong> <%= address.altPhone %><br>
+                                        <% } %>
+                                        <small class="text-muted">
+                                            Added on: 
+                                            <% if (address.createdAt) { %>
+                                                <%= new Date(address.createdAt).toDateString() %>
+                                            <% } else if (address._id) { %>
+                                                <%= address._id.getTimestamp().toDateString() %>
+                                            <% } else { %>
+                                                N/A
+                                            <% } %>
+                                        </small>
+                                    </p>
+                    
+                                    <button type="button" class="btn btn-link" onclick="editAddress('<%= address._id %>')">Edit</button>
+                                </div>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="alert alert-info">No saved addresses found. Please add a new address.</div>
+                        <% } %>
+                    
+                        <!-- Pagination -->
+                        <% if (totalPages > 1) { %> <!-- Only show pagination if there's more than one page -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-center">
+                                <!-- Previous Button -->
+                                <% if (currentPage > 1) { %>
+                                    <a href="/checkout?page=<%= currentPage - 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Previous</a>
+                                <% } else { %>
+                                    <button class="btn btn-secondary" disabled>Previous</button>
+                                <% } %>
+                    
+                                <!-- Page Numbers -->
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <a href="/checkout?page=<%= i %>&limit=<%= limit || 3 %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                                <% } %>
+                    
+                                <!-- Next Button -->
+                                <% if (currentPage < totalPages) { %>
+                                    <a href="/checkout?page=<%= currentPage + 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Next</a>
+                                <% } else { %>
+                                    <button class="btn btn-secondary" disabled>Next</button>
+                                <% } %>
+                            </div>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="address" id="savedAddress2" value="Address 2">
-                            <label class="form-check-label" for="savedAddress2">
-                                5678 Oak St, City, State, 20002
-                            </label>
-                            <button type="button" class="btn btn-link" onclick="editAddress()">Edit</button>
-                        </div>
+                        <% } %>
+                    
                         <button type="button" class="btn btn-primary mt-3" onclick="addNewAddress()">Add New Address</button>
                     </div>
+                    
 
+                   
                     <!-- Add/Edit Address Form (Initially Hidden) -->
-                    <div id="addressForm" class="mt-4 d-none">
-                        <h5 id="addressFormTitle">Add New Address</h5>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="inputAddress">Address</label>
-                                <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
-                                <div class="invalid-feedback">Please enter your address.</div>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="inputCity">City</label>
-                                <input type="text" class="form-control" id="inputCity" placeholder="City">
-                                <div class="invalid-feedback">Please enter your city.</div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-4">
-                                <label for="inputState">State</label>
-                                <select id="inputState" class="form-control">
-                                    <option selected>Choose...</option>
-                                    <option>State 1</option>
-                                    <option>State 2</option>
-                                    <option>State 3</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a state.</div>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="inputZip">Zip</label>
-                                <input type="text" class="form-control" id="inputZip" placeholder="Zip Code">
-                                <div class="invalid-feedback">Please enter your zip code.</div>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="inputCountry">Country</label>
-                                <input type="text" class="form-control" id="inputCountry" placeholder="Country">
-                                <div class="invalid-feedback">Please enter your country.</div>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-success" onclick="saveAddress()">Save Address</button>
-                    </div>
+<div id="addressForm" class="mt-4 d-none">
+    <h5 id="addressFormTitle">Add New Address</h5>
+    <form action="/saveAddress" method="POST" novalidate>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputName">Name</label>
+                <input type="text" class="form-control" id="inputName" name="name" placeholder="Full Name" required>
+                <div class="invalid-feedback">Please enter your name.</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputHouseName">House/Apartment</label>
+                <input type="text" class="form-control" id="inputHouseName" name="houseName" placeholder="House/Apartment" required>
+                <div class="invalid-feedback">Please enter your house name.</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputLandmark">Landmark</label>
+                <input type="text" class="form-control" id="inputLandmark" name="landMark" placeholder="Landmark" required>
+                <div class="invalid-feedback">Please enter a landmark.</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputCity">City</label>
+                <input type="text" class="form-control" id="inputCity" name="city" placeholder="City" required>
+                <div class="invalid-feedback">Please enter your city.</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="inputState">State</label>
+                <select id="inputState" class="form-control" name="state" required>
+                    <option selected>Choose...</option>
+                    <!-- Add options for states here -->
+                    <option>Kerala</option>
+                    <option>Tamilnadu</option>
+                    <option>Karanadaka</option>
+                </select>
+                <div class="invalid-feedback">Please select a state.</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputPincode">Pincode</label>
+                <input type="text" class="form-control" id="inputPincode" name="pincode" placeholder="Pincode" required>
+                <div class="invalid-feedback">Please enter your pincode.</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputPhone">Phone</label>
+                <input type="text" class="form-control" id="inputPhone" name="phone" placeholder="Phone" required>
+                <div class="invalid-feedback">Please enter your phone number.</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputAltPhone">Alternate Phone</label>
+                <input type="text" class="form-control" id="inputAltPhone" name="altPhone" placeholder="Alternate Phone">
+                <div class="invalid-feedback">Please enter your alternate phone number.</div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Save Address</button>
+    </form>
+</div>
+
                 </div>
             </div>
 
@@ -151,7 +227,7 @@
                             Cash on Delivery
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-warning btn-block mt-4" style="background-color: #FFD700;" onclick="location.href='/checkout'">Place Order</button>
+                    <button type="submit" class="btn btn-warning btn-block mt-4" style="background-color: #FFD700;" >Place Order</button>
                 </div>
             </div>
         </form>
