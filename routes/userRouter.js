@@ -95,6 +95,7 @@ router.get('/shop',shopController.viewAllProducts);
 //CHECK OUT
 
 router.get('/checkout',userAuth,checkoutController.checkoutLoad);
+router.post('/checkout/addAddress',userAuth,addressController.postAddAddress)
 //router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
 //router.get('/cart/:id',userAuth, profileController.getCartView);
 //router.get('/orders/:id',userAuth, profileController.getOrdersView);

@@ -4,11 +4,136 @@
     <!-- Checkout Section -->
     <div class="container mt-5">
         <h2 class="text-center">Checkout</h2>
+                            <!-- Add/Edit Address Form (Initially Hidden) -->
+
+
+    
+
+
+
+    <form id="addAddressForm"  class="d-none" action="/checkout/addAddress" method="POST" novalidate>
+
+        
+
+               
+
+                    <div class="card mb-4" id="addAddressCard">
+                        <div class="card-header">Add New Address</div>
+                        <div class="card-body">
+                           
+
+        
+        <div class="form-row">
+
+            <div class="form-group col-md-6">
+                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name"  required>
+                    <div class="invalid-feedback">
+                        Please enter your name.
+                    </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="houseName" class="form-label">House/Apartment Name <span class="text-danger">*</span></label>
+                    <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name"  required>
+                    <div class="invalid-feedback">
+                        Please enter your house or apartment name.
+                    </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="landMark" class="form-label">Landmark <span class="text-danger">*</span></label>
+                    <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark"  required>
+                    <div class="invalid-feedback">
+                        Please enter a landmark.
+                    </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                    <input type="text" id="city" name="city" class="form-control" placeholder="Enter city"  required>
+                    <div class="invalid-feedback">
+                        Please enter your city.
+                    </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                <select  id="state" name="state" class="form-control" placeholder="Enter state"  required>
+                    <option >Choose...</option>
+                    <!-- Add options for states here -->
+                    <option selected>Kerala</option>
+                    <option>Tamilnadu</option>
+                    <option>Karanadaka</option>
+                </select>
+                <div class="invalid-feedback">Please select a state.</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+                    <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" min="100000" max="999999"  required>
+                    <div class="invalid-feedback">
+                        Please enter a valid 6-digit pincode.
+                    </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number" pattern="^\d{10}$"  required>
+                <div class="invalid-feedback">
+                    Please enter a valid 10-digit phone number.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group mb-3">
+                <label for="addressType" class="form-label">Address Type <span class="text-danger">*</span></label>
+                <select id="addressType" name="addressType" class="form-control" required>
+                     <option value="">Select Type</option>
+                    <option value="Home" >Home</option>
+                    <option value="Work" >Work</option>
+                    <option value="Other" >Other</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select an address type.
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="altPhone">Alternate Phone Number</label>
+                    <input type="text" id="altPhone" name="altPhone" class="form-control" pattern="^\d{10}$" >
+                    <small class="form-text text-muted">Optional. Must be a 10-digit number.</small>
+                    <div class="invalid-feedback">
+                        Please enter a valid 10-digit alternate phone number.
+                    </div>
+            </div>
+        </div>
+        <input type="hidden" name="redirectPath" value="/checkout">
+        <div>
+        <button type="submit" class="btn btn-success">Save Address</button>
+        <button type="button" class="btn btn-primary" onclick="CancelAddNewAddress()">Cancel</button>
+        </div>
+
+                        </div>
+                        </div>
+                        
+                        
+
+    </form>
+
+
         <form id="checkoutForm" onsubmit="return validateCheckoutForm()"  method="POST" novalidate>
             <!-- Address Section -->
-            <div class="card mb-4">
-                <div class="card-header">Shipping Address</div>
-                <div class="card-body">
+            <div class="card mb-4" >
+                <div class="card-header" >Shipping Address</div>
+                <div class="card-body" id="UserSavedAddressCard">
+
+                    <!-- Display Success Message -->
+            <% if (typeof message !== 'undefined' && message) { %>
+                <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
+                    <%= message %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <% } %>
                     <!-- Dynamic Saved Addresses -->
                     <div id="savedAddresses">
                         <h5>Select an Address:</h5>
@@ -82,70 +207,10 @@
                     
 
                    
-                    <!-- Add/Edit Address Form (Initially Hidden) -->
-<div id="addressForm" class="mt-4 d-none">
-    <h5 id="addressFormTitle">Add New Address</h5>
-    <form action="/saveAddress" method="POST" novalidate>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputName">Name</label>
-                <input type="text" class="form-control" id="inputName" name="name" placeholder="Full Name" required>
-                <div class="invalid-feedback">Please enter your name.</div>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputHouseName">House/Apartment</label>
-                <input type="text" class="form-control" id="inputHouseName" name="houseName" placeholder="House/Apartment" required>
-                <div class="invalid-feedback">Please enter your house name.</div>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputLandmark">Landmark</label>
-                <input type="text" class="form-control" id="inputLandmark" name="landMark" placeholder="Landmark" required>
-                <div class="invalid-feedback">Please enter a landmark.</div>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputCity">City</label>
-                <input type="text" class="form-control" id="inputCity" name="city" placeholder="City" required>
-                <div class="invalid-feedback">Please enter your city.</div>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="inputState">State</label>
-                <select id="inputState" class="form-control" name="state" required>
-                    <option selected>Choose...</option>
-                    <!-- Add options for states here -->
-                    <option>Kerala</option>
-                    <option>Tamilnadu</option>
-                    <option>Karanadaka</option>
-                </select>
-                <div class="invalid-feedback">Please select a state.</div>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputPincode">Pincode</label>
-                <input type="text" class="form-control" id="inputPincode" name="pincode" placeholder="Pincode" required>
-                <div class="invalid-feedback">Please enter your pincode.</div>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputPhone">Phone</label>
-                <input type="text" class="form-control" id="inputPhone" name="phone" placeholder="Phone" required>
-                <div class="invalid-feedback">Please enter your phone number.</div>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputAltPhone">Alternate Phone</label>
-                <input type="text" class="form-control" id="inputAltPhone" name="altPhone" placeholder="Alternate Phone">
-                <div class="invalid-feedback">Please enter your alternate phone number.</div>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">Save Address</button>
-    </form>
-</div>
+
 
                 </div>
-            </div>
+            <!-- </div> -->
 
             <!-- Product Details Section -->
             <div class="card mb-4">
@@ -239,3 +304,4 @@
 <%- include("../../views/partials/user/footer") %>
 
 <script src="/js/userJs/checkout.js"></script>
+<script src="/js/userJs/addAddress.js"></script>

@@ -26,7 +26,7 @@ document.querySelectorAll('.quantity-input').forEach(input => {
             setTimeout(() => {
                 cartMessage.style.display = 'none';
             }, 1000); // Match this timeout with the duration in your CSS transition
-        }, 5000); // Show for 5 seconds before starting to fade out
+        }, 3000); // Show for 5 seconds before starting to fade out
     }
     
 

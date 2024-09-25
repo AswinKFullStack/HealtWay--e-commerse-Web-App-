@@ -1,68 +1,19 @@
 // Function to show Add/Edit Address form
 function addNewAddress() {
-    document.getElementById('savedAddresses').classList.add('d-none');
-    document.getElementById('addressForm').classList.remove('d-none');
-    document.getElementById('addressFormTitle').innerText = "Add New Address";
+    document.getElementById('UserSavedAddressCard').classList.add('d-none');
+    document.getElementById('addAddressForm').classList.remove('d-none');
+   
 }
 
 function editAddress() {
-    document.getElementById('savedAddresses').classList.add('d-none');
-    document.getElementById('addressForm').classList.remove('d-none');
+    document.getElementById('UserSavedAddressCard').classList.add('d-none');
+    document.getElementById('addAddressCard').classList.remove('d-none');
     document.getElementById('addressFormTitle').innerText = "Edit Address";
 }
 
-// Function to validate form inputs
-function validateCheckoutForm() {
-    let valid = true;
-
-    // Get form input fields
-    const address = document.getElementById('inputAddress');
-    const city = document.getElementById('inputCity');
-    const state = document.getElementById('inputState');
-    const zip = document.getElementById('inputZip');
-    const country = document.getElementById('inputCountry');
-
-    // Validate address
-    if (address.value === "") {
-        address.classList.add('is-invalid');
-        valid = false;
-    } else {
-        address.classList.remove('is-invalid');
-    }
-
-    // Validate city
-    if (city.value === "") {
-        city.classList.add('is-invalid');
-        valid = false;
-    } else {
-        city.classList.remove('is-invalid');
-    }
-
-    // Validate state
-    if (state.value === "Choose...") {
-        state.classList.add('is-invalid');
-        valid = false;
-    } else {
-        state.classList.remove('is-invalid');
-    }
-
-    // Validate zip
-    if (zip.value === "") {
-        zip.classList.add('is-invalid');
-        valid = false;
-    } else {
-        zip.classList.remove('is-invalid');
-    }
-
-    // Validate country
-    if (country.value === "") {
-        country.classList.add('is-invalid');
-        valid = false;
-    } else {
-        country.classList.remove('is-invalid');
-    }
-
-    return valid;
+function CancelAddNewAddress(){
+    document.getElementById('UserSavedAddressCard').classList.remove('d-none');
+    document.getElementById('addAddressForm').classList.add('d-none');
 }
 
 // Function to save address and return to saved addresses section
@@ -73,3 +24,22 @@ function saveAddress() {
         document.getElementById('addressForm').classList.add('d-none');
     }
 }
+
+
+
+
+/// Script to hide message after some seconds -->
+
+    // Check if the message element exists
+    const checkoutMessage = document.getElementById('checkout-message');
+    if (checkoutMessage) {
+        // Set a timeout to apply the fade-out effect after 5 seconds
+        setTimeout(() => {
+            checkoutMessage.classList.add('fade-out');
+    
+            // Hide the element after the fade-out transition is complete
+            setTimeout(() => {
+                checkoutMessage.style.display = 'none';
+            }, 1000); // Match this timeout with the duration in your CSS transition
+        }, 3000); // Show for 5 seconds before starting to fade out
+    }

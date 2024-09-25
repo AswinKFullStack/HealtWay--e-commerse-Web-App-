@@ -49,3 +49,9 @@
 .d-none {
     display: none;
 }
+
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease-out; /* Adjust the duration and easing as needed */
+}

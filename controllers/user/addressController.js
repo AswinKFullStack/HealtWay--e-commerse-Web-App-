@@ -108,7 +108,8 @@ const postAddAddress = async (req,res) => {
             state,
             pincode,
             phone,
-            altPhone
+            altPhone,
+            redirectPath // Added to handle where to redirect after adding address
         } = req.body;
 
         if (!addressType || !name || !houseName || !landMark || !city || !state || !pincode || !phone) {
@@ -177,8 +178,12 @@ const postAddAddress = async (req,res) => {
         }
         await addressDoc.save();
         const message = "Address added successfully!";
-        res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
-
+        // Use redirectPath to determine where to go next
+        if (redirectPath === '/checkout') {
+            return res.redirect(`/checkout?message=${encodeURIComponent(message)}`);
+        } else {
+            return res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
+        }
     } catch (error) {
         console.error("Error saving address (postAddAddress)", error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while saving the address.", req.headers.referer || `/addAddress`);
