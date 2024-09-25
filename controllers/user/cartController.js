@@ -123,43 +123,62 @@ const addCart = async (req, res) => {
 
 ////// Loading the cart page 
 
-const LoadCartPage = async (req,res) => {
+const LoadCartPage = async (req, res) => {
     try {
         const { message = null, page = 1, limit = 3 } = req.query;
 
         const user = await User.findById(req.session.user);
-        if(!user){
+        if (!user) {
             const backLink = req.headers.referer || '/';
-            return  renderErrorPage(res, 404, "User not find", "User need to login", backLink);
+            return renderErrorPage(res, 404, "User not found", "User needs to log in", backLink);
         }
 
-
-        const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
-        // Ensure cart is defined and has a totalCartPrice property
-        const isCartEmpty = !cart || !cart.items.length;
-        const cartData = isCartEmpty ? { items: [], totalCartPrice: 0 } : cart;
-
-        if (isCartEmpty) {
+        // Fetch user's cart
+        let cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
+        if (!cart || !cart.items.length) {
             console.log("User doesn't have products in the cart");
             const message = "Your cart is empty.";
             return res.render('cartView', {
                 title: 'Cart Management',
                 user,
-                cart: cartData,
+                cart: { items: [], totalCartPrice: 0 },
                 message,
                 currentPage: 1,
                 totalPages: 1
             });
         }
 
-        // Sort the cart items by their creation date in descending order (latest first)
-        cart.items.sort((a, b) => b.createdAt - a.createdAt);
+        // Loop through each cart item and validate product stock and availability
+        let totalCartPrice = 0;
+        for (let i = 0; i < cart.items.length; i++) {
+            const item = cart.items[i];
+            const product = await Product.findById(item.productId);
+
+            if (!product || product.isDeleted || product.status !== "Available" || product.quantity === 0) {
+                // If product is not available, remove it from the cart
+                cart.items.splice(i, 1);
+                i--;  // Adjust index since we've removed the item
+                continue;
+            }
+
+            // If product quantity is less than cart quantity, update cart quantity
+            if (product.quantity < item.quantity) {
+                item.quantity = product.quantity;
+                item.totalPrice = product.salePrice * item.quantity;
+            }
+
+            // Calculate total price of the cart
+            totalCartPrice += item.totalPrice;
+        }
+
+        // Update total cart price
+        cart.totalCartPrice = totalCartPrice;
+        await cart.save();
 
         // Pagination logic
         const totalItems = cart.items.length;
         const totalPages = Math.ceil(totalItems / limit);
         const currentPage = Math.max(1, Math.min(page, totalPages)); // Ensure current page is within bounds
-
 
         // Calculate the items to display on the current page
         const paginatedItems = cart.items.slice((currentPage - 1) * limit, currentPage * limit);
@@ -169,7 +188,7 @@ const LoadCartPage = async (req,res) => {
             user,
             cart: {
                 items: paginatedItems,
-                totalCartPrice: cart.totalCartPrice // Assuming you have this field in your cart schema
+                totalCartPrice: cart.totalCartPrice
             },
             message,
             currentPage,
@@ -177,12 +196,12 @@ const LoadCartPage = async (req,res) => {
         });
 
     } catch (error) {
-        
         console.error("Error in LoadCartPage:", error);
         const backLink = req.headers.referer || '/';
         renderErrorPage(res, 500, "Internal Server Error", "An error occurred while loading the cart page", backLink);
     }
-}
+};
+
 
 
 
