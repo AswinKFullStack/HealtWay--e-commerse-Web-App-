@@ -115,7 +115,7 @@ const postAddAddress = async (req,res) => {
         if (!addressType || !name || !houseName || !landMark || !city || !state || !pincode || !phone) {
             
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent('All required fields must be filled.')}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent('All required fields must be filled.')}`);
             } else {
             return res.status(400).render('addAddress', {
                 title: "Add Address",
@@ -131,7 +131,7 @@ const postAddAddress = async (req,res) => {
         if (isNaN(pincodeNumber) || pincodeNumber < 100000 || pincodeNumber > 999999) {
 
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent('Pincode must be a valid 6-digit number.')}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent('Pincode must be a valid 6-digit number.')}`);
             } else {
             return res.status(400).render('addAddress', {
                 title: "Add Address",
@@ -147,7 +147,7 @@ const postAddAddress = async (req,res) => {
         if (!phonePattern.test(phone)) {
 
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent('phone number must be a valid 10-digit number.')}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent('phone number must be a valid 10-digit number.')}`);
             } else {
             return res.status(400).render('addAddress', {
                 title: "Add Address",
@@ -161,7 +161,7 @@ const postAddAddress = async (req,res) => {
 
         if (altPhone && !phonePattern.test(altPhone)) {
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent('Alternate phone number must be a valid 10-digit number.')}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent('Alternate phone number must be a valid 10-digit number.')}`);
             } else {
             return res.status(400).render('addAddress', {
                 title: "Add Address",
@@ -199,7 +199,7 @@ const postAddAddress = async (req,res) => {
         const message = "Address added successfully!";
         // Use redirectPath to determine where to go next
         if (redirectPath === '/checkout') {
-            return res.redirect(`/checkout?message=${encodeURIComponent(message)}`);
+            return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}`);
         } else {
             return res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}`);
         }
@@ -304,7 +304,7 @@ const postEditAddress = async (req,res)=>{
 
             const message = "All required fields must be filled.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
             }
@@ -315,7 +315,7 @@ const postEditAddress = async (req,res)=>{
            
             const message = "Pincode must be a valid 6-digit number.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
             }
@@ -325,7 +325,7 @@ const postEditAddress = async (req,res)=>{
         if (!phonePattern.test(phone)) {
             const message = "Phone number must be a valid 10-digit number.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkoutaddressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
             }
@@ -335,7 +335,7 @@ const postEditAddress = async (req,res)=>{
             
             const message = "Alternate phone number must be a valid 10-digit number.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}`);
             }
@@ -357,7 +357,7 @@ const postEditAddress = async (req,res)=>{
          if (!mongoose.Types.ObjectId.isValid(addressId)) {
             const message = "Invalid Address ID.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(400).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}&page=${currentPage}`);
             }
@@ -395,7 +395,7 @@ const postEditAddress = async (req,res)=>{
         if (addressUpdateResult.matchedCount === 0) {
             const message = "Address not found.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(404).redirect(`/editAddress/${addressId}?message=${encodeURIComponent(message)}&page=${currentPage}`);
             }
@@ -404,7 +404,7 @@ const postEditAddress = async (req,res)=>{
         if (addressUpdateResult.modifiedCount === 0) {
             const message = "No changes were made to the address.";
             if (redirectPath === '/checkout') {
-                return res.redirect(`/checkout?message=${encodeURIComponent(message)}&page=${currentPage}`);
+                return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}&addressPage=${currentPage}`);
             }else{
             return res.status(200).redirect(`/addresses/${user._id}?message=${encodeURIComponent(message)}&page=${currentPage}`);
             }
@@ -413,7 +413,7 @@ const postEditAddress = async (req,res)=>{
         // Successful update
         const successMessage = "Address edited successfully!";
         if (redirectPath === '/checkout') {
-            return res.redirect(`/checkout?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
+            return res.redirect(`/checkout?addressMessage=${encodeURIComponent(successMessage)}&addressPage=${currentPage}`);
         } else {
         res.redirect(`/addresses/${user._id}?message=${encodeURIComponent(successMessage)}&page=${currentPage}`);
         }

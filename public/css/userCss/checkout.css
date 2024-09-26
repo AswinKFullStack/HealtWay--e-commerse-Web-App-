@@ -55,3 +55,8 @@
     opacity: 0;
     transition: opacity 1s ease-out; /* Adjust the duration and easing as needed */
 }
+
+#addNewAddressBtn {
+    border-color: #aee8a1;
+    background-color: #ccd103;;
+}

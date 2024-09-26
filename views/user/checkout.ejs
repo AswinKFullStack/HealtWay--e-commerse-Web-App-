@@ -125,10 +125,10 @@
                 <div class="card-header" >Shipping Address</div>
                 <div class="card-body" id="UserSavedAddressCard">
 
-                    <!-- Display Success Message -->
-            <% if (typeof message !== 'undefined' && message) { %>
+                    <!-- Display  Message -->
+            <% if (typeof addressMessage !== 'undefined' && addressMessage) { %>
                 <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
-                    <%= message %>
+                    <%= addressMessage %>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -140,6 +140,7 @@
                     
                         <% if (addresses && addresses.length > 0) { %>
                             <% addresses.forEach(function(address, index) { %>
+                                
                             <div class="form-check list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <input class="form-check-input" type="radio" name="address" id="savedAddress<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
@@ -177,7 +178,7 @@
                              '<%= address.state %>', 
                              '<%= address.pincode %>', 
                              '<%= address.phone %>', 
-                             '<%= currentPage %>',
+                             '<%= currentAddressPage %>',
                              '<%= address.altPhone ? address.altPhone : null %>', 
                              )">Edit</a>
 
@@ -192,24 +193,24 @@
                         <% } %>
                     
                         <!-- Pagination -->
-                        <% if (totalPages > 1) { %> <!-- Only show pagination if there's more than one page -->
+                        <% if (totalAddressPages > 1) { %> <!-- Only show pagination if there's more than one page -->
                         <div class="row mt-4">
                             <div class="col-md-12 text-center">
                                 <!-- Previous Button -->
-                                <% if (currentPage > 1) { %>
-                                    <a href="/checkout?page=<%= currentPage - 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Previous</a>
+                                <% if (currentAddressPage > 1) { %>
+                                    <a href="/checkout?addressPage=<%= currentAddressPage - 1 %>" class="btn btn-secondary">Previous</a>
                                 <% } else { %>
                                     <button class="btn btn-secondary" disabled>Previous</button>
                                 <% } %>
                     
                                 <!-- Page Numbers -->
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <a href="/checkout?page=<%= i %>&limit=<%= limit || 3 %>" class="btn <%= currentPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                                <% for (let i = 1; i <= totalAddressPages; i++) { %>
+                                    <a href="/checkout?addressPage=<%= i %>" class="btn <%= currentAddressPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
                                 <% } %>
                     
                                 <!-- Next Button -->
-                                <% if (currentPage < totalPages) { %>
-                                    <a href="/checkout?page=<%= currentPage + 1 %>&limit=<%= limit || 3 %>" class="btn btn-secondary">Next</a>
+                                <% if (currentAddressPage < totalAddressPages) { %>
+                                    <a href="/checkout?addressPage=<%= currentAddressPage + 1 %>" class="btn btn-secondary">Next</a>
                                 <% } else { %>
                                     <button class="btn btn-secondary d-none" disabled>Next</button>
                                 <% } %>
@@ -217,7 +218,7 @@
                         </div>
                         <% } %>
                     
-                        <button type="button" class="btn btn-primary mt-3" onclick="addNewAddress()">Add New Address</button>
+                        <button type="button" class="btn btn-primary mt-3" id="addNewAddressBtn" onclick="addNewAddress()">Add New Address</button>
                     </div>
                     
 
@@ -228,61 +229,78 @@
             <!-- </div> -->
 
             <!-- Product Details Section -->
-            <div class="card mb-4">
-                <div class="card-header">Order Summary</div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Product</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Kashmeeri Mulak Podi</td>
-                                <td>₹200</td>
-                                <td>
-                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
-                                </td>
-                                <td class="product-total">₹200</td>
-                            </tr>
-                            <tr>
-                                <td>Malli Podi</td>
-                                <td>₹150</td>
-                                <td>
-                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
-                                </td>
-                                <td class="product-total">₹150</td>
-                            </tr>
-                            <tr>
-                                <td>Manjal</td>
-                                <td>₹180</td>
-                                <td>
-                                    <input type="number" value="1" min="1" class="form-control quantity" onchange="updateTotal(this)">
-                                </td>
-                                <td class="product-total">₹180</td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="3" class="text-right">Subtotal:</th>
-                                <th id="subtotal">₹530</th>
-                            </tr>
-                            <tr>
-                                <th colspan="3" class="text-right">GST (5%):</th>
-                                <th id="gst">₹26.50</th>
-                            </tr>
-                            <tr>
-                                <th colspan="3" class="text-right">Total:</th>
-                                <th id="total">₹556.50</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+            <!-- Product Details Section -->
+<div class="card mb-4">
+    <div class="card-header">Order Summary</div>
+    <div class="card-body">
+                <!-- Display  Message -->
+                <% if (typeof cartMessage !== 'undefined' && cartMessage) { %>
+                    <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
+                        <%= cartMessage %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <% } %>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (cart && cart.items && cart.items.length > 0) { %>
+                    <% cart.items.forEach(item => { %>
+                        <tr>
+                            <td><%= item.productId.productName %></td>
+                            <td>₹<%= item.price %></td>
+                            <td>
+                                <input type="number" value="<%= item.quantity %>" min="1" class="form-control quantity" onchange="updateTotal(this, '<%= item.productId._id %>')" style="width: 100px; height: 30px; font-size: 1em;">
+                            </td>
+                            <td class="product-total">₹<%= item.totalPrice %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" class="text-center">Your cart is empty.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-right">Subtotal:</th>
+                    <th id="subtotal">₹<%= cart && cart.totalCartPrice ? cart.totalCartPrice.toFixed(2) : '0.00' %></th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-right">GST (5%):</th>
+                    <th id="gst">₹<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.05).toFixed(2) : '0.00' %></th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-right">Total:</th>
+                    <th id="total">₹<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.05).toFixed(2) : '0.00' %></th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Pagination for Cart Items -->
+        <div class="pagination justify-content-center mt-4">
+            <% if (currentCartPage > 1) { %>
+                <a href="/checkout?cartPage=<%= currentCartPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+            <% } %>
+            <% for (let i = 1; i <= totalCartPages; i++) { %>
+                <a href="/checkout?cartPage=<%= i %>" class="btn btn-outline-primary <%= i === currentCartPage ? 'active' : '' %> mr-1"><%= i %></a>
+            <% } %>
+            <% if (currentCartPage < totalCartPages) { %>
+                <a href="/checkout?cartPage=<%= currentCartPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+            <% } %>
+        </div>
+
+    </div>
+</div>
+
 
             <!-- Payment Section -->
             <div class="card mb-4">
@@ -314,9 +332,8 @@
     </div>
 
 
-
+<script src="/js/userJs/checkout.js"></script>
+<script src="/js/userJs/addAddress.js"></script>
 
 <%- include("../../views/partials/user/footer") %>
 
-<script src="/js/userJs/checkout.js"></script>
-<script src="/js/userJs/addAddress.js"></script>
