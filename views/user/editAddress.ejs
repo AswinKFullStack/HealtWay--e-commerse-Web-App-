@@ -97,7 +97,15 @@
     <!-- State -->
     <div class="form-group mb-3">
         <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-        <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= address.state %>" required>
+        
+        <select  id="state" name="state" class="form-control" placeholder="Enter state" value="<%= address.state %>" required>
+            <option value="">Choose...</option>
+            <!-- Add options for states here -->
+            <option value="Kerala" <%= address.state === 'Kerala' ? 'selected' : '' %>>Kerala</option>
+            <option value="Tamilnadu" <%= address.state === 'Tamilnadu' ? 'selected' : '' %>>Tamilnadu</option>
+            <option value="Karanadaka" <%= address.state === 'Karanadaka' ? 'selected' : '' %>>Karanadaka</option>
+           
+        </select>
         <div class="invalid-feedback">Please enter a state.</div>
     </div>
 
@@ -129,6 +137,7 @@
         
     </div>
     <button type="submit" class="btn btn-primary">Save Changes</button>
+    <input type="hidden" name="redirectPath" value="/addresses">
 </form>
 
                         <% } else { %>

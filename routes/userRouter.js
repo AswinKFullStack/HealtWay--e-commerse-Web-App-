@@ -8,6 +8,9 @@ const profileController = require("../controllers/user/profileController");
 const passwordController = require("../controllers/user/passwordController");
 const addressController = require("../controllers/user/addressController");
 const cartController = require("../controllers/user/cartController");  
+const shopController = require("../controllers/user/shopController");  
+const checkoutController = require("../controllers/user/checkoutController");  
+const orderController = require("../controllers/user/orderController"); 
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -78,10 +81,29 @@ router.get('/product/addCart/:productId',userAuth,cartController.addCart);
 router.get('/cartView',userAuth,cartController.LoadCartPage);
                //Cart Quantity updation
 router.post('/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
-router.get('/cart/update/:productId',userAuth,cartController.LoadCartPage)
-//router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
-//router.get('/cart/:id',userAuth, profileController.getCartView);
-//router.get('/orders/:id',userAuth, profileController.getOrdersView);
+router.get('/cart/update/:productId',userAuth,cartController.LoadCartPage);
+router.post('/cartView/remove/:productId/:cartItemId',userAuth,cartController.removeCartItem);
+router.post('/checkout/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
+
+
+
+///SHOP SECTION
+
+router.get('/shop',shopController.viewAllProducts);
+
+
+
+
+//CHECK OUT
+
+router.get('/checkout',userAuth,checkoutController.checkoutLoad);
+router.post('/checkout/addAddress',userAuth,addressController.postAddAddress);
+router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postEditAddress);
+
+
+//ORDER 
+
+router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
 
 module.exports = router
 

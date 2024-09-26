@@ -31,7 +31,8 @@
                                 <div class="ml-4">
                                     <!-- Product Description and Price -->
                                     <h6 class="mb-1"><%= item.productId.description %></h6>
-                                    <p class="text-muted mb-2">Price: <strong>$<%= item.price %></strong></p>
+                                    <p class="text-muted mb-2">Product Price: <strong>$<%= item.price %></strong></p>
+                                    <p class="text-muted mb-2">Price Per Quantity: <strong>$<%= item.totalPrice %></strong></p>
 
                                     <!-- Quantity Control -->
                                     <div class="quantity-control d-flex align-items-center">
@@ -68,29 +69,30 @@
             </div>
         </div>
 
-        <!-- Order Summary -->
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Order Summary</h5>
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Subtotal</span>
-                            <strong>$<%= cart.totalCartPrice %></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Tax (10%)</span>
-                            <strong>$<%= (cart.totalCartPrice * 0.1).toFixed(2) %></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Total</span>
-                            <strong id="totalPrice">$<%= (cart.totalCartPrice * 1.1).toFixed(2) %></strong>
-                        </li>
-                    </ul>
-                    <button class="btn btn-primary btn-block">Proceed to Checkout</button>
-                </div>
-            </div>
+       <!-- Order Summary -->
+<div class="col-md-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Order Summary</h5>
+            <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Subtotal</span>
+                    <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice : '0.00' %></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Tax (10%)</span>
+                    <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.1).toFixed(2) : '0.00' %></strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Total</span>
+                    <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.1).toFixed(2) : '0.00' %></strong>
+                </li>
+            </ul>
+            <button class="btn btn-primary btn-block" onclick="location.href='/checkout'">Proceed to Checkout</button>
         </div>
+    </div>
+</div>
+
     </div>
 </div>
 

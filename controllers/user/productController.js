@@ -19,33 +19,42 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // Render the product view page
 const getProductView = async (req, res) => {
     try {
-        
-
         const productId = req.params.productId;
-        const message = req.query.message || null ;
+        const message = req.query.message || null;
+
         // Validate product ID
         if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             console.error("Invalid or missing Product ID");
             return renderErrorPage(res, 400, "Bad Request", "Product ID is required and must be valid.", req.headers.referer || '/');
         }
+
         // Fetch user data from the session
         const user = req.session.user ? await User.findById(req.session.user) : null;
         let isCartItem = null;
+        let cartProductIds = []; // Initialize an array to hold product IDs in the cart
+
         if (user) {
-            // Check if cart contains the item
-             isCartItem = await Cart.findOne({
-                userId: user._id,
-                'items.productId': productId
-            }).lean();
-        
-            if (isCartItem) {
-                console.log("Item found in cart.");
+            // Fetch the user's cart
+            const userCart = await Cart.findOne({ userId: user._id }).lean();
+            if (userCart && userCart.items) {
+                // Extract all product IDs from the cart items
+                cartProductIds = userCart.items.map(item => item.productId.toString());
+
+                // Check if the main product is in the cart
+                isCartItem = cartProductIds.includes(productId);
+                
+                if (isCartItem) {
+                    console.log("Main item found in cart.");
+                } else {
+                    console.log("Main item not found in cart.");
+                }
             } else {
-                console.log("Item not found in cart.");
+                console.log("Cart is empty.");
             }
         } else {
             console.log("No user found.");
         }
+
         // Fetch the product details
         const product = await Product.findById(productId)
             .populate('brand', 'brandName')
@@ -76,10 +85,8 @@ const getProductView = async (req, res) => {
 
         // Calculate total pages for pagination
         const totalPages = Math.ceil(totalRelatedProducts / itemsPerPage);
-       
-        
+
         res.render('productView', {
-            
             product: product,
             relatedProducts: relatedProducts,
             relatedProductCurrentPage: page,
@@ -87,7 +94,8 @@ const getProductView = async (req, res) => {
             title: product.productName || 'Product Details',
             user,
             message,
-            isCartItem : isCartItem || null, // Pass the user data to the view
+            isCartItem: isCartItem || null, // For main product
+            cartProductIds: cartProductIds, // Pass the array of cart product IDs
         });
     } catch (error) {
         console.error("Error fetching product details:", error);

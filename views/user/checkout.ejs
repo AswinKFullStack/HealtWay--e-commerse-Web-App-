@@ -1,0 +1,351 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/checkout.css">
+
+
+    <!-- Checkout Section -->
+    <div class="container mt-5">
+        <h2 class="text-center">Checkout</h2>
+                            <!-- Add/Edit Address Form (Initially Hidden) -->
+
+
+    
+
+
+
+    <form id="addAddressForm"  class="d-none" action="/checkout/addAddress" method="POST" novalidate>
+
+        
+
+               
+
+                    <div class="card mb-4" id="addAddressCard">
+                        <div class="card-header" id="addOredit-Title">Add New Address</div>
+                        <div class="card-body">
+                           
+
+        
+        <div class="form-row">
+
+            <div class="form-group col-md-6">
+                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name"  required>
+                    <div class="invalid-feedback">
+                        Please enter your name.
+                    </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="houseName" class="form-label">House/Apartment Name <span class="text-danger">*</span></label>
+                    <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter house or apartment name"  required>
+                    <div class="invalid-feedback">
+                        Please enter your house or apartment name.
+                    </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="landMark" class="form-label">Landmark <span class="text-danger">*</span></label>
+                    <input type="text" id="landMark" name="landMark" class="form-control" placeholder="Enter landmark"  required>
+                    <div class="invalid-feedback">
+                        Please enter a landmark.
+                    </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                    <input type="text" id="city" name="city" class="form-control" placeholder="Enter city"  required>
+                    <div class="invalid-feedback">
+                        Please enter your city.
+                    </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                <select  id="state" name="state" class="form-control" placeholder="Enter state"  required>
+                    <option value="">Choose...</option>
+                    <!-- Add options for states here -->
+                    <option value="Kerala">Kerala</option>
+                    <option value="Tamilnadu">Tamilnadu</option>
+                    <option value="Karanadaka">Karanadaka</option>
+                </select>
+                <div class="invalid-feedback">Please select a state.</div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+                    <input type="number" id="pincode" name="pincode" class="form-control" placeholder="Enter pincode" min="100000" max="999999"  required>
+                    <div class="invalid-feedback">
+                        Please enter a valid 6-digit pincode.
+                    </div>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number" pattern="^\d{10}$"  required>
+                <div class="invalid-feedback">
+                    Please enter a valid 10-digit phone number.
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group mb-3">
+                <label for="addressType" class="form-label">Address Type <span class="text-danger">*</span></label>
+                <select id="addressType" name="addressType" class="form-control" required>
+                     <option value="">Select Type</option>
+                    <option value="Home" >Home</option>
+                    <option value="Work" >Work</option>
+                    <option value="Other" >Other</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select an address type.
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="altPhone">Alternate Phone Number</label>
+                    <input type="text" id="altPhone" name="altPhone" class="form-control" pattern="^\d{10}$" >
+                    <small class="form-text text-muted">Optional. Must be a 10-digit number.</small>
+                    <div class="invalid-feedback">
+                        Please enter a valid 10-digit alternate phone number.
+                    </div>
+            </div>
+        </div>
+        <input type="hidden" name="redirectPath" value="/checkout">
+        <div>
+        <button type="submit" class="btn btn-success">Save Address</button>
+        <button type="button" class="btn btn-primary" onclick="CancelAddNewAddress()">Cancel</button>
+        </div>
+
+                        </div>
+                        </div>
+                        
+                        
+
+    </form>
+
+
+    <form id="checkoutForm" action="/checkout/<%= cartId %>" method="POST" novalidate>
+
+        
+
+            <!-- Address Section -->
+            <div class="card mb-4" >
+                <div class="card-header" >Shipping Address</div>
+                <div class="card-body" id="UserSavedAddressCard">
+
+                    <!-- Display  Message -->
+             <% if (typeof addressMessage !== 'undefined' && addressMessage) { %>
+                <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
+                    <%= addressMessage %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+             <% } %>
+                    <!-- Dynamic Saved Addresses -->
+                    <div id="savedAddresses">
+                        <h5>Select an Address:</h5>
+                    
+                        <% if (addresses && addresses.length > 0) { %>
+                            <% addresses.forEach(function(address, index) { %>
+                                
+                            <div class="form-check list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input class="form-check-input" type="radio" name="address" id="savedAddress<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                    <label for="savedAddress<%= index %>">
+                                    <h5 class="mb-1"><%= address.addressType %> Address</h5> <!-- Display Address Type -->
+                                    <p class="mb-1">
+                                        <strong>Name:</strong> <%= address.name %><br>
+                                        <strong>House/Apartment:</strong> <%= address.houseName %><br>
+                                        <strong>Landmark:</strong> <%= address.landMark %><br>
+                                        <strong>City:</strong> <%= address.city %><br>
+                                        <strong>State:</strong> <%= address.state %><br>
+                                        <strong>Pincode:</strong> <%= address.pincode %><br>
+                                        <strong>Phone:</strong> <%= address.phone %><br>
+                                        <% if (address.altPhone) { %>
+                                            <strong>Alternate Phone:</strong> <%= address.altPhone %><br>
+                                        <% } %>
+                                        <small class="text-muted">
+                                            Added on: 
+                                            <% if (address.createdAt) { %>
+                                                <%= new Date(address.createdAt).toDateString() %>
+                                            <% } else if (address._id) { %>
+                                                <%= address._id.getTimestamp().toDateString() %>
+                                            <% } else { %>
+                                                N/A
+                                            <% } %>
+                                        </small>
+                                    </p>
+                                </label>
+                                    <a  class="btn btn-success mt-3" onclick="editAddress('<%= address._id %>', 
+                             '<%= address.addressType %>', 
+                             '<%= address.name %>', 
+                             '<%= address.houseName %>', 
+                             '<%= address.landMark %>', 
+                             '<%= address.city %>', 
+                             '<%= address.state %>', 
+                             '<%= address.pincode %>', 
+                             '<%= address.phone %>', 
+                             '<%= currentAddressPage %>',
+                             '<%= address.altPhone ? address.altPhone : null %>', 
+                             )">Edit</a>
+
+
+                            
+                                    
+                                </div>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="alert alert-info">No saved addresses found. Please add a new address.</div>
+                        <% } %>
+                            <!-- Validation error message for address -->
+                <div class="text-danger" id="addressError"></div>
+                        <!-- Pagination -->
+                        <% if (totalAddressPages > 1) { %> <!-- Only show pagination if there's more than one page -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-center">
+                                <!-- Previous Button -->
+                                <% if (currentAddressPage > 1) { %>
+                                    <a href="/checkout?addressPage=<%= currentAddressPage - 1 %>" class="btn btn-secondary">Previous</a>
+                                <% } else { %>
+                                    <button class="btn btn-secondary" disabled>Previous</button>
+                                <% } %>
+                    
+                                <!-- Page Numbers -->
+                                <% for (let i = 1; i <= totalAddressPages; i++) { %>
+                                    <a href="/checkout?addressPage=<%= i %>" class="btn <%= currentAddressPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
+                                <% } %>
+                    
+                                <!-- Next Button -->
+                                <% if (currentAddressPage < totalAddressPages) { %>
+                                    <a href="/checkout?addressPage=<%= currentAddressPage + 1 %>" class="btn btn-secondary">Next</a>
+                                <% } else { %>
+                                    <button class="btn btn-secondary d-none" disabled>Next</button>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                    
+                        <button type="button" class="btn btn-primary mt-3" id="addNewAddressBtn" onclick="addNewAddress()">Add New Address</button>
+                    </div>
+                    </div>
+            </div>
+            
+
+            <!-- Product Details Section -->
+            
+<div class="card mb-4">
+    <div class="card-header">Order Summary</div>
+    <div class="card-body">
+                <!-- Display  Message -->
+                <% if (typeof cartMessage !== 'undefined' && cartMessage) { %>
+                    <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
+                        <%= cartMessage %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <% } %>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (cart && cart.items && cart.items.length > 0) { %>
+                    <% cart.items.forEach(item => { %>
+                        <tr>
+                            <td><%= item.productId.productName %></td>
+                            <td>₹<%= item.price %></td>
+                            <td>
+                                
+                                
+                               
+                                    
+                                    
+                                        
+                                        
+                                        <input type="number" name="quantity" value="<%= item.quantity %>" id="quantity-<%= item.id %>" min="1" class="form-control quantity" onchange="updateCartQuantity('<%= item.productId._id %>', '<%= item.id %>' , '<%= item.quantity %>')" style="width: 100px; height: 30px; font-size: 1em;">
+
+                                        <div class="text-danger" id="quantityError-<%= item.id %>"></div> <!-- Quantity Error --> 
+                                
+                            </td>
+                            <td class="product-total">₹<%= item.totalPrice %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4" class="text-center">Your cart is empty.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-right">Subtotal:</th>
+                    <th id="subtotal">₹<%= cart && cart.totalCartPrice ? cart.totalCartPrice.toFixed(2) : '0.00' %></th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-right">GST (5%):</th>
+                    <th id="gst">₹<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.05).toFixed(2) : '0.00' %></th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-right">Total:</th>
+                    <th id="total">₹<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.05).toFixed(2) : '0.00' %></th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Pagination for Cart Items -->
+        <div class="pagination justify-content-center mt-4">
+            <% if (currentCartPage > 1) { %>
+                <a href="/checkout?cartPage=<%= currentCartPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+            <% } %>
+            <% for (let i = 1; i <= totalCartPages; i++) { %>
+                <a href="/checkout?cartPage=<%= i %>" class="btn btn-outline-primary <%= i === currentCartPage ? 'active' : '' %> mr-1"><%= i %></a>
+            <% } %>
+            <% if (currentCartPage < totalCartPages) { %>
+                <a href="/checkout?cartPage=<%= currentCartPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+            <% } %>
+        </div>
+
+    </div>
+</div>
+
+
+            <!-- Payment Section -->
+            <div class="card mb-4">
+                <div class="card-header">Payment Method</div>
+                <div class="card-body">
+                    <h5>Select Payment Method:</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard" checked>
+                        <label class="form-check-label" for="creditCard">
+                            Credit Card
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="debitCard">
+                        <label class="form-check-label" for="debitCard">
+                            Debit Card
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cashOnDelivery">
+                        <label class="form-check-label" for="cod">
+                            Cash on Delivery
+                        </label>
+                    </div>
+                    <div class="text-danger" id="paymentError"></div> <!-- Payment Method Error -->
+                    <button type="submit" class="btn btn-warning btn-block mt-4" style="background-color: #FFD700;" >Place Order</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+<script src="/js/userJs/checkout.js"></script>
+<script src="/js/userJs/addAddress.js"></script>
+
+<%- include("../../views/partials/user/footer") %>
+

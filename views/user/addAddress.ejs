@@ -94,7 +94,13 @@
 
                 <div class="form-group mb-3">
                     <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-                    <input type="text" id="state" name="state" class="form-control" placeholder="Enter state" value="<%= formData.state || '' %>" required>
+                    <select  id="state" name="state" class="form-control" placeholder="Enter state"  required>
+                        <option value="">Choose...</option>
+                        <!-- Add options for states here -->
+                        <option value="Kerala">Kerala</option>
+                        <option value="Tamilnadu">Tamilnadu</option>
+                        <option value="Karanadaka">Karanadaka</option>
+                    </select>
                     <div class="invalid-feedback">
                         Please enter your state.
                     </div>
@@ -124,7 +130,7 @@
                         Please enter a valid 10-digit alternate phone number.
                     </div>
                 </div>
-
+                <input type="hidden" name="redirectPath" value="/addresses">
                 <button type="submit" class="btn btn-success">Add Address</button>
             </form>
         </div>

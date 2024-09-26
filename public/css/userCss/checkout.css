@@ -1,0 +1,62 @@
+/* Product Card Styles */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+/* Wishlist Button */
+.btn-light {
+    background-color: transparent;
+    border: none;
+}
+
+.btn-light i {
+    color: #e74c3c;
+}
+
+
+
+/* Styling for Checkout Page */
+.container {
+    max-width: 800px;
+}
+
+.card-header {
+    background-color: #E0F4D2;
+    font-weight: bold;
+}
+
+.invalid-feedback {
+    display: none;
+    color: red;
+}
+
+.d-none {
+    display: none;
+}
+
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease-out; /* Adjust the duration and easing as needed */
+}
+
+#addNewAddressBtn {
+    border-color: #aee8a1;
+    background-color: #ccd103;;
+}

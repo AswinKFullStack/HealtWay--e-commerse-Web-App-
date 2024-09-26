@@ -4,13 +4,14 @@ const {v4:uuidv4} = require("uuid");
 const Product = require("./productSchema");
 
 const orderSchema = new Schema({
-    orderId:{
-        type:String,
-        default:()=>uuidv4,
-        unique:true
+    
+    userId: {
+        type:Schema.Types.ObjectId,
+        ref:"User",
+        required:true
     },
     orderdItems:[{
-        product:{
+        productId:{
             type:Schema.Types.ObjectId,
             ref:"Product",
             required:true
@@ -19,7 +20,11 @@ const orderSchema = new Schema({
             type:Number,
             required:true
         },
-        price:{
+        priceOfProduct:{
+            type:Number,
+            default:0
+        },
+        priceOfQuantity:{
             type:Number,
             default:0
         }
@@ -58,6 +63,9 @@ const orderSchema = new Schema({
         type:Boolean,
         default:false
     }
+}, {
+    timestamps: true
+
 })
 
 const Order = mongoose.model("Order",orderSchema);

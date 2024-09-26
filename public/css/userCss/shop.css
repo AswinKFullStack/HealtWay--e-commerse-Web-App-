@@ -1,0 +1,43 @@
+.border-bottom-custom {
+    border-bottom: 3px solid #28a745;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+.top-0 {
+    top: 0;
+}
+
+.end-0 {
+    right: 0;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.position-relative {
+    position: relative;
+}
+
+
+
+
+/* My styling */
+.pagenstion-color {
+    color: #28a745;
+}
+
+
+.page-item.active .page-link{
+    background-color: #28a745;  
+    border-color: #9faa02; 
+}
+
+
+select.form-control {
+    height: auto; /* Ensures full content is visible */
+    overflow: visible; /* Ensures no content is hidden */
+}

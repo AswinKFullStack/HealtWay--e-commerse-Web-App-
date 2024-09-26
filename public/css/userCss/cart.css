@@ -65,3 +65,9 @@ body {
     border-color: rgb(178, 178, 178);; /* Keep border color same on hover */
 }
 
+
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease-out; /* Adjust the duration and easing as needed */
+}
