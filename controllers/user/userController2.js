@@ -32,7 +32,6 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate email and password
         if (!email || !password) {
             return res.render("login", {
                 message: "Email and password are required.",
@@ -40,30 +39,26 @@ const login = async (req, res) => {
             });
         }
 
-        // Check if user exists
         const findUser = await User.findOne({ isAdmin: false, email: email });
         if (!findUser) {
             return res.render("login", { message: "User not found", title: 'Login Page' });
         }
 
-        // Check if user is blocked
         if (findUser.isBlocked) {
             return res.render("login", { message: "User is blocked by admin", title: 'Login Page' });
         }
 
-        // Validate password
         const passwordMatch = await bcrypt.compare(password, findUser.password);
         if (!passwordMatch) {
             return res.render("login", { message: "Incorrect Password", title: 'Login Page' });
         }
 
-        // User successfully logged in
         req.session.user = findUser._id;
         console.log("User login successful with req.session.user =", req.session.user);
 
         // Redirect to the originally requested page (if available) or home page
         const redirectTo = req.session.userReturnTo || '/';
-        delete req.session.userReturnTo; // Clear the stored URL after using it
+        delete req.session.userReturnTo; 
         res.redirect(redirectTo);
         
        

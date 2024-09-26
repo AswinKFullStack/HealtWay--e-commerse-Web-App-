@@ -24,7 +24,7 @@
     },
     isDeleted: {
         type: Boolean,
-        default: false, // Default to false as the category is not deleted initially
+        default: false, 
       },
     createdAt:{
         type:Number,

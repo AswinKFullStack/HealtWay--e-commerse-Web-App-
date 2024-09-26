@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const {Schema} = mongoose;
-const {v4:uuidv4} = require("uuid");
-const Product = require("./productSchema");
+
 
 const orderSchema = new Schema({
     
@@ -10,7 +9,7 @@ const orderSchema = new Schema({
         ref:"User",
         required:true
     },
-    orderdItems:[{
+    orderedItems:[{
         productId:{
             type:Schema.Types.ObjectId,
             ref:"Product",
@@ -43,7 +42,7 @@ const orderSchema = new Schema({
     },
     address:{
         type:Schema.Types.ObjectId,
-        ref:"User",
+        ref:"Address",
         required:true
     },
     invoiceDate:{

@@ -14,9 +14,9 @@
     },
     phone:{
         type:String,
-        required:false, //may be user signup using google account,so that it not mondatory
+        required:false, 
         unique:false,
-        spare:true, //for setting uniqe constrans.there is no phonenumber when signup using single signup.so that we set true //
+        spare:true, 
         default:null
     },
     googleId:{
@@ -63,7 +63,7 @@
     redeemUser:[{
         type:Schema.Types.ObjectId,
         ref:"User",
-        // required:true
+        
     }],
     searchHistory:[{
         category:{

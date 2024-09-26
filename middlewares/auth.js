@@ -14,7 +14,6 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 // User authentication middleware
 const userAuth = async (req, res, next) => {
     try {
-        // Capture the current URL to use as the back link
         const backLink = req.headers.referer || req.originalUrl;
 
         if (req.session.user) {
@@ -35,7 +34,6 @@ const userAuth = async (req, res, next) => {
             }
         } else {
             console.log("Session not found");
-            // Store the original URL before redirecting to login
             req.session.userReturnTo = req.originalUrl;
 
             return renderErrorPage(
@@ -61,7 +59,6 @@ const userAuth = async (req, res, next) => {
 // Admin authentication middleware
 const adminAuth = async (req, res, next) => {
     try {
-        // Capture the current URL to use as the back link
         const backLink = req.headers.referer || req.originalUrl;
 
         if (req.session.admin) {
@@ -82,7 +79,6 @@ const adminAuth = async (req, res, next) => {
                 );
             }
         } else {
-            // Store the original URL before redirecting to login
             req.session.adminReturnTo = req.originalUrl;
             return renderErrorPage(
                 res, 

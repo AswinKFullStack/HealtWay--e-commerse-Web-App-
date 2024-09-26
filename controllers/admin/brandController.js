@@ -13,33 +13,28 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 
 const getBrandpage = async(req,res)=>{
   try {
-      const searchTerm = req.query.search || ""; // Search term from query string
-      const currentPage = Math.max(1, parseInt(req.query.page)); // Current page number from query string
-      const itemsPerPage = 3; // Number of categories per page
+      const searchTerm = req.query.search || ""; 
+      const currentPage = Math.max(1, parseInt(req.query.page)); 
+      const itemsPerPage = 3; 
   
-      // Filter categories by search term (case-insensitive) and exclude deleted categories
       const searchQuery = {
         ...((searchTerm && { brandName: { $regex: new RegExp(searchTerm, "i") } }) || {})
        
       };
   
-      // Count total categories for pagination
       const totalCategories = await Brand.countDocuments(searchQuery);
   
-      // Fetch the categories for the current page
       const brands = await Brand.find(searchQuery)
         .skip((currentPage - 1) * itemsPerPage)
         .limit(itemsPerPage);
   
-      // Calculate total pages
       const totalPages = Math.ceil(totalCategories / itemsPerPage);
   
-      // Render the category management page with fetched data
       res.render("brands", {
         data: brands,
         totalpages: totalPages,
         currentPage: currentPage,
-        searchTerm: searchTerm, // Pass this for prefilling the search box
+        searchTerm: searchTerm, 
       });
     } catch (error) {
       console.error("Error fetching brand page:", error);
@@ -62,12 +57,10 @@ const postAddBrand = async (req, res) => {
     const { brandName } = req.body;
     const brandImage = req.file.filename;
 
-    // Validate brand data
     if (!brandName.trim()) {
       return res.render("addNewBrand", { errorMessage: "Brand name cannot be empty." });
     }
 
-    // Save the new brand to the database
     const newBrand = new Brand({
       brandName,
       brandImage: [brandImage]

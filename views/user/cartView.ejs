@@ -3,7 +3,9 @@
 
 <!-- Cart Section -->
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Your Shopping Cart</h2>
+    <% if (cart && cart.items && cart.items.length > 0) { %>
+        <h2 class="text-center mb-4">Your Shopping Cart</h2>
+        <% } %>
     <div class="row">
         <% if (typeof message !== 'undefined' && message) { %>
             <div id="cart-message" class="alert alert-success w-100 text-center">
@@ -15,6 +17,7 @@
         <div class="col-md-8">
             <% if (cart && cart.items && cart.items.length > 0) { %>
                 <% cart.items.forEach(item => { %>
+                    
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <h5 class="card-title d-flex justify-content-between align-items-center">
@@ -52,46 +55,53 @@
                     </div>
                 <% }) %>
             <% } else { %>
+                <h2 class="text-center mb-4">No Cart Items</h2>
                 <p>Your cart is empty.</p>
             <% } %>
 
             <!-- Pagination -->
-            <div class="pagination justify-content-center mt-4">
-                <% if (currentPage > 1) { %>
-                    <a href="/cartView?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
-                <% } %>
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                    <a href="/cartView?page=<%= i %>" class="btn btn-outline-primary <%= i === currentPage ? 'active' : '' %> mr-1"><%= i %></a>
-                <% } %>
-                <% if (currentPage < totalPages) { %>
-                    <a href="/cartView?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
-                <% } %>
-            </div>
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %> <!-- Only show pagination if more than 1 page -->
+                <div class="pagination justify-content-center mt-4">
+                    <% if (currentPage > 1) { %>
+                        <a href="/cartView?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+                    <% } %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="/cartView?page=<%= i %>" class="btn btn-outline-primary <%= i === currentPage ? 'active' : '' %> mr-1"><%= i %></a>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/cartView?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+                    <% } %>
+                </div>
+            <% } %>
         </div>
 
        <!-- Order Summary -->
-<div class="col-md-4">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">Order Summary</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Subtotal</span>
-                    <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice : '0.00' %></strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Tax (10%)</span>
-                    <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.1).toFixed(2) : '0.00' %></strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>Total</span>
-                    <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.1).toFixed(2) : '0.00' %></strong>
-                </li>
-            </ul>
-            <button class="btn btn-primary btn-block" onclick="location.href='/checkout'">Proceed to Checkout</button>
+  <!-- Order Summary -->
+  <% if (cart && cart.items && cart.items.length > 0) { %> <!-- Only show order summary if there are items in the cart -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Order Summary</h5>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Subtotal</span>
+                        <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice : '0.00' %></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Tax (10%)</span>
+                        <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.1).toFixed(2) : '0.00' %></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Total</span>
+                        <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.1).toFixed(2) : '0.00' %></strong>
+                    </li>
+                </ul>
+                <button class="btn btn-primary btn-block" onclick="location.href='/checkout'">Proceed to Checkout</button>
+            </div>
         </div>
     </div>
-</div>
+<% } %>
 
     </div>
 </div>

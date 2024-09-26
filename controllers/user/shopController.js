@@ -19,11 +19,11 @@ const viewAllProducts = async (req, res) => {
     try {
         // Pagination setup
         const productPage = parseInt(req.query.page) || 1;
-        const productLimit = 3; // Number of products per page
+        const productLimit = 3; 
         const skip = (productPage - 1) * productLimit; 
 
         // Sorting setup
-        const sortOption = req.query.sort || ''; // Default sorting is by popularity
+        const sortOption = req.query.sort || ''; 
         let sortCriteria = {};
 
         switch (sortOption) {
@@ -46,7 +46,7 @@ const viewAllProducts = async (req, res) => {
                 sortCriteria = { popularity: -1 };
                 break;
             default:
-                sortCriteria = {}; // Default sorting
+                sortCriteria = {}; 
         }
 
         // Searching setup
@@ -92,11 +92,9 @@ const viewAllProducts = async (req, res) => {
             .skip(skip)
             .limit(productLimit);
 
-             // Merge the results: "starts with" products first, followed by "contains" products
              products = [...startsWithProducts, ...containsProducts];
             
         }else{
-             // If no search term, fetch products normally
              products = await Product.find(productQuery)
              .populate('category')
              .populate('brand')
@@ -111,17 +109,14 @@ const viewAllProducts = async (req, res) => {
         }
         
 
-        // Total product count for pagination
         let totalProducts;
         if (searchTerm) {
-            // Count total products matching the search criteria
             const searchRegex = new RegExp(searchTerm, 'i');
             totalProducts = await Product.countDocuments({
                 isDeleted: false,
                 productName: { $regex: searchRegex }
             });
         } else {
-            // If no search term, count total products normally
             totalProducts = await Product.countDocuments(productQuery);
         }
 
@@ -130,21 +125,19 @@ const viewAllProducts = async (req, res) => {
     console.log('Products:', products.map(p => p.productName));
 
 
-        // Fetch user details if logged in
         const user = req.session.user 
             ? await User.findById(req.session.user) 
             : req.user 
             ? await User.findById(req.user._id) 
             : null;
 
-        // Render the shop page
         res.render("shop", {
             user,
             products,
             productCurrentPage: productPage,
             productTotalPages: Math.ceil(totalProducts / productLimit),
             searchTerm,
-            sort: sortOption, // Pass the selected sort option
+            sort: sortOption, 
             title: 'Shop Page'
         });
 

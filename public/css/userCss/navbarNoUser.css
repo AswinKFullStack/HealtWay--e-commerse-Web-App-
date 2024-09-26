@@ -93,3 +93,43 @@ footer .list-unstyled {
 footer .list-unstyled li {
     margin-bottom: 0.5rem;
 }
+
+
+#userNavbar{
+   
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1030; /* Ensures the navbar is above other content */
+   
+    
+  
+    
+}
+
+body {
+    padding-top: 70px; /* Adjust based on the height of your navbar to prevent content from overlapping */
+}
+
+
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1; /* This ensures the main content area takes up the available space */
+}
+
+footer {
+    background-color: #E0F4D2;
+    /* other footer styles */
+}

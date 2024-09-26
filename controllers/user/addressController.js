@@ -16,7 +16,7 @@ const getAddressesView = async (req,res) => {
     try {
         const { page = 1, limit = 3 } = req.query;
         const userId = req.params.userId;
-        const message = req.query.message; // Check if message is passed in query
+        const message = req.query.message; 
         const addressDoc = await Address.findOne({ userId }).select('address').lean();
 
         if (!addressDoc || addressDoc.address.length === 0) {
@@ -33,7 +33,6 @@ const getAddressesView = async (req,res) => {
         }
 
         
-         // Sort the addresses in descending order based on createdAt (latest first)
          const sortedAddresses = addressDoc.address.sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt) : a._id.getTimestamp();
             const dateB = b.createdAt ? new Date(b.createdAt) : b._id.getTimestamp();
@@ -109,7 +108,7 @@ const postAddAddress = async (req,res) => {
             pincode,
             phone,
             altPhone,
-            redirectPath // Added to handle where to redirect after adding address
+            redirectPath 
         } = req.body;
 
         if (!addressType || !name || !houseName || !landMark || !city || !state || !pincode || !phone) {
@@ -197,7 +196,6 @@ const postAddAddress = async (req,res) => {
         }
         await addressDoc.save();
         const message = "Address added successfully!";
-        // Use redirectPath to determine where to go next
         if (redirectPath === '/checkout') {
             return res.redirect(`/checkout?addressMessage=${encodeURIComponent(message)}`);
         } else {
@@ -224,7 +222,6 @@ const getEditAddress = async (req,res) => {
 
         console.log('Address ID:', addressId);
 
-        // Validate  addressId 
         if (!mongoose.Types.ObjectId.isValid(addressId)) {
             return res.status(400).render('editAddress', {
                 title: 'Edit Address',
@@ -238,9 +235,9 @@ const getEditAddress = async (req,res) => {
         const userId = user._id;
         const aggregationResult = await Address.aggregate([
             { $match: { userId} },
-            { $unwind: '$address' }, // Unwind the address array to filter on individual addresses
+            { $unwind: '$address' }, 
             { $match: { 'address._id': addressObjectId } },
-            { $replaceRoot: { newRoot: '$address' } } // Replace the root with the address object
+            { $replaceRoot: { newRoot: '$address' } } 
         ]);
 
         console.log('Aggregation Result:', aggregationResult);
@@ -254,21 +251,20 @@ const getEditAddress = async (req,res) => {
             });
         }
 
-        const address = aggregationResult[0]; // Extract the address object
+        const address = aggregationResult[0]; 
 
-        // Render the editAddress view with the found address
         res.render('editAddress', {
             title: 'Edit Address',
             activePage: 'address management',
             user,
             address,
-            currentPage, // Pass the single address object
+            currentPage, 
             errors: [],
 
         });
 
     }catch (error) {
-    console.error('Error in getEditAddress:', error); // Enhanced error logging
+    console.error('Error in getEditAddress:', error); 
 
     const backLink = req.headers.referer || `/addresses/${req.session.user}`;
     renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred while loading the edit address page.", backLink);
@@ -353,7 +349,6 @@ const postEditAddress = async (req,res)=>{
             ...(altPhone && { altPhone })
         };
        
-         // Validate and convert addressId to ObjectId
          if (!mongoose.Types.ObjectId.isValid(addressId)) {
             const message = "Invalid Address ID.";
             if (redirectPath === '/checkout') {
@@ -364,14 +359,13 @@ const postEditAddress = async (req,res)=>{
         }
 
         const addressObjectId = new mongoose.Types.ObjectId(addressId);
-        const userId = user._id; // user._id is already an ObjectId
+        const userId = user._id; 
         console.log(`Updating address for user ID: ${userId} and address ID: ${addressObjectId}`);
-        // Perform the update
         
               
 
         const addressUpdateResult = await Address.updateOne(
-            { userId, 'address._id': addressObjectId }, // Match the user and the specific address
+            { userId, 'address._id': addressObjectId }, 
             {
                 $set: {
                     'address.$.addressType': addressType,
@@ -391,7 +385,7 @@ const postEditAddress = async (req,res)=>{
         console.log('Update Result:', addressUpdateResult);
 
 
-        // Check if any document was matched and modified
+      
         if (addressUpdateResult.matchedCount === 0) {
             const message = "Address not found.";
             if (redirectPath === '/checkout') {
@@ -410,7 +404,6 @@ const postEditAddress = async (req,res)=>{
             }
         }
         
-        // Successful update
         const successMessage = "Address edited successfully!";
         if (redirectPath === '/checkout') {
             return res.redirect(`/checkout?addressMessage=${encodeURIComponent(successMessage)}&addressPage=${currentPage}`);

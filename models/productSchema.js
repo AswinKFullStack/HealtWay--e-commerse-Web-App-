@@ -34,7 +34,7 @@
         default:0
     },
     weight: {
-        type: String, // Options like '500g' or '1000g'
+        type: String, 
         required: false
     },
     quantity:{
@@ -42,22 +42,22 @@
         default:1
     },
     productImages:{
-        type:[String], //multiple images will be there,so that we deifine inside an array
+        type:[String], 
         required:true
 
     },
-    coupons: [{        // Added coupons field, referencing Coupon collection
+    coupons: [{        
         type: Schema.Types.ObjectId,
         ref: "Coupon"
     }],
-    ratings: {         // Added ratings field, storing average rating
+    ratings: {         
         type: Number,
         default: 0
     },
-    reviews: [{        // Added coupons field, referencing Coupon collection
+    reviews: [{        
         type: Schema.Types.ObjectId,
         ref: "Review"
-    }], // Embedded review schema
+    }], 
     isBlocked:{
         type:Boolean,
         default:false
@@ -80,7 +80,7 @@
     popularity:{
         type:Number,
         required :false,
-        default:0   // number of orderderd count of this item
+        default:0   
     }
 },
 {timestamps:true}

@@ -9,13 +9,12 @@ const customerInfo = async (req,res)=>{
         const sort = req.query.sort || 'newest';
         const usersPerPage = 3;
 
-        // Fetch users based on search and sort logic
-     // Query to filter out admin users and search by name
+        
      const query = { 
         name: new RegExp(search, 'i'), 
         isAdmin: false 
     };
-    const sortCriteria = sort === 'newest' ? { createdAt: -1 } : { createdAt: 1 }; // example sorting by createdAt
+    const sortCriteria = sort === 'newest' ? { createdAt: -1 } : { createdAt: 1 }; 
 
    
 
@@ -42,9 +41,8 @@ const customerInfo = async (req,res)=>{
 // Handle Blocking a Customer
 const customerBlocked = async (req, res) => {
     try {
-        const userId = req.query.id; // Get the user ID from the query parameters
+        const userId = req.query.id; 
         
-        // Update the user's blocked status
         const user = await User.findByIdAndUpdate(
             userId,
             { isBlocked: true },
@@ -54,7 +52,7 @@ const customerBlocked = async (req, res) => {
         if (!user) {
             return renderErrorPage(res, 404, "User Not Found", "The user you are trying to block does not exist.", '/admin/users');
         }
-        res.redirect('/admin/users'); // Redirect to the user list page after blocking
+        res.redirect('/admin/users'); 
     } catch (error) {
         console.error("Error blocking user:", error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while blocking the user.", '/admin/users');
@@ -64,9 +62,8 @@ const customerBlocked = async (req, res) => {
 // Handle Unblocking a Customer
 const customerUnblocked = async (req, res) => {
     try {
-        const userId = req.query.id; // Get the user ID from the query parameters
+        const userId = req.query.id; 
         
-        // Update the user's blocked status
         const user = await User.findByIdAndUpdate(
             userId,
             { isBlocked: false },
@@ -76,7 +73,7 @@ const customerUnblocked = async (req, res) => {
         if (!user) {
             return renderErrorPage(res, 404, "User Not Found", "The user you are trying to unblock does not exist.", '/admin/users');
         }
-        res.redirect('/admin/users'); // Redirect to the user list page after unblocking
+        res.redirect('/admin/users'); 
     } catch (error) {
         console.error("Error unblocking user:", error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while unblocking the user.", '/admin/users');

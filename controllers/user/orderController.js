@@ -32,12 +32,7 @@ const confirmOrder = async (req, res) => {
             return  res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
         }
 
-        const productIds = cart.items.map(item => item.productId);
-        const products = await Product.find({
-            _id: { $in: productIds },
-            isDeleted: false,
-            status: "Available"
-        });
+        
 
         let totalCartPrice = 0;
         for (let i = 0; i < cart.items.length; i++) {
@@ -45,19 +40,16 @@ const confirmOrder = async (req, res) => {
             const product = await Product.findById(item.productId);
 
             if (!product || product.isDeleted || product.status !== "Available" || product.quantity === 0) {
-                // If product is not available, remove it from the cart
                 cart.items.splice(i, 1);
-                i--;  // Adjust index since we've removed the item
+                i--;  
                 continue;
             }
 
-            // If product quantity is less than cart quantity, update cart quantity
             if (product.quantity < item.quantity || product.salePrice !== item.price) {
                 item.quantity = product.quantity;
                 item.totalPrice = product.salePrice * item.quantity;
             }
 
-            // Calculate total price of the cart
             totalCartPrice += item.totalPrice;
         }
 
@@ -79,31 +71,50 @@ const confirmOrder = async (req, res) => {
             return res.status(404).redirect(`/checkout?cartMessage=${encodeURIComponent(message)}`);
         }
 
-        const userAddress = await Address.findOne({
-            userId: user._id,
-            address: { $elemMatch: { _id: new mongoose.Types.ObjectId(addressId) } }
-        });
+        console.log("addressId = ",addressId);
+        console.log("paymentMethod = ",paymentMethod);
+        const addressObjectId = new mongoose.Types.ObjectId(addressId);
+        const userAddress = await Address.aggregate([
+            { $match: { userId : user._id} },
+            { $unwind: '$address' }, 
+            { $match: { 'address._id': addressObjectId } },
+            { $replaceRoot: { newRoot: '$address' } } 
+        ]);
 
-        if (!userAddress) {
+
+        if (!userAddress || userAddress.length === 0) {
             const message = "The requested address could not be found. Please check the address ID and try again.";
             return res.status(404).redirect(`/checkout?cartMessage=${encodeURIComponent(message)}`);
         }
-        console.log("cart and address  validation over ")
-        const newOrderedItems = cart.items.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            priceOfProduct: item.price,
-            priceOfQuantity: item.totalPrice,
-        }));
 
+        console.log("cart and address  validation over ")
+        let newOrderdItems = [];
+        for (let i = 0; i < cart.items.length; i++) {
+            const item = cart.items[i];
+            const product = await Product.findById(item.productId);
+
+        newOrderdItems.push( {
+            productId :product._id ,
+            quantity : item.quantity ,
+            priceOfProduct : item.price ,
+            priceOfQuantity : item.totalPrice,
+        });
+        product.quantity -= item.quantity;
+        product.save();
+
+    }
+
+         console.log("Address ID =",addressObjectId ,"Address TYpe =" ,typeof addressObjectId)
+        console.log("New Product for Ordering fo Order Collection = ",newOrderdItems);
         const newOrder = {
             userId: user._id,
-            orderedItems: newOrderedItems,
+            orderedItems: newOrderdItems,
             totalPrice: cart.totalCartPrice,
             finalAmount: cart.totalCartPrice * 1.05,
-            address: addressId,
+            address: addressObjectId,
             status: "Processing"
         };
+        console.log("The Order Full Details =",newOrder);
         console.log("going to check paymetnt method")
         console.log(paymentMethod);
         if (paymentMethod === "cashOnDelivery") {
@@ -114,11 +125,10 @@ const confirmOrder = async (req, res) => {
                 console.log("saved order = ",order)
                 await order.save();
                 await Cart.findByIdAndDelete(cartId);
-                return res.redirect('/cartView');
+                return res.redirect(`/orderconfirm/${order._id}`);
             }
             
 
-            //return res.redirect('/orderConfirmation?orderId=' + order._id);
         } else if (paymentMethod === "onlinePayment") {
             return res.redirect('/paymentGateway?orderId=' + newOrder._id);
         } else {
@@ -131,6 +141,41 @@ const confirmOrder = async (req, res) => {
     }
 };
 
+
+
+
+///Confirmed bill
+
+const orderConfirmed = async (req,res) => {
+
+    try {
+        const user = await User.findById(req.session.user);
+        
+        if (!user) {
+            return renderErrorPage(res, 404, "User not found", "User needs to log in.", req.headers.referer || '/');
+        }
+        
+        const order = await Order.findById(req.params.orderId);
+        
+        
+        if (!order) {
+            return renderErrorPage(res, 404, "Order not found", "Check the order page ,Please Check all details", req.headers.referer || '/');
+        }
+        console.log("Order Details ,total price = ",order.finalAmount);
+        res.render('orderConfirm',{
+            title :"Order Confirmed",
+            user,
+            order
+        });
+    } catch (error) {
+        console.error("Error during order confirmated bill:", error);
+        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred. Please try again later.", '/');
+    }
+}
+
+
+
 module.exports = {
-    confirmOrder
+    confirmOrder,
+    orderConfirmed
 };

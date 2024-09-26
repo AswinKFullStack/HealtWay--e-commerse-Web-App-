@@ -297,18 +297,31 @@
         </table>
 
         <!-- Pagination for Cart Items -->
-        <div class="pagination justify-content-center mt-4">
+       <!-- Cart Pagination -->
+<% if (totalCartPages > 1) { %> <!-- Only show pagination if more than one page -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <!-- Previous Button -->
             <% if (currentCartPage > 1) { %>
-                <a href="/checkout?cartPage=<%= currentCartPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+                <a href="/checkout?cartPage=<%= currentCartPage - 1 %>" class="btn btn-secondary">Previous</a>
+            <% } else { %>
+                <button class="btn btn-secondary" disabled>Previous</button>
             <% } %>
+    
+            <!-- Page Numbers -->
             <% for (let i = 1; i <= totalCartPages; i++) { %>
-                <a href="/checkout?cartPage=<%= i %>" class="btn btn-outline-primary <%= i === currentCartPage ? 'active' : '' %> mr-1"><%= i %></a>
+                <a href="/checkout?cartPage=<%= i %>" class="btn <%= currentCartPage === i ? 'btn-primary active' : 'btn-primary' %>"><%= i %></a>
             <% } %>
+    
+            <!-- Next Button -->
             <% if (currentCartPage < totalCartPages) { %>
-                <a href="/checkout?cartPage=<%= currentCartPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+                <a href="/checkout?cartPage=<%= currentCartPage + 1 %>" class="btn btn-secondary">Next</a>
+            <% } else { %>
+                <button class="btn btn-secondary" disabled>Next</button>
             <% } %>
         </div>
-
+    </div>
+    <% } %>
     </div>
 </div>
 
