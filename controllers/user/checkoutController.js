@@ -60,6 +60,7 @@ const checkoutLoad = async (req,res) => {
 
     // Fetch user's cart
     let cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
+    const cartId = cart._id;
     let paginatedCartItems = [];
     let totalCartPrice = 0;
     let totalCartPages = 1;
@@ -109,6 +110,7 @@ const checkoutLoad = async (req,res) => {
         res.render('checkout',{
             title : "Check Out Page",
             user,
+            cartId,
             addresses: paginatedAddresses, 
             cart: {
                 items: paginatedCartItems,

@@ -120,21 +120,24 @@
     </form>
 
 
-        <form id="checkoutForm" onsubmit="return validateCheckoutForm()"  method="POST" novalidate>
+    <form id="checkoutForm" action="/checkout/<%= cartId %>" method="POST" novalidate>
+
+        
+
             <!-- Address Section -->
             <div class="card mb-4" >
                 <div class="card-header" >Shipping Address</div>
                 <div class="card-body" id="UserSavedAddressCard">
 
                     <!-- Display  Message -->
-            <% if (typeof addressMessage !== 'undefined' && addressMessage) { %>
+             <% if (typeof addressMessage !== 'undefined' && addressMessage) { %>
                 <div class="alert alert-success alert-dismissible fade show" id="checkout-message" role="alert">
                     <%= addressMessage %>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            <% } %>
+             <% } %>
                     <!-- Dynamic Saved Addresses -->
                     <div id="savedAddresses">
                         <h5>Select an Address:</h5>
@@ -145,7 +148,7 @@
                             <div class="form-check list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <input class="form-check-input" type="radio" name="address" id="savedAddress<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
-                    
+                                    <label for="savedAddress<%= index %>">
                                     <h5 class="mb-1"><%= address.addressType %> Address</h5> <!-- Display Address Type -->
                                     <p class="mb-1">
                                         <strong>Name:</strong> <%= address.name %><br>
@@ -169,7 +172,7 @@
                                             <% } %>
                                         </small>
                                     </p>
-                    
+                                </label>
                                     <a  class="btn btn-success mt-3" onclick="editAddress('<%= address._id %>', 
                              '<%= address.addressType %>', 
                              '<%= address.name %>', 
@@ -192,7 +195,8 @@
                         <% } else { %>
                             <div class="alert alert-info">No saved addresses found. Please add a new address.</div>
                         <% } %>
-                    
+                            <!-- Validation error message for address -->
+                <div class="text-danger" id="addressError"></div>
                         <!-- Pagination -->
                         <% if (totalAddressPages > 1) { %> <!-- Only show pagination if there's more than one page -->
                         <div class="row mt-4">
@@ -221,16 +225,12 @@
                     
                         <button type="button" class="btn btn-primary mt-3" id="addNewAddressBtn" onclick="addNewAddress()">Add New Address</button>
                     </div>
-                    
-
-                   
-
-
-                </div>
-            <!-- </div> -->
+                    </div>
+            </div>
+            
 
             <!-- Product Details Section -->
-            <!-- Product Details Section -->
+            
 <div class="card mb-4">
     <div class="card-header">Order Summary</div>
     <div class="card-body">
@@ -268,7 +268,7 @@
                                         
                                         <input type="number" name="quantity" value="<%= item.quantity %>" id="quantity-<%= item.id %>" min="1" class="form-control quantity" onchange="updateCartQuantity('<%= item.productId._id %>', '<%= item.id %>' , '<%= item.quantity %>')" style="width: 100px; height: 30px; font-size: 1em;">
 
-                                        
+                                        <div class="text-danger" id="quantityError-<%= item.id %>"></div> <!-- Quantity Error --> 
                                 
                             </td>
                             <td class="product-total">₹<%= item.totalPrice %></td>
@@ -319,23 +319,24 @@
                 <div class="card-body">
                     <h5>Select Payment Method:</h5>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="Credit Card" checked>
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard" checked>
                         <label class="form-check-label" for="creditCard">
                             Credit Card
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="Debit Card">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="debitCard">
                         <label class="form-check-label" for="debitCard">
                             Debit Card
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="Cash on Delivery">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cashOnDelivery">
                         <label class="form-check-label" for="cod">
                             Cash on Delivery
                         </label>
                     </div>
+                    <div class="text-danger" id="paymentError"></div> <!-- Payment Method Error -->
                     <button type="submit" class="btn btn-warning btn-block mt-4" style="background-color: #FFD700;" >Place Order</button>
                 </div>
             </div>

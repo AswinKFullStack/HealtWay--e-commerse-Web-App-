@@ -135,6 +135,7 @@ const LoadCartPage = async (req, res) => {
 
         // Fetch user's cart
         let cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
+        
         if (!cart || !cart.items.length) {
             console.log("User doesn't have products in the cart");
             const message = "Your cart is empty.";
@@ -162,7 +163,7 @@ const LoadCartPage = async (req, res) => {
             }
 
             // If product quantity is less than cart quantity, update cart quantity
-            if (product.quantity < item.quantity) {
+            if (product.quantity < item.quantity || product.salePrice !== item.price) {
                 item.quantity = product.quantity;
                 item.totalPrice = product.salePrice * item.quantity;
             }
@@ -187,12 +188,15 @@ const LoadCartPage = async (req, res) => {
             title: 'Cart Management',
             user,
             cart: {
+            
                 items: paginatedItems,
                 totalCartPrice: cart.totalCartPrice
             },
             message,
             currentPage,
-            totalPages
+            totalPages,
+            
+            
         });
 
     } catch (error) {

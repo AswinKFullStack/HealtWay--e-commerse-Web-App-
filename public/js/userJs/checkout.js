@@ -49,7 +49,7 @@ function saveAddress() {
 }
 
 function updateCartQuantity(productId, cartItemId) {
-    alert('The function updateCartQuantity is triggered');
+    
     const redirectPath = '/checkout';
     // Get the quantity element
     const quantityElement = document.getElementById(`quantity-${cartItemId}`);
@@ -106,5 +106,50 @@ function updateCartQuantity(productId, cartItemId) {
             setTimeout(() => {
                 checkoutMessage.style.display = 'none';
             }, 1000); // Match this timeout with the duration in your CSS transition
-        }, 3000); // Show for 5 seconds before starting to fade out
+        }, 10000); // Show for 5 seconds before starting to fade out
     }
+
+
+
+
+    document.getElementById('checkoutForm').addEventListener('submit', function(event) {
+        let isValid = true;
+    
+        // Address Validation
+        const selectedAddress = document.querySelector('input[name="address"]:checked');
+        const addressError = document.getElementById('addressError');
+        if (!selectedAddress) {
+            addressError.textContent = 'Please select a shipping address.';
+            isValid = false;
+        } else {
+            addressError.textContent = ''; // Clear error if valid
+        }
+    
+        // Quantity Validation
+        const quantities = document.querySelectorAll('input[name="quantity"]');
+        quantities.forEach(function(quantityField) {
+            const quantityError = document.getElementById('quantityError-' + quantityField.id.split('-')[1]);
+            if (quantityField.value < 1) {
+                quantityError.textContent = 'Quantity must be at least 1.';
+                isValid = false;
+            } else {
+                quantityError.textContent = ''; // Clear error if valid
+            }
+        });
+    
+        // Payment Method Validation
+        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+        const paymentError = document.getElementById('paymentError');
+        if (!selectedPaymentMethod) {
+            paymentError.textContent = 'Please select a payment method.';
+            isValid = false;
+        } else {
+            paymentError.textContent = ''; // Clear error if valid
+        }
+    
+        // If any validation fails, prevent form submission
+        if (!isValid) {
+            event.preventDefault(); // Prevent form from submitting
+        }
+    });
+    

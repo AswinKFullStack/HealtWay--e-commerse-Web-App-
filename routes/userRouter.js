@@ -10,6 +10,7 @@ const addressController = require("../controllers/user/addressController");
 const cartController = require("../controllers/user/cartController");  
 const shopController = require("../controllers/user/shopController");  
 const checkoutController = require("../controllers/user/checkoutController");  
+const orderController = require("../controllers/user/orderController"); 
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -98,9 +99,11 @@ router.get('/shop',shopController.viewAllProducts);
 router.get('/checkout',userAuth,checkoutController.checkoutLoad);
 router.post('/checkout/addAddress',userAuth,addressController.postAddAddress);
 router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postEditAddress);
-//router.get('/wishlist/:id',userAuth, profileController.getWishlistView);
-//router.get('/cart/:id',userAuth, profileController.getCartView);
-//router.get('/orders/:id',userAuth, profileController.getOrdersView);
+
+
+//ORDER 
+
+router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
 
 module.exports = router
 
