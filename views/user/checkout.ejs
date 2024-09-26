@@ -1,6 +1,7 @@
 <%- include("../../views/partials/user/header") %>
 <link rel="stylesheet" href="/css/userCss/checkout.css">
 
+
     <!-- Checkout Section -->
     <div class="container mt-5">
         <h2 class="text-center">Checkout</h2>
@@ -258,7 +259,17 @@
                             <td><%= item.productId.productName %></td>
                             <td>₹<%= item.price %></td>
                             <td>
-                                <input type="number" value="<%= item.quantity %>" min="1" class="form-control quantity" onchange="updateTotal(this, '<%= item.productId._id %>')" style="width: 100px; height: 30px; font-size: 1em;">
+                                
+                                
+                               
+                                    
+                                    
+                                        
+                                        
+                                        <input type="number" name="quantity" value="<%= item.quantity %>" id="quantity-<%= item.id %>" min="1" class="form-control quantity" onchange="updateCartQuantity('<%= item.productId._id %>', '<%= item.id %>' , '<%= item.quantity %>')" style="width: 100px; height: 30px; font-size: 1em;">
+
+                                        
+                                
                             </td>
                             <td class="product-total">₹<%= item.totalPrice %></td>
                         </tr>

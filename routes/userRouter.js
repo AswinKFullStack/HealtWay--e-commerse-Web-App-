@@ -82,6 +82,7 @@ router.get('/cartView',userAuth,cartController.LoadCartPage);
 router.post('/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
 router.get('/cart/update/:productId',userAuth,cartController.LoadCartPage);
 router.post('/cartView/remove/:productId/:cartItemId',userAuth,cartController.removeCartItem);
+router.post('/checkout/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
 
 
 

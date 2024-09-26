@@ -23,7 +23,7 @@ const checkoutLoad = async (req,res) => {
         const { addressPage = 1, addressLimit = 3 ,cartPage = 1 ,cartLimit = 10} = req.query;
         const user =await User.findById(req.session.user);
 
-        const {cartMessage ,addressMessage} = req.query; 
+        let {cartMessage ,addressMessage} = req.query; 
 
         const addressDoc = await Address.findOne({userId :req.session.user}).select('address').lean();
 

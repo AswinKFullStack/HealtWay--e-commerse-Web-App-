@@ -48,7 +48,49 @@ function saveAddress() {
     }
 }
 
+function updateCartQuantity(productId, cartItemId) {
+    alert('The function updateCartQuantity is triggered');
+    const redirectPath = '/checkout';
+    // Get the quantity element
+    const quantityElement = document.getElementById(`quantity-${cartItemId}`);
+    
+    if (!quantityElement) {
+        console.error(`Element with id 'quantity-${cartItemId}' not found.`);
+        Swal.fire('Error', 'Could not find the quantity input field. Please try again.', 'error');
+        return;
+    }
+    
+    const quantity = quantityElement.value;
+    console.log(quantity);
+    
+    const url = `/checkout/cart/update/${productId}/${cartItemId}`;
+    
+    // Perform AJAX request to update item quantity
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            quantity: quantity,
+            redirectPath
 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload or update the relevant part of the page after quantity is updated.
+            location.reload();
+        } else {
+            Swal.fire('Error', data.message || 'There was an issue updating the item quantity.', 'error');
+        }
+    })
+    .catch(error => {
+        console.log('Error updating quantity:', error);
+        Swal.fire('Error', 'There was a problem connecting to the server.', 'error');
+    });
+}
 
 
 /// Script to hide message after some seconds -->
