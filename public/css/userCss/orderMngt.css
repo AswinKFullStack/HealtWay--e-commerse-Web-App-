@@ -1,0 +1,27 @@
+.container {
+    background-color: #E0F4D2;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Order Card Styles */
+.order-card {
+    background-color: #FFFFFF;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.order-card h5 {
+    color: #333;
+}
+
+.order-card .badge {
+    font-size: 1rem;
+}
+
+.order-card img {
+    border-radius: 8px;
+    max-height: 150px;
+}

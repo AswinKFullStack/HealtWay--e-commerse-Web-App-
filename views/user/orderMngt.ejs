@@ -1,0 +1,65 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/orderMngt.css">
+
+
+
+<div class="container mt-5">
+    
+    <% if (orders && orders.length > 0) { %>
+    <h2 class="text-center mb-4">Your Orders</h2>
+    <% } %>
+
+
+    <% if (typeof message !== 'undefined' && message) { %>
+        <div id="cart-message" class="alert alert-success w-100 text-center">
+            <%= message %>
+        </div>
+    <% } %>
+
+   
+    <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+
+    <!-- Order 1 -->
+    <div class="card order-card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="/uploads/re-image/<%= order.productDetails.productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h5><%= order.productDetails.productName %></h5>
+                    <p>Order Referance ID: <strong><%= order.orderedItems._id %></strong></p>
+                    <p>Order Date: <strong><%= order.createdAt %></strong></p>
+                    <p>Payment Status: <span class="badge badge-success"><%= order.paymentStatus %></span></p>
+                    <p>Delivery Status: <span class="badge badge-primary"><%= order.status %></span></p>
+                </div>
+                <div class="col-md-3 text-center">
+                    
+                    <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order.orderedItems._id %>'">Track Order</button>
+                    <% if (order.status !== "Cancelled" && order.status !== "Delivered" && order.status !== "Returned" && order.status !== "Return Request") { %>
+                    <button class="btn btn-info" onclick="location.href='/cancelOrder/<%= order.orderedItems._id %>'">Cancel Order</button>
+                    <% } %>
+                    <% if (order.status !== "Cancelled" && order.status !== "Returned" && order.status !== "Return Request") { %>
+                        <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order.orderedItems._id %>'">Return Order</button>
+                    <% } %>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% }); %> 
+    <% } else { %>
+        <div class="alert alert-info">No Order found. <a href="/shop" class="btn btn-primary btn-sm">Shop Now</a></div>
+    <% } %> 
+   
+
+   
+</div>
+
+
+
+
+
+<%- include("../../views/partials/user/footer") %>

@@ -173,9 +173,42 @@ const orderConfirmed = async (req,res) => {
     }
 }
 
+const  LoadOrderPage = async (req,res) => {
+    try {
+        const user = await User.findById(req.session.user);
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+        const ordersDetailList = await Order.aggregate([{$match:{userId :user._id}},{$unwind:"$orderedItems"},{
+            $lookup: {
+              from: "products",              // The collection you want to join with
+              localField: "orderedItems.productId", // Field from "Order" to match
+              foreignField: "_id",           // Field from the "products" collection to match
+              as: "productDetails"           // Output field for joined data
+            }
+          }, { $unwind: "$productDetails" },])
+          console.log("Order Product,= " ,ordersDetailList[0]);
+          console.log("Product details = ",ordersDetailList[0].productDetails)
+        const sortedordersDetailList = ordersDetailList.sort((a,b)=>{
+            const dateA = a.orderedItems.createdAt ? new Date(a.orderedItems.createdAt) : a.orderedItems._id.getTimestamp();
+            const dateB = b.orderedItems.createdAt ? new Date(b.orderedItems.createdAt) : b.orderedItems._id.getTimestamp();
+            return dateB - dateA;
+        })  
+        console.log("Total orders item = ",ordersDetailList.length);
+        res.render('orderMngt',{
+            title:"Order List",
+            user,
+            orders : sortedordersDetailList,
+        
 
+        });
+    } catch (error) {
+        
+    }
+}
 
 module.exports = {
     confirmOrder,
-    orderConfirmed
+    orderConfirmed,
+    LoadOrderPage
 };

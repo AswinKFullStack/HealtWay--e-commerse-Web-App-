@@ -27,7 +27,7 @@ const orderSchema = new Schema({
             type:Number,
             default:0
         }
-    }],
+    },{ timestamps :true}],
     totalPrice:{
         type:Number,
         required:true
@@ -61,6 +61,13 @@ const orderSchema = new Schema({
     couponApplied:{
         type:Boolean,
         default:false
+    },
+    paymentStatus :{
+        type:String,
+        required:true,
+        enum:["Cash on Delevery" ,"Paid"],
+        default:"Cash on Delevery"
+
     }
 }, {
     timestamps: true
