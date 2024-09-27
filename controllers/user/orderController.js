@@ -254,13 +254,19 @@ const cancelOrder = async (req,res) => {
             
             return res.status(404).json({ success: false, message: 'Ordered item not found.' });
         }
+        if (orderedItem.status === 'Cancelled') {
+            return res.status(400).json({ success: false, message: 'Item is already cancelled.' });
+        }
 
         
-        await Order.updateOne(
+        const updateOrderResult = await Order.updateOne(
             { _id: orderIdOfCartItems, userId: user._id, "orderedItems._id": itemOrderId },
             { $set: { "orderedItems.$.status": "Cancelled" } }
           );
 
+          if (updateOrderResult.modifiedCount === 0) {
+            return res.status(500).json({ success: false, message: 'Failed to update order status.' });
+        }
           
          const productUpdateResult = await Product.updateOne(
             { _id: orderedItem.productId },
@@ -274,7 +280,13 @@ const cancelOrder = async (req,res) => {
     } catch (error) {
         
         console.error("Error in cancelOrder:", error);
-        return res.status(500).json({ success: false, message: "An error occurred while cancelling the order." });
+
+        if (error.name === 'CastError') {
+            return res.status(400).json({ success: false, message: 'Invalid Order or Item ID.' });
+        }
+
+        
+        return res.status(500).json({ success: false, message: 'An internal server error occurred while cancelling the order.' });
     }
 }
 

@@ -84,5 +84,7 @@ router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
 
 
                                 //listing orders
-router.get("/orders",adminAuth,orderController.getOrders);
+router.get('/orders',adminAuth,orderController.getOrders);
+
+router.post('/order/changeStatus/:orderIdOfCartItems/:itemOrderId',adminAuth,orderController.changeStatus);
 module.exports = router

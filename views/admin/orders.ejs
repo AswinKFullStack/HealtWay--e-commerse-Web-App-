@@ -1,6 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 
 <link rel="stylesheet" href="/css/adminCss/customers.css">
+<link rel="stylesheet" href="/css/adminCss/order.css">
 
 <h2 class="my-4">Order Management</h2>
 
@@ -15,7 +16,7 @@
         <tr>
             <th>Order ID</th>
             <th>User Name</th>
-            <th>No of Items</th>
+            <th>Quantity Of Items</th>
             <th>Delivery Address</th>
             <th>Total Price</th>
             <th>Created Date</th>
@@ -24,28 +25,33 @@
         </tr>
     </thead>
     <tbody>
-        <% oders.forEach(function(order) { %>        
+        <% orders.forEach(function(order) { %>        
             <tr>
-                <td><%= order._id %></td>
-                <td><%= order.user.name%></td>
-                <td><%= order.items.length %></td>
-                <td><%= order.address.address %></td>
-                <td><%= order.totalPrice %></td>
+                <td><%= order.orderedItems._id %></td>
+                <td><%= order.userDetails[0].name%></td>
+                <td><%= order.orderedItems.quantity %></td>
+                <td><%= order.deliveryAddress[0].houseName %>,<%= order.deliveryAddress[0].city %>,<%= order.deliveryAddress[0].pincode %>,<%= order.deliveryAddress[0].phone %></td>
+                <td><%= order.orderedItems.priceOfQuantity %></td>
                 <td><%= order.createdOn %></td>
-                <td><%= order.status %></td>
+                <td><select class="form-control order-status" data-order-id="<%= order._id %>" data-item-orderId="<%= order.orderedItems._id %>">
+                    <option value="Pending" <%= order.orderedItems.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Processing" <%= order.orderedItems.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                    <option value="Shipped" <%= order.orderedItems.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="Delivered" <%= order.orderedItems.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Cancelled" <%= order.orderedItems.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    <option value="Returned" <%= order.orderedItems.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                </select></td>
+                
                 <td>
                     <!-- Actions -->
-                    <button class="btn btn-primary btn-sm" onclick="location.href='/admin/order/edit/<%= order._id %>'">
+                    <button class="btn btn-primary btn-sm" onclick="location.href='/admin/order/edit/<%= order._id %>/<%= order.orderedItems._id %>'">
                         <i class="bi bi-pencil-square"></i> Edit
                     </button>
-                    <button class="btn btn-danger btn-sm" onclick="location.href='/admin/order/delete/<%= order._id %>'">
+                    <button class="btn btn-danger btn-sm" onclick="location.href='/admin/order/delete/<%= order._id %>/<%= order.orderedItems._id %>'">
                         <i class="bi bi-trash-fill"></i> Cancel
                     </button>
-                    <button class="btn btn-info btn-sm" onclick="location.href='/admin/order/view/<%= order._id %>'">
+                    <button class="btn btn-info btn-sm" onclick="location.href='/admin/order/view/<%= order._id %>/<%= order.orderedItems._id %>'">
                         <i class="bi bi-eye"></i> View
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="location.href='/admin/order/block/<%= order._id %>'">
-                        <i class="bi bi-lock-fill"></i> Change Status
                     </button>
                    
                 </td>
@@ -55,14 +61,22 @@
 </table>
 
 <!-- Pagination Controls -->
+ 
 <nav>
-    <ul class="pagination justify-content-center" id="paginationControls">
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>&search=<%= encodeURIComponent(searchTerm) %>"><%= i %></a>
-            </li>
-        <% } %>
-    </ul>
+    <% if (totalPages > 1) { %> <!-- Only show pagination if more than 1 page -->
+        <div class="pagination justify-content-center mt-4">
+            <% if (currentPage > 1) { %>
+                <a href="/admin/orders?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="/admin/orders?page=<%= i %>" class="btn btn-outline-primary <%= i === currentPage ? 'active' : '' %> mr-1"><%= i %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+                <a href="/admin/orders?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+            <% } %>
+        </div>
+    <% } %>
+    
 </nav>
 
 <script src="/js/adminJs/orders.js"></script>
