@@ -1,0 +1,82 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/orderMngt.css">
+
+
+
+<div class="container mt-5">
+    
+    <% if (orders && orders.length > 0) { %>
+    <h2 class="text-center mb-4">Your Orders</h2>
+    <% } %>
+
+
+    <% if (typeof message !== 'undefined' && message) { %>
+        <div id="cart-message" class="alert alert-success w-100 text-center">
+            <%= message %>
+        </div>
+    <% } %>
+
+   
+    <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+
+    <!-- Order 1 -->
+    <div class="card order-card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="/uploads/re-image/<%= order.productDetails.productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h5><%= order.productDetails.productName %></h5>
+                    <p>Order Referance ID: <strong><%= order.orderedItems._id %></strong></p>
+                    <p>Order Date: <strong><%= order.createdAt %></strong></p>
+                    <p>Payment Status: <span class="badge badge-success"><%= order.orderedItems.paymentStatus %></span></p>
+                    <p>Delivery Status: <span class="badge badge-primary"><%= order.orderedItems.status %></span></p>
+                </div>
+                <div class="col-md-3 text-center">
+                    
+                    <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order.orderedItems._id %>'">Track Order</button>
+                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Delivered" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
+                        
+                        <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>', '<%= order.orderedItems._id %>')">
+                            <i class="bi bi-trash-fill"></i> Cancel Order
+                        </button>
+                    
+                    <% } %>
+                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
+                        <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Return Order</button>
+                    <% } %>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% }); %> 
+    <% } else { %>
+        <div class="alert alert-info">No Order found. <a href="/shop" class="btn btn-primary btn-sm">Shop Now</a></div>
+    <% } %> 
+   
+
+   <!-- Pagination -->
+    <% if (totalPages > 1) { %> <!-- Only show pagination if more than 1 page -->
+        <div class="pagination justify-content-center mt-4">
+            <% if (currentPage > 1) { %>
+                <a href="/viewOrder?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="/viewOrder?page=<%= i %>" class="btn btn-outline-primary <%= i === currentPage ? 'active' : '' %> mr-1"><%= i %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+                <a href="/viewOrder?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+
+
+<script src="/js/userJs/orderMngt.js"></script>
+
+<%- include("../../views/partials/user/footer") %>

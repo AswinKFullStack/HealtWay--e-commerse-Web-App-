@@ -22,11 +22,9 @@ const loadHomepage = async (req, res) => {
     try {
         
 
-        // For "Our Products"
         const productPage = parseInt(req.query.productPage) || 1;
-        // Logic to load products and categories...
 
-        const productLimit = 3; // Number of products per page
+        const productLimit = 3; 
         const searchTerm = req.query.search || '';
 
         let productQuery = { isDeleted: false };
@@ -37,7 +35,6 @@ const loadHomepage = async (req, res) => {
             };
         }
 
-        // Fetch paginated "Our Products"
         const totalProducts = await Product.countDocuments(productQuery);
         const products = await Product.find(productQuery)
             .populate('category')
@@ -45,7 +42,6 @@ const loadHomepage = async (req, res) => {
             .skip((productPage - 1) * productLimit)
             .limit(productLimit);
 
-        // For Categories - We will paginate products for each category
         const categories = await Category.find();
         const categoryProducts = {};
 
@@ -68,7 +64,6 @@ const loadHomepage = async (req, res) => {
         });
 
         await Promise.all(categoryPromises);
-        // Check if the user is logged in using either session or Passport
        const user = req.session.user 
                   ? await User.findById(req.session.user) 
                   : req.user 
@@ -76,16 +71,15 @@ const loadHomepage = async (req, res) => {
                   : null;
 
 
-        // Render the homepage with paginated products and category products
         res.render("home", {
             user,
-            products, // Our Products
+            products, 
             productCurrentPage: productPage,
             productTotalPages: Math.ceil(totalProducts / productLimit),
             searchTerm,
             categories,
             categoryProducts,
-            title: 'Home Page'  // Paginated products for each category
+            title: 'Home Page'  
         });
     } catch (error) {
         console.error("Error loading homepage", error);
@@ -93,7 +87,6 @@ const loadHomepage = async (req, res) => {
     }
 };
 
-// Load signup page
 const loadSignup = async (req, res) => {
     try {
         res.render("signup", { title: 'SignUp Page' });

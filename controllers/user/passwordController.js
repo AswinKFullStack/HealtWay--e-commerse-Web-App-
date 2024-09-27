@@ -11,7 +11,6 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
         backLink
     });
 };
-// Render the forgot-password page
 const getForgotPassword = async (req,res) => {
     try {
         res.render("forgot-password", { title: 'Forgot-password Page' });
@@ -21,12 +20,10 @@ const getForgotPassword = async (req,res) => {
     }
 }
 
-// Function to generate a random 6-digit OTP
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Send verification email with OTP
 async function sendVerificationEmail(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -78,7 +75,7 @@ const postForgotPassword = async (req,res) => {
             });
         }
         const otp = generateOtp();
-        const otpExpiresAt = Date.now() + 90 * 1000; // OTP expires in 90 seconds
+        const otpExpiresAt = Date.now() + 90 * 1000; 
         const emailSent = await sendVerificationEmail(email, otp);
 
         if (!emailSent) {
@@ -210,11 +207,9 @@ const getResetPassword = async (req,res) => {
 const postResetPassword = async (req,res) => {
     try {
         const { newPassword, confirmPassword } = req.body;
-         // Check if passwords match
         if (newPassword !== confirmPassword) {
             return renderErrorPage(res, 400, "Password Not matching", "Passwords do not match", req.headers.referer || '/resetPassword');
         }
-         // Check if session is valid
         if (!req.session.user) {
             return renderErrorPage(res, 401, "Session Expired", "Your session has expired. Please try resetting the password again.", '/login');
         }
@@ -231,7 +226,6 @@ const postResetPassword = async (req,res) => {
                     console.error("Error destroying session:", err);
                     return renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while logging you out.", '/login');
                 }
-                // Redirect to login with a success message after session is cleared
                 res.render("login", { message: "Password successfully changed, please log in.", title: 'Login Page' });
                 
             });

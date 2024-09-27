@@ -104,6 +104,9 @@ router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postE
 //ORDER 
 
 router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
+router.get('/orderconfirm/:orderId',userAuth,orderController.orderConfirmed);
+router.get('/viewOrder',userAuth, orderController.LoadOrderPage);
+router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderController.cancelOrder);
 
 module.exports = router
 

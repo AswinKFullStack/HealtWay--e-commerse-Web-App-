@@ -48,7 +48,7 @@
             validate: {
                 validator: function (v) {
                     if (v == null || v.trim() === '') return true; 
-                    return /^\d{10}$/.test(v);  // Enforce 10 digits
+                    return /^\d{10}$/.test(v);  
                 },
                 message: props => `${props.value} is not a valid alternate phone number!`
             }
@@ -60,7 +60,7 @@
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'User', 
             required: true },
-        address: [individualAddressSchema] // Use the subschema here
+        address: [individualAddressSchema] 
     }, { timestamps: true });
 
  const Address = mongoose.model("Address",addressSchema)

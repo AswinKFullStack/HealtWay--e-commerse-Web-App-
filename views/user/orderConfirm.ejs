@@ -1,0 +1,33 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/orderConfirm.css">
+
+<div class="container mt-5">
+    <div class="order-confirmation-card">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2>Order Confirmed</h2>
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+            </div>
+            <div class="card-body text-center">
+                
+                <% if (order) { %>
+                <p>Thank you for your purchase!</p>
+                <p>Your order ID is <strong><%= order._id %></strong></p>
+                <p>Order Status = <strong><%= order.status %></strong></p>
+                <p>Total Price of your Order <strong><%= order.finalAmount %></strong></p>
+                <p>We've sent a confirmation to your email.</p>
+                <p>Estimated Delivery Date: <strong>October 5, 2024</strong></p>
+                <a href="/viewOrder" class="btn btn-primary mt-3">Check Your Orders</a>
+                <a href="/payOnline" class="btn btn-primary mt-3">Pay Online</a>
+                <% } else { %>
+                    <p>Order Proccessing,Please wait some time</p>
+                  <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+   
+<%- include("../../views/partials/user/footer") %>

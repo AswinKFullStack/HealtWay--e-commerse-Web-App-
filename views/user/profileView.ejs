@@ -10,7 +10,7 @@
                         My Profile
                     </button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'wishlist') ? 'active' : '' %>" onclick="location.href='/wishlist/<%= user._id %>'">Wishlists</button>
-                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'cart') ? 'active' : '' %>" onclick="location.href='/cart/<%= user._id %>'">Cart</button>
+                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'cart') ? 'active' : '' %>" onclick="location.href='/cartView'">Cart</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/orders/<%= user._id %>'">Orders</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'account details') ? 'active' : '' %>" onclick="location.href='/userDetails/<%= user._id %>'">Account Details</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'address management') ? 'active' : '' %>" onclick="location.href='/addresses/<%= user._id %>'">Address Management</button>

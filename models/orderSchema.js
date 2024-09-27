@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const {Schema} = mongoose;
-const {v4:uuidv4} = require("uuid");
-const Product = require("./productSchema");
+
 
 const orderSchema = new Schema({
     
@@ -10,7 +9,7 @@ const orderSchema = new Schema({
         ref:"User",
         required:true
     },
-    orderdItems:[{
+    orderedItems:[{
         productId:{
             type:Schema.Types.ObjectId,
             ref:"Product",
@@ -27,8 +26,28 @@ const orderSchema = new Schema({
         priceOfQuantity:{
             type:Number,
             default:0
+        },
+        status:{
+            type:String,
+            required:true,
+            enum:["Pending","Processing","Shipped","Delivered","Cancelled","Return Request","Returned"],
+            default :"Processing"
+        },
+        paymentMethod:{
+
+            type:String,
+            required:true,
+            enum:["Cash on Delevery" ,"UPI","Debit-Card","Credit-Card"],
+            default:"Cash on Delevery"
+        },
+        paymentStatus :{
+            type:String,
+            required:true,
+            enum:["Cash on Delevery" ,"Paid"],
+            default:"Cash on Delevery"
+    
         }
-    }],
+    },{ timestamps :true}],
     totalPrice:{
         type:Number,
         required:true
@@ -43,17 +62,14 @@ const orderSchema = new Schema({
     },
     address:{
         type:Schema.Types.ObjectId,
-        ref:"User",
+        ref:"Address",
         required:true
     },
     invoiceDate:{
         type:Date
     },
-    status:{
-        type:String,
-        required:true,
-        enum:["Pending","Processing","Shipped","Delivered","Cancelled","Return Request","Returned"]
-    },
+    
+    
     createdOn:{
         type:Date,
         default:Date.now,
@@ -62,6 +78,21 @@ const orderSchema = new Schema({
     couponApplied:{
         type:Boolean,
         default:false
+    },
+    paymentMethod:{
+
+        type:String,
+        required:true,
+        enum:["Cash on Delevery" ,"UPI","Debit-Card","Credit-Card"],
+        default:"Cash on Delevery"
+    }
+    ,
+    paymentStatus :{
+        type:String,
+        required:true,
+        enum:["Cash on Delevery" ,"Paid"],
+        default:"Cash on Delevery"
+
     }
 }, {
     timestamps: true

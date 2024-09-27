@@ -1,0 +1,46 @@
+.container {
+    background-color: #E0F4D2;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Order Card Styles */
+.order-card {
+    background-color: #FFFFFF;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.order-card h5 {
+    color: #333;
+}
+
+.order-card .badge {
+    font-size: 1rem;
+}
+
+.order-card img {
+    border-radius: 8px;
+    max-height: 150px;
+}
+
+/*Order Cancel Button Styling */
+
+/* Custom Remove Button Style */
+.custom-remove-btn {
+    background-color: #ffffff; /* White background */
+    color: rgb(150, 150, 150);; /* Soft gray color */
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: 2px solid rgb(143, 143, 143); /* Border on all sides */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-remove-btn:hover {
+    background-color: rgb(147, 145, 145);; /* Gray background on hover */
+    color: rgb(255, 255, 255); /* White text on hover */
+    border-color: rgb(178, 178, 178);; /* Keep border color same on hover */
+}
