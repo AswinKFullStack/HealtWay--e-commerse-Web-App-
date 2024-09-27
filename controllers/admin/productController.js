@@ -36,6 +36,7 @@ const getProducts = async (req, res) => {
         const products = await Product.find(query)
             .populate('category')
             .populate('brand')
+            .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit);
 
