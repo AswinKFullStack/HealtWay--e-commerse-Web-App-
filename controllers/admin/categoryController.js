@@ -26,6 +26,7 @@ const categoryInfo = async (req, res) => {
         const totalCategories = await Category.countDocuments(searchQuery);
 
         const categories = await Category.find(searchQuery)
+            .sort({ createdAt: -1 }) 
             .skip((currentPage - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
