@@ -84,5 +84,5 @@ router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
 
 
                                 //listing orders
-router.get("/orders",adminAuth,orderController.getOrders);
+router.get('/orders',adminAuth,orderController.getOrders);
 module.exports = router

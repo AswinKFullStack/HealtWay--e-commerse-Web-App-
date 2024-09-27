@@ -129,7 +129,9 @@ const LoadCartPage = async (req, res) => {
             return renderErrorPage(res, 404, "User not found", "User needs to log in", backLink);
         }
 
-        let cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
+        let cart = await Cart.findOne({
+             userId: user._id })
+            .populate('items.productId');
         
         if (!cart || !cart.items.length) {
             console.log("User doesn't have products in the cart");
