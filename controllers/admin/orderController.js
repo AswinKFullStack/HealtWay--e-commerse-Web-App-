@@ -82,7 +82,18 @@ const getOrders = async (req, res) => {
         const paginatedOrders = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
         console.log(paginatedOrders[0]);
 
-        return res.status(200).send("Order fetched successfully");
+
+        res.render('orders', {
+            
+            
+            orders: paginatedOrders,
+            currentPage,
+            totalPages,
+            searchTerm
+
+        });
+
+        
     } catch (error) {
         console.error('Error fetching orders:', error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching orders.", '/admin/orders');
