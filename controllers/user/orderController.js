@@ -98,6 +98,8 @@ const confirmOrder = async (req, res) => {
             quantity : item.quantity ,
             priceOfProduct : item.price ,
             priceOfQuantity : item.totalPrice,
+            paymentMethod,
+
         });
         product.quantity -= item.quantity;
         product.save();
@@ -110,14 +112,15 @@ const confirmOrder = async (req, res) => {
             userId: user._id,
             orderedItems: newOrderdItems,
             totalPrice: cart.totalCartPrice,
-            finalAmount: cart.totalCartPrice * 1.05,
+            finalAmount: cart.totalCartPrice,
             address: addressObjectId,
-            status: "Processing"
+            paymentMethod,
+            
         };
         console.log("The Order Full Details =",newOrder);
         console.log("going to check paymetnt method")
         console.log(paymentMethod);
-        if (paymentMethod === "cashOnDelivery") {
+        if (paymentMethod === "Cash on Delevery") {
             const order = new Order(newOrder);
             if(!order){
                 return renderErrorPage(res, 400, "Order not saved", "Check order saving arrea", '/checkout');
@@ -129,9 +132,12 @@ const confirmOrder = async (req, res) => {
             }
             
 
-        } else if (paymentMethod === "onlinePayment") {
+        } else if (paymentMethod === "Debit-Card") {
             return res.redirect('/paymentGateway?orderId=' + newOrder._id);
-        } else {
+        } else if (paymentMethod === "Credit-Card") {
+            return res.redirect('/paymentGateway?orderId=' + newOrder._id);
+        } 
+        else {
             return renderErrorPage(res, 400, "Invalid Payment Method", "Please choose a valid payment method.", '/checkout');
         }
 
@@ -173,42 +179,101 @@ const orderConfirmed = async (req,res) => {
     }
 }
 
-const  LoadOrderPage = async (req,res) => {
+const LoadOrderPage = async (req, res) => {
     try {
         const user = await User.findById(req.session.user);
         if (!user) {
-            return res.status(404).send('User not found.');
+            return renderErrorPage(res, 404, 'User Not Found', 'The user associated with the session was not found.', '/back-to-home');
         }
-        const ordersDetailList = await Order.aggregate([{$match:{userId :user._id}},{$unwind:"$orderedItems"},{
-            $lookup: {
-              from: "products",              // The collection you want to join with
-              localField: "orderedItems.productId", // Field from "Order" to match
-              foreignField: "_id",           // Field from the "products" collection to match
-              as: "productDetails"           // Output field for joined data
-            }
-          }, { $unwind: "$productDetails" },])
-          console.log("Order Product,= " ,ordersDetailList[0]);
-          console.log("Product details = ",ordersDetailList[0].productDetails)
-        const sortedordersDetailList = ordersDetailList.sort((a,b)=>{
+
+        const ordersDetailList = await Order.aggregate([
+            { $match: { userId: user._id } },
+            { $unwind: "$orderedItems" },
+            {
+                $lookup: {
+                    from: "products",               
+                    localField: "orderedItems.productId",
+                    foreignField: "_id",            
+                    as: "productDetails"            
+                }
+            },
+            { $unwind: "$productDetails" }
+        ]);
+
+        if (!ordersDetailList.length) {
+            return renderErrorPage(res, 404, 'No Orders Found', 'This user has no orders to display.', '/back-to-home');
+        }
+
+        const sortedOrdersDetailList = ordersDetailList.sort((a, b) => {
             const dateA = a.orderedItems.createdAt ? new Date(a.orderedItems.createdAt) : a.orderedItems._id.getTimestamp();
             const dateB = b.orderedItems.createdAt ? new Date(b.orderedItems.createdAt) : b.orderedItems._id.getTimestamp();
             return dateB - dateA;
-        })  
-        console.log("Total orders item = ",ordersDetailList.length);
-        res.render('orderMngt',{
-            title:"Order List",
-            user,
-            orders : sortedordersDetailList,
-        
-
         });
+
+        res.render('orderMngt', {
+            title: "Order List",
+            user,
+            orders: sortedOrdersDetailList
+        });
+
+    } catch (error) {
+        console.error("Error loading orders: ", error);
+
+        renderErrorPage(res, 500, 'Internal Server Error', 'An error occurred while loading the orders.', '/back-to-home');
+    }
+};
+
+const cancelOrder = async (req,res) => {
+    try {
+        const {orderIdOfCartItems ,itemOrderId} = req.params;
+        const user = await User.findById(req.session.user);
+        if (!user) {
+            return renderErrorPage(res, 404, 'User Not Found', 'The user associated with the session was not found.', '/back-to-home');
+        }
+        const OrderItemDoc = await Order.findOne({
+            _id : orderIdOfCartItems,
+            userId:user._id,
+            "orderedItems._id" :itemOrderId
+        })
+
+        if(!OrderItemDoc){
+           const message = "Order or Order Item not found.";
+    return res.status(404).send(message);
+        }
+
+        const orderedItem = OrderItemDoc.orderedItems.find(item => item._id.toString() === itemOrderId.toString());
+        if (!orderedItem) {
+            const message = "Ordered item not found.";
+            return res.status(404).send(message);
+        }
+
+        
+        await Order.updateOne(
+            { _id: orderIdOfCartItems, userId: user._id, "orderedItems._id": itemOrderId },
+            { $set: { "orderedItems.$.status": "Cancelled" } }
+          );
+
+          
+         const productUpdateResult = await Product.updateOne(
+            { _id: orderedItem.productId },
+            { $inc: { quantity: orderedItem.quantity } }
+            );
+
+            console.log("Product quantity update result:", productUpdateResult);
+        
+            return res.status(200).send("Order cancelled successfully and product quantity updated.");
+
+
     } catch (error) {
         
+        console.error("Error in cancelOrder:", error);
+    return res.status(500).send("An error occurred while cancelling the order.");
     }
 }
 
 module.exports = {
     confirmOrder,
     orderConfirmed,
-    LoadOrderPage
+    LoadOrderPage,
+    cancelOrder
 };

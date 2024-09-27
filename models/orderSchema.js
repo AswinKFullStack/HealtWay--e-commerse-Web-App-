@@ -26,6 +26,26 @@ const orderSchema = new Schema({
         priceOfQuantity:{
             type:Number,
             default:0
+        },
+        status:{
+            type:String,
+            required:true,
+            enum:["Pending","Processing","Shipped","Delivered","Cancelled","Return Request","Returned"],
+            default :"Processing"
+        },
+        paymentMethod:{
+
+            type:String,
+            required:true,
+            enum:["Cash on Delevery" ,"UPI","Debit-Card","Credit-Card"],
+            default:"Cash on Delevery"
+        },
+        paymentStatus :{
+            type:String,
+            required:true,
+            enum:["Cash on Delevery" ,"Paid"],
+            default:"Cash on Delevery"
+    
         }
     },{ timestamps :true}],
     totalPrice:{
@@ -48,11 +68,8 @@ const orderSchema = new Schema({
     invoiceDate:{
         type:Date
     },
-    status:{
-        type:String,
-        required:true,
-        enum:["Pending","Processing","Shipped","Delivered","Cancelled","Return Request","Returned"]
-    },
+    
+    
     createdOn:{
         type:Date,
         default:Date.now,
@@ -62,6 +79,14 @@ const orderSchema = new Schema({
         type:Boolean,
         default:false
     },
+    paymentMethod:{
+
+        type:String,
+        required:true,
+        enum:["Cash on Delevery" ,"UPI","Debit-Card","Credit-Card"],
+        default:"Cash on Delevery"
+    }
+    ,
     paymentStatus :{
         type:String,
         required:true,

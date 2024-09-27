@@ -31,17 +31,17 @@
                     <h5><%= order.productDetails.productName %></h5>
                     <p>Order Referance ID: <strong><%= order.orderedItems._id %></strong></p>
                     <p>Order Date: <strong><%= order.createdAt %></strong></p>
-                    <p>Payment Status: <span class="badge badge-success"><%= order.paymentStatus %></span></p>
-                    <p>Delivery Status: <span class="badge badge-primary"><%= order.status %></span></p>
+                    <p>Payment Status: <span class="badge badge-success"><%= order.orderedItems.paymentStatus %></span></p>
+                    <p>Delivery Status: <span class="badge badge-primary"><%= order.orderedItems.status %></span></p>
                 </div>
                 <div class="col-md-3 text-center">
                     
                     <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order.orderedItems._id %>'">Track Order</button>
-                    <% if (order.status !== "Cancelled" && order.status !== "Delivered" && order.status !== "Returned" && order.status !== "Return Request") { %>
-                    <button class="btn btn-info" onclick="location.href='/cancelOrder/<%= order.orderedItems._id %>'">Cancel Order</button>
+                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Delivered" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
+                    <button class="btn btn-info" onclick="location.href='/cancelOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Cancel Order</button>
                     <% } %>
-                    <% if (order.status !== "Cancelled" && order.status !== "Returned" && order.status !== "Return Request") { %>
-                        <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order.orderedItems._id %>'">Return Order</button>
+                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
+                        <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Return Order</button>
                     <% } %>
                     
                 </div>

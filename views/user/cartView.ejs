@@ -89,12 +89,12 @@
                         <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice : '0.00' %></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Tax (10%)</span>
-                        <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0.1).toFixed(2) : '0.00' %></strong>
+                        <span>Tax (0%)</span>
+                        <strong>$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 0).toFixed(2) : '0.00' %></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Total</span>
-                        <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1.1).toFixed(2) : '0.00' %></strong>
+                        <strong id="totalPrice">$<%= cart && cart.totalCartPrice ? (cart.totalCartPrice * 1).toFixed(2) : '0.00' %></strong>
                     </li>
                 </ul>
                 <button class="btn btn-primary btn-block" onclick="location.href='/checkout'">Proceed to Checkout</button>
