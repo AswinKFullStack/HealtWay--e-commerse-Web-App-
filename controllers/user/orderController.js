@@ -181,6 +181,7 @@ const orderConfirmed = async (req,res) => {
 
 const LoadOrderPage = async (req, res) => {
     try {
+        const {  page = 1, limit = 3 } = req.query;
         const user = await User.findById(req.session.user);
         if (!user) {
             return renderErrorPage(res, 404, 'User Not Found', 'The user associated with the session was not found.', '/back-to-home');
@@ -209,11 +210,18 @@ const LoadOrderPage = async (req, res) => {
             const dateB = b.orderedItems.createdAt ? new Date(b.orderedItems.createdAt) : b.orderedItems._id.getTimestamp();
             return dateB - dateA;
         });
+        const totalOrder = sortedOrdersDetailList.length;
+        const totalPages = Math.ceil(totalOrder / limit);
+        const currentPage = Math.max(1, Math.min(page, totalPages)); 
+        const paginatedOrder = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
 
         res.render('orderMngt', {
             title: "Order List",
             user,
-            orders: sortedOrdersDetailList
+            orders: paginatedOrder,
+            currentPage,
+            totalPages,
+
         });
 
     } catch (error) {

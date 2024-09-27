@@ -59,7 +59,20 @@
     <% } %> 
    
 
-   
+   <!-- Pagination -->
+    <% if (totalPages > 1) { %> <!-- Only show pagination if more than 1 page -->
+        <div class="pagination justify-content-center mt-4">
+            <% if (currentPage > 1) { %>
+                <a href="/viewOrder?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary mr-2">Previous</a>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="/viewOrder?page=<%= i %>" class="btn btn-outline-primary <%= i === currentPage ? 'active' : '' %> mr-1"><%= i %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+                <a href="/viewOrder?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary ml-2">Next</a>
+            <% } %>
+        </div>
+    <% } %>
 </div>
 
 
