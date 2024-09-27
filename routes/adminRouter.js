@@ -6,6 +6,7 @@ const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const brandController = require("../controllers/admin/brandController");
 const orderController = require("../controllers/admin/orderController");
+const orderUserController = require("../controllers/user/orderController"); 
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
@@ -87,4 +88,6 @@ router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
 router.get('/orders',adminAuth,orderController.getOrders);
 
 router.post('/order/changeStatus/:orderIdOfCartItems/:itemOrderId',adminAuth,orderController.changeStatus);
+router.post('/order/cancel/:orderIdOfCartItems/:itemOrderId',adminAuth,orderUserController.cancelOrder);
+
 module.exports = router

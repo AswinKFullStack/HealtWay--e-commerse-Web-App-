@@ -50,3 +50,29 @@ document.querySelectorAll('.order-status').forEach((element) => {
         });
     });
 });
+
+
+
+
+
+
+
+function cancelOrder(orderId, itemOrderId) {
+    if (confirm('Are you sure you want to cancel this order?')) {
+        $.ajax({
+            url: `/admin/order/cancel/${orderId}/${itemOrderId}`,
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload(); // Refresh the page to reflect changes
+                } else {
+                    alert('Failed to cancel the order.');
+                }
+            },
+            error: function() {
+                alert('An error occurred while canceling the order.');
+            }
+        });
+    }
+}
