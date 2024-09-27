@@ -38,7 +38,11 @@
                     
                     <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order.orderedItems._id %>'">Track Order</button>
                     <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Delivered" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
-                    <button class="btn btn-info" onclick="location.href='/cancelOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Cancel Order</button>
+                        
+                        <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>', '<%= order.orderedItems._id %>')">
+                            <i class="bi bi-trash-fill"></i> Cancel Order
+                        </button>
+                    
                     <% } %>
                     <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
                         <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Return Order</button>
@@ -60,6 +64,6 @@
 
 
 
-
+<script src="/js/userJs/orderMngt.js"></script>
 
 <%- include("../../views/partials/user/footer") %>

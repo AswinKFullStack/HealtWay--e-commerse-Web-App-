@@ -228,7 +228,7 @@ const cancelOrder = async (req,res) => {
         const {orderIdOfCartItems ,itemOrderId} = req.params;
         const user = await User.findById(req.session.user);
         if (!user) {
-            return renderErrorPage(res, 404, 'User Not Found', 'The user associated with the session was not found.', '/back-to-home');
+            return res.status(404).json({ success: false, message: 'User not found.' });
         }
         const OrderItemDoc = await Order.findOne({
             _id : orderIdOfCartItems,
@@ -237,14 +237,14 @@ const cancelOrder = async (req,res) => {
         })
 
         if(!OrderItemDoc){
-           const message = "Order or Order Item not found.";
-    return res.status(404).send(message);
+           
+           return res.status(404).json({ success: false, message: 'Order or Order Item not found..' });
         }
 
         const orderedItem = OrderItemDoc.orderedItems.find(item => item._id.toString() === itemOrderId.toString());
         if (!orderedItem) {
-            const message = "Ordered item not found.";
-            return res.status(404).send(message);
+            
+            return res.status(404).json({ success: false, message: 'Ordered item not found.' });
         }
 
         
@@ -261,13 +261,12 @@ const cancelOrder = async (req,res) => {
 
             console.log("Product quantity update result:", productUpdateResult);
         
-            return res.status(200).send("Order cancelled successfully and product quantity updated.");
-
+            return res.status(200).json({ success: true, message: 'Order cancelled !' });
 
     } catch (error) {
         
         console.error("Error in cancelOrder:", error);
-    return res.status(500).send("An error occurred while cancelling the order.");
+        return res.status(500).json({ success: false, message: "An error occurred while cancelling the order." });
     }
 }
 
