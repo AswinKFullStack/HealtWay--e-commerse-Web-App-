@@ -101,7 +101,28 @@ const getOrders = async (req, res) => {
 };
 
 
+const changeStatus = async (req,res) => {
+    try {
+        
+        const { orderIdOfCartItems, itemOrderId } = req.params;
+        const { status } = req.body;
+
+        const updatedResult = await Order.updateOne(
+            { _id: orderIdOfCartItems, 'orderedItems._id': itemOrderId },
+            { $set: { 'orderedItems.$.status': status } })
+
+         if(updatedResult.modifiedCount === 0){
+            return res.status(500).json({ success: false, message: 'Error updating status' });
+         }   
+         return res.status(200).json({ success: true, message: 'Status updated successfully' });
+    } catch (error) {
+        
+    }
+}
+
+
 
 module.exports ={
-    getOrders
+    getOrders,
+    changeStatus
 }

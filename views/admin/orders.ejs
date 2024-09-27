@@ -1,6 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 
 <link rel="stylesheet" href="/css/adminCss/customers.css">
+<link rel="stylesheet" href="/css/adminCss/order.css">
 
 <h2 class="my-4">Order Management</h2>
 
@@ -30,9 +31,17 @@
                 <td><%= order.userDetails[0].name%></td>
                 <td><%= order.orderedItems.quantity %></td>
                 <td><%= order.deliveryAddress[0].houseName %>,<%= order.deliveryAddress[0].city %>,<%= order.deliveryAddress[0].pincode %>,<%= order.deliveryAddress[0].phone %></td>
-                <td><%= order.priceOfQuantity %></td>
+                <td><%= order.orderedItems.priceOfQuantity %></td>
                 <td><%= order.createdOn %></td>
-                <td><%= order.orderedItems.status %></td>
+                <td><select class="form-control order-status" data-order-id="<%= order._id %>" data-item-orderId="<%= order.orderedItems._id %>">
+                    <option value="Pending" <%= order.orderedItems.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Processing" <%= order.orderedItems.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                    <option value="Shipped" <%= order.orderedItems.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="Delivered" <%= order.orderedItems.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Cancelled" <%= order.orderedItems.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    <option value="Returned" <%= order.orderedItems.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                </select></td>
+                
                 <td>
                     <!-- Actions -->
                     <button class="btn btn-primary btn-sm" onclick="location.href='/admin/order/edit/<%= order._id %>/<%= order.orderedItems._id %>'">
@@ -43,9 +52,6 @@
                     </button>
                     <button class="btn btn-info btn-sm" onclick="location.href='/admin/order/view/<%= order._id %>/<%= order.orderedItems._id %>'">
                         <i class="bi bi-eye"></i> View
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="location.href='/admin/order/block/<%= order._id %>/<%= order.orderedItems._id %>'">
-                        <i class="bi bi-lock-fill"></i> Change Status
                     </button>
                    
                 </td>

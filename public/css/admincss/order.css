@@ -1,0 +1,15 @@
+.order-status {
+    width: 100%; /* Ensure dropdown takes full width of the table cell */
+    min-width: 150px; /* Set a minimum width to avoid cramping */
+    height: auto; /* Ensure the dropdown scales with content */
+    padding: 5px; /* Add some padding for better visibility */
+    font-size: 14px; /* Adjust font size for better readability */
+}
+
+.table td {
+    vertical-align: middle; /* Ensure proper vertical alignment in table rows */
+}
+
+.table {
+    table-layout: fixed; /* Avoid uneven column widths */
+}
