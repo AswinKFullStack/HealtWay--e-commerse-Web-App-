@@ -33,13 +33,20 @@ document.querySelectorAll('.order-status').forEach((element) => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Order status updated successfully.');
-            } else {
-                alert('Error updating status.');
+                Swal.fire(
+                    'Order status updated successfully',
+                    data.message,
+                    'success'
+                 ).then(() => {
+                    // Reload the page to reflect the updated cart
+                    location.reload();
+                });
+             } else {
+                Swal.fire('Error', data.message  || 'There was an issue Error updating status of the Order.', 'error');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            Swal.fire('Error', 'There was a problem connecting to the server.', 'error');
         });
     });
 });
