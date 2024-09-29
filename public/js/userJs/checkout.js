@@ -112,52 +112,143 @@ function updateCartQuantity(productId, cartItemId) {
 
 
 
+
+    
+    
+
     document.getElementById('checkoutForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent form from submitting immediately
         
-        // Show a confirmation dialog
-        const userConfirmed = confirm("Are you sure you want to place the order?");
-        
-        if (userConfirmed) {
-            let isValid = true;
-        
-            // Address Validation
-            const selectedAddress = document.querySelector('input[name="address"]:checked');
-            const addressError = document.getElementById('addressError');
-            if (!selectedAddress) {
-                addressError.textContent = 'Please select a shipping address.';
-                isValid = false;
-            } else {
-                addressError.textContent = ''; // Clear error if valid
-            }
-        
-            // Quantity Validation
-            const quantities = document.querySelectorAll('input[name="quantity"]');
-            quantities.forEach(function(quantityField) {
-                const quantityError = document.getElementById('quantityError-' + quantityField.id.split('-')[1]);
-                if (quantityField.value < 1) {
-                    quantityError.textContent = 'Quantity must be at least 1.';
+        // Show SweetAlert confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to place this order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, place order!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let isValid = true;
+            
+                // Address Validation
+                const selectedAddressId = document.querySelector('input[name="address"]:checked').value;
+                console.log(selectedAddressId);
+                const addressError = document.getElementById('addressError');
+                if (!selectedAddressId) {
+                    addressError.textContent = 'Please select a shipping address.';
                     isValid = false;
                 } else {
-                    quantityError.textContent = ''; // Clear error if valid
+                    addressError.textContent = ''; // Clear error if valid
                 }
-            });
-        
-            // Payment Method Validation
-            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-            const paymentError = document.getElementById('paymentError');
-            if (!selectedPaymentMethod) {
-                paymentError.textContent = 'Please select a payment method.';
-                isValid = false;
-            } else {
-                paymentError.textContent = ''; // Clear error if valid
+            
+                // Quantity Validation
+                const quantities = document.querySelectorAll('input[name="quantity"]');
+                quantities.forEach(function(quantityField) {
+                    const quantityError = document.getElementById('quantityError-' + quantityField.id.split('-')[1]);
+                    if (quantityField.value < 1) {
+                        quantityError.textContent = 'Quantity must be at least 1.';
+                        isValid = false;
+                    } else {
+                        quantityError.textContent = ''; // Clear error if valid
+                    }
+                });
+            
+                // Payment Method Validation
+                const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                
+                const paymentError = document.getElementById('paymentError');
+                if (!selectedPaymentMethod) {
+                    paymentError.textContent = 'Please select a payment method.';
+                    isValid = false;
+                } else {
+                    paymentError.textContent = ''; // Clear error if valid
+                }
+            
+                // If all validations pass, submit the form using AJAX
+                if (isValid) {
+                    // Collect form data
+                    
+                    
+                    const cartId = document.getElementById('cartId').value;
+                    console.log("Addess ID = ", selectedAddressId , "Payment Method = ", selectedPaymentMethod)
+                    // Submit form via AJAX
+                    fetch(`/checkout/${cartId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json', // Set the content type to JSON
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            addressId: selectedAddressId,
+                            paymentMethod: selectedPaymentMethod
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.CODsuccess) {
+                            Swal.fire(
+                                'Order Placed!',
+                                'Your order has been successfully placed.',
+                                'success'
+                            ).then(() => {
+                                window.location.href = `/orderconfirm/${data.orderId}`; // Redirect to confirmation page
+                            });
+                        } else if (data.OnlinePayment) {
+                            Swal.fire({
+                                title: 'Pay Online',
+                                text: "For confirm your Order ,please pay now",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Pay Now'
+                            }).then(() => {
+                                var options = {
+                                    "key": data.razor_key_id ,
+                                    "amount": data.amount * 100, // in paise
+                                    "currency": "INR",
+                                    "order_id": data.razorpayOrderId, // Razorpay order ID
+                                    "handler": function (response){
+                                        Swal.fire(
+                                            'Order Placed!',
+                                            'Your order has been successfully placed.',
+                                            'success'
+                                        ).then(() => {
+                                            
+                                            window.location.href = `/payment/success?cartId=${data.cartId}&paymentOrderId=${data.razorpayOrderId}&paymentId=` + response.razorpay_payment_id;
+                                           
+                                        });
+                                       
+                                    },
+                                    "prefill": {
+                                        "name": "Test User",
+                                        "email": "aswinkplacement@gmail.com",
+                                        "contact": "7560966745"
+                                    }
+                                };
+                                var rzp1 = new Razorpay(options);
+                                 rzp1.open();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'There was an issue placing your order. Please try again.',
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            'Something went wrong with your request.',error,
+                            'error'
+                        );
+                    });
+                }
             }
-        
-            // If all validations pass, submit the form
-            if (isValid) {
-                this.submit(); // Submit the form if everything is valid
-            }
-        }
+        });
     });
-    
     

@@ -4,6 +4,7 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
+const razorpayInstance = require('../../config/razorpayConfig');
 
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
     res.status(errorCode).render('error-page', {
@@ -18,7 +19,8 @@ const confirmOrder = async (req, res) => {
     try {
         console.log("ordering stated")
         const { cartId } = req.params;
-        const {address: addressId, paymentMethod } = req.body;
+        const {addressId, paymentMethod } = req.body;
+        console.log("address ID = ",addressId,"payment Method = ", paymentMethod )
 
         const user = await User.findById(req.session.user);
         if (!user) {
@@ -96,9 +98,9 @@ const confirmOrder = async (req, res) => {
         newOrderdItems.push( {
             productId :product._id ,
             quantity : item.quantity ,
-            priceOfProduct : item.price ,
-            priceOfQuantity : item.totalPrice,
+            totalPriceOfEachItemOrder: (item.price*item.quantity),
             paymentMethod,
+            
 
         });
         product.quantity -= item.quantity;
@@ -106,38 +108,61 @@ const confirmOrder = async (req, res) => {
 
     }
 
-         console.log("Address ID =",addressObjectId ,"Address TYpe =" ,typeof addressObjectId)
-        console.log("New Product for Ordering fo Order Collection = ",newOrderdItems);
+        
+        
         const newOrder = {
             userId: user._id,
             orderedItems: newOrderdItems,
             totalPrice: cart.totalCartPrice,
             finalAmount: cart.totalCartPrice,
             address: addressObjectId,
-            paymentMethod,
+            
+            
             
         };
-        console.log("The Order Full Details =",newOrder);
-        console.log("going to check paymetnt method")
+        const order = new Order(newOrder);
+        if(!order){
+            return renderErrorPage(res, 400, "Order not saved", "Check order saving arrea", '/checkout');
+        }
+        await order.save();
+        
+
         console.log(paymentMethod);
-        if (paymentMethod === "Cash on Delevery") {
-            const order = new Order(newOrder);
-            if(!order){
-                return renderErrorPage(res, 400, "Order not saved", "Check order saving arrea", '/checkout');
-            }else{
-                console.log("saved order = ",order)
-                await order.save();
+        if (paymentMethod === "Cash on Delivery") {
+            
+            
+                console.log("saved orderDetails  = ",order)
+                
                 await Cart.findByIdAndDelete(cartId);
-                return res.redirect(`/orderconfirm/${order._id}`);
-            }
+                return res.status(200).json({ CODsuccess: true, orderId : order._id });
+                
+            
             
 
-        } else if (paymentMethod === "Debit-Card") {
-            return res.redirect('/paymentGateway?orderId=' + newOrder._id);
-        } else if (paymentMethod === "Credit-Card") {
-            return res.redirect('/paymentGateway?orderId=' + newOrder._id);
-        } 
-        else {
+        } else if (paymentMethod === "Online") {
+            //return res.redirect('/paymentGateway?orderId=' + newOrder._id);
+            const razorpayOrder = await razorpayInstance.orders.create({
+                amount: order.finalAmount * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
+                currency: "INR",
+                receipt: `order_rcptid_${order._id}`
+            });
+            if(!razorpayOrder){
+                return renderErrorPage(res, 400, "Online paymet issue", "error in confirm order section at else if case", '/checkout');
+            }
+            console.log(razorpayOrder.id);
+            order.paymentOrderId = razorpayOrder.id;
+            await order.save();
+
+            console.log("after Updation = ", order);
+            return res.status(200).json({ 
+                OnlinePayment : true, 
+                razorpayOrderId: razorpayOrder.id,
+                amount: order.finalAmount ,
+                razor_key_id: process.env.RAZORPAY_KEY_ID, 
+                cartId 
+            });
+            
+        }else {
             return renderErrorPage(res, 400, "Invalid Payment Method", "Please choose a valid payment method.", '/checkout');
         }
 
@@ -286,9 +311,40 @@ const cancelOrder = async (req,res) => {
     }
 }
 
+
+
+
+
+const onlinePayment = async (req,res) => {
+    try {
+        console.log("After online payment = order collection updation")
+        const {paymentOrderId, paymentId ,cartId } = req.query;
+
+        if (!paymentOrderId || !paymentId) {
+            return res.status(400).send("Missing paymentOrderId or paymentId");
+        }
+        console.log("payment orderId = ",paymentOrderId," paymentId =",  paymentId)
+
+        const order = await Order.findOne({ paymentOrderId });
+        if (!order) {
+            return res.status(404).send("Order not found");
+        }
+        order.paymentStatus = "Paid";
+        order.paymentId = paymentId;
+
+       await Cart.findByIdAndDelete(cartId);
+        await order.save();
+        
+        return res.redirect(`/orderconfirm/${order._id}`);
+    } catch (error) {
+        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred in Online payment . Please try again later.", '/');   
+    }
+}
+
 module.exports = {
     confirmOrder,
     orderConfirmed,
     LoadOrderPage,
-    cancelOrder
+    cancelOrder,
+    onlinePayment
 };

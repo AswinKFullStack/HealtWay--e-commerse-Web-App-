@@ -108,5 +108,9 @@ router.get('/orderconfirm/:orderId',userAuth,orderController.orderConfirmed);
 router.get('/viewOrder',userAuth, orderController.LoadOrderPage);
 router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderController.cancelOrder);
 
+//Online Payment 
+
+router.get('/payment/success',userAuth,orderController.onlinePayment);
+
 module.exports = router
 

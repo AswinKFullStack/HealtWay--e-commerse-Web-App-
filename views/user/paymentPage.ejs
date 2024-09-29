@@ -1,0 +1,36 @@
+<%- include("../../views/partials/user/header") %>
+
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<button id="rzp-button1">Pay Now</button>
+<script>
+    var options = {
+        "key": "<%= razor_key_id %>",
+        "amount": "<%= amount %> * 100", // in paise
+        "currency": "INR",
+        "order_id": "<%= razorpayOrderId %>", // Razorpay order ID
+        "handler": function (response){
+            alert("Payment successful. Payment ID: " + response.razorpay_payment_id);
+            // Redirect to confirm order with payment info
+            window.location.href = `/payment/success?orderId=<%= razorpayOrderId %>&paymentId=` + response.razorpay_payment_id;
+        },
+        "prefill": {
+            "name": "Test User",
+            "email": "aswinkplacement@gmail.com",
+            "contact": "7560966745"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        alert("Pay Now btn clicked")
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+
+
+
+<%-include("../../views/partials/user/footer")%>
