@@ -100,7 +100,7 @@ const confirmOrder = async (req, res) => {
             quantity : item.quantity ,
             totalPriceOfEachItemOrder: (item.price*item.quantity),
             paymentMethod,
-            
+            statusHistory :[{status : "Processing"}]
 
         });
         product.quantity -= item.quantity;
@@ -132,7 +132,8 @@ const confirmOrder = async (req, res) => {
             
             
                 console.log("saved orderDetails  = ",order)
-                
+                order.isConfirm = true;
+                await order.save();
                 await Cart.findByIdAndDelete(cartId);
                 return res.status(200).json({ CODsuccess: true, orderId : order._id });
                 
@@ -159,6 +160,7 @@ const confirmOrder = async (req, res) => {
                 razorpayOrderId: razorpayOrder.id,
                 amount: order.finalAmount ,
                 razor_key_id: process.env.RAZORPAY_KEY_ID, 
+            
                 cartId 
             });
             
@@ -331,6 +333,7 @@ const onlinePayment = async (req,res) => {
         }
         order.paymentStatus = "Paid";
         order.paymentId = paymentId;
+        order.isConfirm = true;
 
        await Cart.findByIdAndDelete(cartId);
         await order.save();

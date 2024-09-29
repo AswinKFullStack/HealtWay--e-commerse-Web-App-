@@ -30,9 +30,9 @@ const individualOrderedItemSchema = new mongoose.Schema({
     statusHistory: [{
         status: {
             type: String,
-            enum: [ "Processing","Confirmed" ,"Shipped", "Delivered", "Cancelled", "Return Requested", "Returned"],
+            enum: [ "Processing" ,"Shipped", "Delivered", "Cancelled", "Return Requested", "Returned"],
             required: true,
-            default: "Processing"
+            
         },
         changedAt: {
             type: Date,
@@ -95,6 +95,10 @@ const orderSchema = new Schema({
         required: true,
         enum: ["Pending", "Paid","Failed", "Refunded"],
         default: "Pending"
+    },
+    isConfirm:{
+        type:Boolean,
+        default: false
     }
 }, {
     timestamps: true
