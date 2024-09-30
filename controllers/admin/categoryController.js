@@ -26,6 +26,7 @@ const categoryInfo = async (req, res) => {
         const totalCategories = await Category.countDocuments(searchQuery);
 
         const categories = await Category.find(searchQuery)
+            .sort({ createdAt: -1 }) 
             .skip((currentPage - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
@@ -149,18 +150,18 @@ const postEditCategory = async (req, res) => {
 };
 
 // Soft delete category controller function
-const deleteCategory = async (req, res) => {
-    try {
-        const categoryId = req.params.id;
+// const deleteCategory = async (req, res) => {
+//     try {
+//         const categoryId = req.params.id;
 
-        await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
+//         await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
 
-        res.redirect("/admin/categories");
-    } catch (error) {
-        console.error("Error soft deleting category:", error);
-        renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while soft deleting the category.", '/admin/categories');
-    }
-};
+//         res.redirect("/admin/categories");
+//     } catch (error) {
+//         console.error("Error soft deleting category:", error);
+//         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while soft deleting the category.", '/admin/categories');
+//     }
+// };
 
 // View single category details
 const viewCategoryDetails = async (req, res) => {
@@ -209,7 +210,7 @@ module.exports = {
     postAddCategory,
     getEditCategory,
     postEditCategory,
-    deleteCategory,
+    // deleteCategory,
     viewCategoryDetails,
     listCategory,
     unlistCategory

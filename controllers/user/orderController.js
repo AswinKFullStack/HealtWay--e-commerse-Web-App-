@@ -234,13 +234,9 @@ const LoadOrderPage = async (req, res) => {
 const cancelOrder = async (req,res) => {
     try {
         const {orderIdOfCartItems ,itemOrderId} = req.params;
-        const user = await User.findById(req.session.user);
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found.' });
-        }
+        
         const OrderItemDoc = await Order.findOne({
             _id : orderIdOfCartItems,
-            userId:user._id,
             "orderedItems._id" :itemOrderId
         })
 
@@ -260,7 +256,7 @@ const cancelOrder = async (req,res) => {
 
         
         const updateOrderResult = await Order.updateOne(
-            { _id: orderIdOfCartItems, userId: user._id, "orderedItems._id": itemOrderId },
+            { _id: orderIdOfCartItems,  "orderedItems._id": itemOrderId },
             { $set: { "orderedItems.$.status": "Cancelled" } }
           );
 

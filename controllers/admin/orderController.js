@@ -80,7 +80,7 @@ const getOrders = async (req, res) => {
         const totalPages = Math.ceil(totalOrders / limit);
         const currentPage = Math.max(1, Math.min(page, totalPages));
         const paginatedOrders = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
-        console.log(paginatedOrders[0]);
+        
 
 
         res.render('orders', {
@@ -107,9 +107,13 @@ const changeStatus = async (req,res) => {
         const { orderIdOfCartItems, itemOrderId } = req.params;
         const { status } = req.body;
 
+       
+
         const updatedResult = await Order.updateOne(
             { _id: orderIdOfCartItems, 'orderedItems._id': itemOrderId },
             { $set: { 'orderedItems.$.status': status } })
+
+            
 
          if(updatedResult.modifiedCount === 0){
             return res.status(500).json({ success: false, message: 'Error updating status' });
