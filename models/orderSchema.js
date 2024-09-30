@@ -23,6 +23,7 @@ const orderSchema = new Schema({
 
   paymentDetails: {
     method: { type: String, enum: ["Cash on Delivery", "Online"], required: true },
+    gateway: {type : String , required:false}, 
     status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
     date: { type: Date , default: Date.now }, 
     beforePymentRefId: { 

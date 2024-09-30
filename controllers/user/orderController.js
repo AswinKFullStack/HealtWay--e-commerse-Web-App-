@@ -243,7 +243,7 @@ const LoadOrderPage = async (req, res) => {
         const totalPages = Math.ceil(totalOrder / limit);
         const currentPage = Math.max(1, Math.min(page, totalPages)); 
         const paginatedOrder = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
-        console.log("order array=",paginatedOrder)
+        
         res.render('orderMngt', {
             title: "Order List",
             user,
@@ -292,7 +292,18 @@ const cancelOrder = async (req,res) => {
             );
 
             console.log("Product quantity update result:", productUpdateResult);
-        
+            
+            if (orderDoc.paymentMethod === 'Razorpay') {
+                
+                const paymentId = orderDoc.paymentDetails.paymentId; 
+                const refundAmount = orderDoc.totalPrice * 100; 
+    
+                const refund = await razorpayInstance.payments.refund(paymentId, {
+                    amount: refundAmount, // Amount should be in paise (for example, Rs.100 is 10000 paise)
+                });
+    
+                console.log("Refund successful:", refund);
+            }
             return res.status(200).json({ success: true, message: 'Order cancelled !' });
 
     } catch (error) {
@@ -364,7 +375,7 @@ const onlinePayment = async (req,res) => {
                 quantity : item.quantity ,
                 totalPrice : item.totalPrice,
                 orderStatus : 'Confirmed' ,
-                paymentDetails :{method : "Online",status:"Paid" ,beforePymentRefId:razorpayOrderId,paymentId},
+                paymentDetails :{method : "Online",gateway :"Razorpay",status:"Paid" ,beforePymentRefId:razorpayOrderId,paymentId},
                 shippingAddress ,  
                 groupId : cart._id
             };
@@ -417,11 +428,69 @@ const restoreProductQuantities = async (req, res) => {
 };
 
 
+
+
+//Return product
+
+const returnOrder = async (req,res)=>{
+   
+        try {
+            const {orderId} = req.params;
+            
+            const orderDoc = await Order.findById(orderId);
+    
+            if(!orderDoc){
+               
+               return res.status(404).json({ success: false, message: 'Order or Order Item not found..' });
+            }
+    
+            
+            if (orderDoc.orderStatus === 'Returned' || orderDoc.orderStatus === 'Return Request') {
+                return res.status(400).json({ success: false, message: 'Item is already return' });
+            }
+    
+            
+            const updateResult = await Order.updateOne(
+                { _id: orderDoc._id},
+                { $set: { "orderStatus": "Return Request" } }
+              );
+    
+              if (updateResult.modifiedCount === 0) {
+                return res.status(500).json({ success: false, message: 'Failed to update order status.' });
+            }
+              
+             const productUpdateResult = await Product.updateOne(
+                { _id: orderDoc.productId },
+                { $inc: { quantity: orderDoc.quantity } }
+                );
+    
+                console.log("Product quantity update result:", productUpdateResult);
+                
+              
+                
+                return res.status(200).json({ success: true, message: 'Order Return Requested successfull !' });
+    
+        } catch (error) {
+            
+            console.error("Error in order Return Request:", error);
+    
+            if (error.name === 'CastError') {
+                return res.status(400).json({ success: false, message: 'Invalid Order or Item ID.' });
+            }
+    
+            
+            return res.status(500).json({ success: false, message: 'An internal server error occurred while Return Request the order.' });
+        }
+    
+}
+
+
 module.exports = {
     confirmOrder,
     orderConfirmed,
     LoadOrderPage,
     cancelOrder,
     onlinePayment,
-    restoreProductQuantities
+    restoreProductQuantities,
+    returnOrder
 };

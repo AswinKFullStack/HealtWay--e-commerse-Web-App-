@@ -249,6 +249,8 @@ function updateCartQuantity(productId, cartItemId) {
                             console.error('Error:', error);
                             Swal.fire('Error!', 'Something went wrong with your request.', 'error');
                         });
+                    }else{
+                        Swal.fire('Error!', 'Please fill all the feild ', 'error');
                     }
                 }
             });
