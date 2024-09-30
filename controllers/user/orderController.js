@@ -109,7 +109,7 @@ const confirmOrder = async (req, res) => {
 
         console.log(paymentMethod);
         if (paymentMethod === "Cash on Delivery") {
-               OrderIds = [];
+               let OrderIds = [];
             for (let i = 0; i < cart.items.length; i++) {
                 const item = cart.items[i];
                 const product = await Product.findById(item.productId);
@@ -142,24 +142,24 @@ const confirmOrder = async (req, res) => {
         } else if (paymentMethod === "Online") {
             //return res.redirect('/paymentGateway?orderId=' + newOrder._id);
             const razorpayOrder = await razorpayInstance.orders.create({
-                amount: order.finalAmount * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
+                amount: cart.totalCartPrice * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
                 currency: "INR",
-                receipt: `order_rcptid_${order._id}`
+                receipt: `order_rcptid_${cart._id}`
             });
             if(!razorpayOrder){
                 return renderErrorPage(res, 400, "Online paymet issue", "error in confirm order section at else if case", '/checkout');
             }
             console.log(razorpayOrder.id);
-            order.paymentOrderId = razorpayOrder.id;
-            await order.save();
+           
+            
 
-            console.log("after Updation = ", order);
+            console.log("before payment ,the payment refence ID = ", req.session.razorpayOrderId);
             return res.status(200).json({ 
                 OnlinePayment : true, 
                 razorpayOrderId: razorpayOrder.id,
-                amount: order.finalAmount ,
+                amount: cart.totalCartPrice ,
                 razor_key_id: process.env.RAZORPAY_KEY_ID, 
-            
+                addressId,
                 cartId 
             });
             
@@ -321,28 +321,72 @@ const cancelOrder = async (req,res) => {
 
 const onlinePayment = async (req,res) => {
     try {
-        console.log("After online payment = order collection updation")
-        const {paymentOrderId, paymentId ,cartId } = req.query;
 
-        if (!paymentOrderId || !paymentId) {
+        const user = await User.findById(req.session.user);
+        console.log("After online payment = order collection updation")
+        const {razorpayOrderId, paymentId ,cartId ,addressId} = req.query;
+        console.log("shipping Address Id= ", addressId);
+        if (!razorpayOrderId || !paymentId) {
            
             return renderErrorPage(res, 400, "Missing paymentOrderId or paymentId", "Missing paymentOrderId or paymentId Please try again later.", '/');   
         }
-        console.log("payment orderId = ",paymentOrderId," paymentId =",  paymentId)
+        console.log("payment orderId = ",razorpayOrderId ," paymentId =",  paymentId)
+        console.log("cartID = ",cartId);
 
-        const order = await Order.findOne({ paymentOrderId });
-        if (!order) {
-          
-            return renderErrorPage(res, 404, "Order not found", "Order not found error occurred in Online payment . Please try again later.", '/');   
-        }
-        order.paymentStatus = "Paid";
-        order.paymentId = paymentId;
-        order.isConfirm = true;
-
-       await Cart.findByIdAndDelete(cartId);
-        await order.save();
         
-        return res.redirect(`/orderconfirm/${order._id}`);
+    
+        const cart = await Cart.findById(cartId);
+        if (!cart) {
+            console.error("Cart not found for cartId = ", cartId);
+            return renderErrorPage(res, 404, "Cart not found", "The cart could not be found. Please try again later.", '/');
+        }
+        if (!cart.items.length) {
+            console.error("Cart is empty for cartId = ", cartId);
+            return renderErrorPage(res, 404, "Your cart is empty", "Your cart is empty. Please try again later.", '/');
+        }
+        
+        const addressObjectId = new mongoose.Types.ObjectId(addressId);
+        const userAddress = await Address.aggregate([
+            { $match: { userId : user._id} },
+            { $unwind: '$address' }, 
+            { $match: { 'address._id': addressObjectId } },
+            { $replaceRoot: { newRoot: '$address' } } 
+        ]);
+        if (!userAddress.length) {
+            console.error("Shipping address not found for addressId = ", addressId);
+            return renderErrorPage(res, 404, "Address not found", "The shipping address could not be found. Please try again later.", '/');
+        }
+        const shippingAddress = userAddress[0];
+        console.log("cart details = ",cart);
+        
+        
+
+        let OrderIds = [];
+        for (let i = 0; i < cart.items.length; i++) {
+            const item = cart.items[i];
+            const product = await Product.findById(item.productId);
+            const newOrder = {
+                userId: req.session.user,
+                productId :product._id ,
+                quantity : item.quantity ,
+                totalPrice : item.totalPrice,
+                orderStatus : 'Confirmed' ,
+                paymentDetails :{method : "Online",status:"Paid" ,beforePymentRefId:razorpayOrderId,paymentId},
+                shippingAddress ,  
+                groupId : cart._id
+            };
+
+            const order = new Order( newOrder);
+            await order.save();
+            OrderIds.push(order._id);
+            
+
+        }
+
+        
+            
+        await Cart.findByIdAndDelete(cartId);
+        return res.redirect(`/orderconfirm/${cart._id}?totalPrice=${cart.totalCartPrice}`);
     } catch (error) {
         return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred in Online payment . Please try again later.", '/');   
     }
