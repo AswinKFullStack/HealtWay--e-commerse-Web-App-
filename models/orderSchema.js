@@ -1,108 +1,100 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
 const { Schema } = mongoose;
-
-// Individual Ordered Item Schema
-const individualOrderedItemSchema = new mongoose.Schema({
-    productId: {
-        type: Schema.Types.ObjectId,
-        ref: "Product",
-        required: true
-    },
-    productUuid: {
-        type: String,
-        default: uuidv4
-    },
-    quantity: {
-        type: Number,
-        required: true
-    },
-    totalPriceOfEachItemOrder: {
-        type: Number,
-        required: true
-    },
-    paymentMethod: {
-        type: String,
-        required: true,
-        enum: ["Cash on Delivery", "Online"],
-        
-    },
-    statusHistory: [{
-        status: {
-            type: String,
-            enum: [ "Processing" ,"Shipped", "Delivered", "Cancelled", "Return Requested", "Returned"],
-            required: true,
-            
-        },
-        changedAt: {
-            type: Date,
-            default: Date.now
-        }
-    }]
-}, {
-    timestamps: true
-});
+const { v4: uuidv4 } = require('uuid');
 
 // Order Schema
 const orderSchema = new Schema({
-    orderId: {
+ orderId: {
         type: String,
         unique: true,
         default: uuidv4
-    },
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    },
-    orderedItems: [individualOrderedItemSchema],
-    totalPrice: {
-        type: Number,
-        required: true
-    },
-    discount: {
-        type: Number,
-        default: 0
-    },
-    finalAmount: {
-        type: Number,
-        required: true
-    },
-    address: {
-        type: Schema.Types.ObjectId,
-        ref: "Address",
-        required: true
-    },
-    invoiceDate: {
-        type: Date
-    },
-    
-    couponApplied: {
-        type: Boolean,
-        default: false
-    },
-    paymentOrderId :{
+ },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
+  productId: { type: Schema.Types.ObjectId, ref: "Product", required: true }, 
+  
+  quantity: { type: Number, required: true },
+  totalPrice: { type: Number, required: true }, 
+  
+  orderStatus: {
+    type: String,
+    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'],
+    default: 'Pending',
+  },
+
+  paymentDetails: {
+    method: { type: String, enum: ["Cash on Delivery", "Online"], required: true },
+    status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
+    date: { type: Date , default: Date.now }, 
+    beforePymentRefId: { 
+        type: String ,
+        required:false
+    },     //for razro payment ,before payment 
+    paymentId: { type: String ,required : false},   // after successfully payment
+    refundAmount: { type: Number, default: 0 }, 
+  },
+
+  shippingAddress: {
+    addressType: {
         type: String,
-        default: false
-        
+        enum: ['Home', 'Work', 'Other'],  
+        required: true
     },
-    paymentId :{
-        type: String,
-        default: false
+    name:{
+        type:String,
+        required:true,
     },
-    paymentStatus: {
+    houseName: { 
+        type: String, 
+        required: true },
+    city:{
+        type:String,
+        required:true
+    },
+    landMark:{
+        type:String,
+        required:true 
+    },
+    state:{
+        type:String,
+        required:true
+    },
+    pincode: {
+        type: Number,
+        required: true,
+        min: 100000,  
+        max: 999999
+    },
+    phone: {
         type: String,
         required: true,
-        enum: ["Pending", "Paid","Failed", "Refunded"],
-        default: "Pending"
+        validate: {
+            validator: function (v) {
+                return /^\d{10}$/.test(v);  
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
     },
-    isConfirm:{
-        type:Boolean,
-        default: false
+    altPhone: {
+        type: String,
+        required: false,
+        validate: {
+            validator: function (v) {
+                if (v == null || v.trim() === '') return true; 
+                return /^\d{10}$/.test(v);  
+            },
+            message: props => `${props.value} is not a valid alternate phone number!`
+        }
     }
-}, {
-    timestamps: true
-});
+  },
+
+  discount: { type: Number, default: 0 }, 
+  couponCode: { type: String }, 
+  groupId: { type: String },
+  invoiceDate: { type: Date },
+  cancellationDate: { type: Date }, 
+
+}, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;
+

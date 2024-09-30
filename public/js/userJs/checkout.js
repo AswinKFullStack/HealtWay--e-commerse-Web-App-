@@ -193,7 +193,7 @@ function updateCartQuantity(productId, cartItemId) {
                                 'Your order has been successfully placed.',
                                 'success'
                             ).then(() => {
-                                window.location.href = `/orderconfirm/${data.orderId}`; // Redirect to confirmation page
+                                window.location.href = `/orderconfirm/${data.groupId}?totalPrice=${data.TotalPrice}`; // Redirect to confirmation page
                             });
                         } else if (data.OnlinePayment) {
                             Swal.fire({
@@ -210,6 +210,7 @@ function updateCartQuantity(productId, cartItemId) {
                                     "amount": data.amount * 100, // in paise
                                     "currency": "INR",
                                     "order_id": data.razorpayOrderId, // Razorpay order ID
+                                    
                                     "handler": function (response) {
                                         Swal.fire(
                                             'Order Placed!',

@@ -93,52 +93,48 @@ const confirmOrder = async (req, res) => {
         }
 
         console.log("cart and address  validation over ")
-        let newOrderdItems = [];
+       
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
             const product = await Product.findById(item.productId);
-
-        newOrderdItems.push( {
-            productId :product._id ,
-            quantity : item.quantity ,
-            totalPriceOfEachItemOrder: (item.price*item.quantity),
-            paymentMethod,
-            statusHistory :[{status : "Processing"}]
-
-        });
-        product.quantity -= item.quantity;
-         await product.save();
-
-    }
-
-        
-        
-        const newOrder = {
-            userId: user._id,
-            orderedItems: newOrderdItems,
-            totalPrice: cart.totalCartPrice,
-            finalAmount: cart.totalCartPrice,
-            address: addressObjectId,
-            
-            
-            
-        };
-        const order = new Order(newOrder);
-        if(!order){
-            return renderErrorPage(res, 400, "Order not saved", "Check order saving arrea", '/checkout');
+            product.quantity -= item.quantity;
+            await product.save();
         }
-        await order.save();
+        const shippingAddress = userAddress[0];
+
+        
+        
+      
         
 
         console.log(paymentMethod);
         if (paymentMethod === "Cash on Delivery") {
-            
-            
-                console.log("saved orderDetails  = ",order)
-                order.isConfirm = true;
+               OrderIds = [];
+            for (let i = 0; i < cart.items.length; i++) {
+                const item = cart.items[i];
+                const product = await Product.findById(item.productId);
+                const newOrder = {
+                    userId: user._id,
+                    productId :product._id ,
+                    quantity : item.quantity ,
+                    totalPrice : item.totalPrice,
+                    orderStatus : 'Confirmed' ,
+                    paymentDetails :{method : paymentMethod },
+                    shippingAddress ,  
+                    groupId : cart._id
+                };
+
+                const order = new Order( newOrder);
                 await order.save();
+                OrderIds.push(order._id);
+                
+    
+            }
+    
+            
+                
                 await Cart.findByIdAndDelete(cartId);
-                return res.status(200).json({ CODsuccess: true, orderId : order._id });
+                return res.status(200).json({ CODsuccess: true, groupId : cart._id ,TotalPrice:cart.totalCartPrice});
                 
             
             
@@ -186,22 +182,25 @@ const orderConfirmed = async (req,res) => {
 
     try {
         const user = await User.findById(req.session.user);
+        const {groupId} = req.params;
+        const { totalPrice } = req.query;
         
         if (!user) {
             return renderErrorPage(res, 404, "User not found", "User needs to log in.", req.headers.referer || '/');
         }
         
-        const order = await Order.findById(req.params.orderId);
+        const order = await Order.findOne({groupId});
         
         
-        if (!order) {
+        if (!order || order.length === 0) {
             return renderErrorPage(res, 404, "Order not found", "Check the order page ,Please Check all details", req.headers.referer || '/');
         }
-        console.log("Order Details ,total price = ",order.finalAmount);
+        
         res.render('orderConfirm',{
             title :"Order Confirmed",
             user,
-            order
+            order,
+            totalPrice
         });
     } catch (error) {
         console.error("Error during order confirmated bill:", error);
