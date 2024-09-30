@@ -104,9 +104,14 @@ router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postE
 //ORDER 
 
 router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
-router.get('/orderconfirm/:orderId',userAuth,orderController.orderConfirmed);
+router.get('/orderconfirm/:groupId',userAuth,orderController.orderConfirmed);
 router.get('/viewOrder',userAuth, orderController.LoadOrderPage);
 router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderController.cancelOrder);
+
+//Online Payment 
+
+router.get('/payment/success',userAuth,orderController.onlinePayment);
+router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderController.restoreProductQuantities);
 
 module.exports = router
 

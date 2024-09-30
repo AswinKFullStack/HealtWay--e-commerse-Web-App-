@@ -12,9 +12,9 @@
                 
                 <% if (order) { %>
                 <p>Thank you for your purchase!</p>
-                <p>Your order ID is <strong><%= order._id %></strong></p>
-                <p>Order Status = <strong><%= order.status %></strong></p>
-                <p>Total Price of your Order <strong><%= order.finalAmount %></strong></p>
+                <p>Your order ID is <strong><%= order.groupId %></strong></p>
+                <p>Order Status = <strong><%= order.orderStatus %></strong></p>
+                <p>Total Price of your Order <strong><%= totalPrice %></strong></p>
                 <p>We've sent a confirmation to your email.</p>
                 <p>Estimated Delivery Date: <strong>October 5, 2024</strong></p>
                 <a href="/viewOrder" class="btn btn-primary mt-3">Check Your Orders</a>

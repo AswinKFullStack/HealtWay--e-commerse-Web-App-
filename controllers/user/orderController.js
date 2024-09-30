@@ -4,6 +4,7 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
+const razorpayInstance = require('../../config/razorpayConfig');
 
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
     res.status(errorCode).render('error-page', {
@@ -18,11 +19,13 @@ const confirmOrder = async (req, res) => {
     try {
         console.log("ordering stated")
         const { cartId } = req.params;
-        const {address: addressId, paymentMethod } = req.body;
+        const {addressId, paymentMethod } = req.body;
+        console.log("address ID = ",addressId,"payment Method = ", paymentMethod )
 
         const user = await User.findById(req.session.user);
         if (!user) {
-            return renderErrorPage(res, 404, "User not found", "User needs to log in.", req.headers.referer || '/');
+            
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
         const cart = await Cart.findById(cartId).populate('items.productId');
@@ -30,6 +33,8 @@ const confirmOrder = async (req, res) => {
             console.log("User doesn't have products in the cart");
             const message = "Your cart is empty.";
             return  res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            
+            
         }
 
         
@@ -88,56 +93,77 @@ const confirmOrder = async (req, res) => {
         }
 
         console.log("cart and address  validation over ")
-        let newOrderdItems = [];
+       
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
             const product = await Product.findById(item.productId);
+            product.quantity -= item.quantity;
+            await product.save();
+        }
+        const shippingAddress = userAddress[0];
 
-        newOrderdItems.push( {
-            productId :product._id ,
-            quantity : item.quantity ,
-            priceOfProduct : item.price ,
-            priceOfQuantity : item.totalPrice,
-            paymentMethod,
+        
+        
+      
+        
 
-        });
-        product.quantity -= item.quantity;
-        product.save();
-
-    }
-
-         console.log("Address ID =",addressObjectId ,"Address TYpe =" ,typeof addressObjectId)
-        console.log("New Product for Ordering fo Order Collection = ",newOrderdItems);
-        const newOrder = {
-            userId: user._id,
-            orderedItems: newOrderdItems,
-            totalPrice: cart.totalCartPrice,
-            finalAmount: cart.totalCartPrice,
-            address: addressObjectId,
-            paymentMethod,
-            
-        };
-        console.log("The Order Full Details =",newOrder);
-        console.log("going to check paymetnt method")
         console.log(paymentMethod);
-        if (paymentMethod === "Cash on Delevery") {
-            const order = new Order(newOrder);
-            if(!order){
-                return renderErrorPage(res, 400, "Order not saved", "Check order saving arrea", '/checkout');
-            }else{
-                console.log("saved order = ",order)
+        if (paymentMethod === "Cash on Delivery") {
+               OrderIds = [];
+            for (let i = 0; i < cart.items.length; i++) {
+                const item = cart.items[i];
+                const product = await Product.findById(item.productId);
+                const newOrder = {
+                    userId: user._id,
+                    productId :product._id ,
+                    quantity : item.quantity ,
+                    totalPrice : item.totalPrice,
+                    orderStatus : 'Confirmed' ,
+                    paymentDetails :{method : paymentMethod },
+                    shippingAddress ,  
+                    groupId : cart._id
+                };
+
+                const order = new Order( newOrder);
                 await order.save();
-                await Cart.findByIdAndDelete(cartId);
-                return res.redirect(`/orderconfirm/${order._id}`);
+                OrderIds.push(order._id);
+                
+    
             }
+    
+            
+                
+                await Cart.findByIdAndDelete(cartId);
+                return res.status(200).json({ CODsuccess: true, groupId : cart._id ,TotalPrice:cart.totalCartPrice});
+                
+            
             
 
-        } else if (paymentMethod === "Debit-Card") {
-            return res.redirect('/paymentGateway?orderId=' + newOrder._id);
-        } else if (paymentMethod === "Credit-Card") {
-            return res.redirect('/paymentGateway?orderId=' + newOrder._id);
-        } 
-        else {
+        } else if (paymentMethod === "Online") {
+            //return res.redirect('/paymentGateway?orderId=' + newOrder._id);
+            const razorpayOrder = await razorpayInstance.orders.create({
+                amount: order.finalAmount * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
+                currency: "INR",
+                receipt: `order_rcptid_${order._id}`
+            });
+            if(!razorpayOrder){
+                return renderErrorPage(res, 400, "Online paymet issue", "error in confirm order section at else if case", '/checkout');
+            }
+            console.log(razorpayOrder.id);
+            order.paymentOrderId = razorpayOrder.id;
+            await order.save();
+
+            console.log("after Updation = ", order);
+            return res.status(200).json({ 
+                OnlinePayment : true, 
+                razorpayOrderId: razorpayOrder.id,
+                amount: order.finalAmount ,
+                razor_key_id: process.env.RAZORPAY_KEY_ID, 
+            
+                cartId 
+            });
+            
+        }else {
             return renderErrorPage(res, 400, "Invalid Payment Method", "Please choose a valid payment method.", '/checkout');
         }
 
@@ -156,22 +182,25 @@ const orderConfirmed = async (req,res) => {
 
     try {
         const user = await User.findById(req.session.user);
+        const {groupId} = req.params;
+        const { totalPrice } = req.query;
         
         if (!user) {
             return renderErrorPage(res, 404, "User not found", "User needs to log in.", req.headers.referer || '/');
         }
         
-        const order = await Order.findById(req.params.orderId);
+        const order = await Order.findOne({groupId});
         
         
-        if (!order) {
+        if (!order || order.length === 0) {
             return renderErrorPage(res, 404, "Order not found", "Check the order page ,Please Check all details", req.headers.referer || '/');
         }
-        console.log("Order Details ,total price = ",order.finalAmount);
+        
         res.render('orderConfirm',{
             title :"Order Confirmed",
             user,
-            order
+            order,
+            totalPrice
         });
     } catch (error) {
         console.error("Error during order confirmated bill:", error);
@@ -286,9 +315,82 @@ const cancelOrder = async (req,res) => {
     }
 }
 
+
+
+
+
+const onlinePayment = async (req,res) => {
+    try {
+        console.log("After online payment = order collection updation")
+        const {paymentOrderId, paymentId ,cartId } = req.query;
+
+        if (!paymentOrderId || !paymentId) {
+           
+            return renderErrorPage(res, 400, "Missing paymentOrderId or paymentId", "Missing paymentOrderId or paymentId Please try again later.", '/');   
+        }
+        console.log("payment orderId = ",paymentOrderId," paymentId =",  paymentId)
+
+        const order = await Order.findOne({ paymentOrderId });
+        if (!order) {
+          
+            return renderErrorPage(res, 404, "Order not found", "Order not found error occurred in Online payment . Please try again later.", '/');   
+        }
+        order.paymentStatus = "Paid";
+        order.paymentId = paymentId;
+        order.isConfirm = true;
+
+       await Cart.findByIdAndDelete(cartId);
+        await order.save();
+        
+        return res.redirect(`/orderconfirm/${order._id}`);
+    } catch (error) {
+        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred in Online payment . Please try again later.", '/');   
+    }
+}
+
+
+
+const restoreProductQuantities = async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const { paymentOrderId } = req.query;
+
+        const cart = await Cart.findById(cartId);
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
+
+        for (let i = 0; i < cart.items.length; i++) {
+            const item = cart.items[i];
+            const product = await Product.findById(item.productId);
+            if (product) {
+                product.quantity += item.quantity;
+                await product.save();  
+            }
+        }
+
+       
+        const order = await Order.findOne({ paymentOrderId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        order.paymentStatus = "Failed";
+        await order.save(); 
+
+        res.json({ success: true, message: "Product quantities restored successfully" });
+    } catch (error) {
+        console.error('Error restoring cart items:', error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+
 module.exports = {
     confirmOrder,
     orderConfirmed,
     LoadOrderPage,
-    cancelOrder
+    cancelOrder,
+    onlinePayment,
+    restoreProductQuantities
 };
