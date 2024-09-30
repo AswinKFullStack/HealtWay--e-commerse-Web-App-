@@ -217,7 +217,7 @@ function updateCartQuantity(productId, cartItemId) {
                                             'Your order has been successfully placed.',
                                             'success'
                                         ).then(() => {
-                                            window.location.href = `/payment/success?cartId=${data.cartId}&paymentOrderId=${data.razorpayOrderId}&paymentId=` + response.razorpay_payment_id;
+                                            window.location.href = `/payment/success?cartId=${data.cartId}&razorpayOrderId=${data.razorpayOrderId}&addressId=${data.addressId}&paymentId=` + response.razorpay_payment_id;
                                         });
                                     },
                                     "prefill": {
