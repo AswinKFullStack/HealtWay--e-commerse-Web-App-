@@ -218,16 +218,16 @@ const LoadOrderPage = async (req, res) => {
 
         const ordersDetailList = await Order.aggregate([
             { $match: { userId: user._id } },
-            { $unwind: "$orderedItems" },
+            
             {
                 $lookup: {
                     from: "products",               
-                    localField: "orderedItems.productId",
+                    localField: "productId",
                     foreignField: "_id",            
                     as: "productDetails"            
                 }
             },
-            { $unwind: "$productDetails" }
+            
         ]);
 
         if (!ordersDetailList.length) {
@@ -235,15 +235,15 @@ const LoadOrderPage = async (req, res) => {
         }
 
         const sortedOrdersDetailList = ordersDetailList.sort((a, b) => {
-            const dateA = a.orderedItems.createdAt ? new Date(a.orderedItems.createdAt) : a.orderedItems._id.getTimestamp();
-            const dateB = b.orderedItems.createdAt ? new Date(b.orderedItems.createdAt) : b.orderedItems._id.getTimestamp();
+            const dateA = a.createdAt ? new Date(a.createdAt) : a._id.getTimestamp();
+            const dateB = b.createdAt ? new Date(b.createdAt) : b._id.getTimestamp();
             return dateB - dateA;
         });
         const totalOrder = sortedOrdersDetailList.length;
         const totalPages = Math.ceil(totalOrder / limit);
         const currentPage = Math.max(1, Math.min(page, totalPages)); 
         const paginatedOrder = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
-
+        console.log("order array=",paginatedOrder)
         res.render('orderMngt', {
             title: "Order List",
             user,
@@ -262,40 +262,33 @@ const LoadOrderPage = async (req, res) => {
 
 const cancelOrder = async (req,res) => {
     try {
-        const {orderIdOfCartItems ,itemOrderId} = req.params;
+        const {orderId} = req.params;
         
-        const OrderItemDoc = await Order.findOne({
-            _id : orderIdOfCartItems,
-            "orderedItems._id" :itemOrderId
-        })
+        const orderDoc = await Order.findById(orderId);
 
-        if(!OrderItemDoc){
+        if(!orderDoc){
            
            return res.status(404).json({ success: false, message: 'Order or Order Item not found..' });
         }
 
-        const orderedItem = OrderItemDoc.orderedItems.find(item => item._id.toString() === itemOrderId.toString());
-        if (!orderedItem) {
-            
-            return res.status(404).json({ success: false, message: 'Ordered item not found.' });
-        }
-        if (orderedItem.status === 'Cancelled') {
+        
+        if (orderDoc.orderStatus === 'Cancelled') {
             return res.status(400).json({ success: false, message: 'Item is already cancelled.' });
         }
 
         
-        const updateOrderResult = await Order.updateOne(
-            { _id: orderIdOfCartItems,  "orderedItems._id": itemOrderId },
-            { $set: { "orderedItems.$.status": "Cancelled" } }
+        const updateResult = await Order.updateOne(
+            { _id: orderDoc._id},
+            { $set: { "orderStatus": "Cancelled" } }
           );
 
-          if (updateOrderResult.modifiedCount === 0) {
+          if (updateResult.modifiedCount === 0) {
             return res.status(500).json({ success: false, message: 'Failed to update order status.' });
         }
           
          const productUpdateResult = await Product.updateOne(
-            { _id: orderedItem.productId },
-            { $inc: { quantity: orderedItem.quantity } }
+            { _id: orderDoc.productId },
+            { $inc: { quantity: orderDoc.quantity } }
             );
 
             console.log("Product quantity update result:", productUpdateResult);

@@ -106,7 +106,7 @@ router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postE
 router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
 router.get('/orderconfirm/:groupId',userAuth,orderController.orderConfirmed);
 router.get('/viewOrder',userAuth, orderController.LoadOrderPage);
-router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderController.cancelOrder);
+router.post('/cancelOrder/:orderId',userAuth,orderController.cancelOrder);
 
 //Online Payment 
 

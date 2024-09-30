@@ -1,4 +1,4 @@
-function confirmRemove(orderIdOfCartItems,itemOrderId) {
+function confirmRemove(orderId) {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to undo this!",
@@ -10,7 +10,7 @@ function confirmRemove(orderIdOfCartItems,itemOrderId) {
     }).then((result) => {
         if (result.isConfirmed) {
             // Perform AJAX request to remove item
-            fetch(`/cancelOrder/${orderIdOfCartItems}/${itemOrderId}`, {
+            fetch(`/cancelOrder/${orderId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
