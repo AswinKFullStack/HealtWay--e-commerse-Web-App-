@@ -111,6 +111,7 @@ router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderContro
 //Online Payment 
 
 router.get('/payment/success',userAuth,orderController.onlinePayment);
+router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderController.restoreProductQuantities);
 
 module.exports = router
 

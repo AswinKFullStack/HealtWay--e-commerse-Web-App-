@@ -30,7 +30,9 @@
                             </h5>
                             <div class="d-flex align-items-center">
                                 <!-- Product Image -->
+                                <a href="/product/view/<%= item.productId._id %>">
                                 <img src="/uploads/re-image/<%= item.productId.productImages[0] || '/path/to/default.jpg' %>" class="img-fluid" alt="<%= item.productId.productName %>" width="150">
+                                </a>
                                 <div class="ml-4">
                                     <!-- Product Description and Price -->
                                     <h6 class="mb-1"><%= item.productId.description %></h6>

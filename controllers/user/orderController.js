@@ -24,7 +24,8 @@ const confirmOrder = async (req, res) => {
 
         const user = await User.findById(req.session.user);
         if (!user) {
-            return renderErrorPage(res, 404, "User not found", "User needs to log in.", req.headers.referer || '/');
+            
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
         const cart = await Cart.findById(cartId).populate('items.productId');
@@ -32,6 +33,8 @@ const confirmOrder = async (req, res) => {
             console.log("User doesn't have products in the cart");
             const message = "Your cart is empty.";
             return  res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            
+            
         }
 
         
@@ -104,7 +107,7 @@ const confirmOrder = async (req, res) => {
 
         });
         product.quantity -= item.quantity;
-        product.save();
+         await product.save();
 
     }
 
@@ -323,13 +326,15 @@ const onlinePayment = async (req,res) => {
         const {paymentOrderId, paymentId ,cartId } = req.query;
 
         if (!paymentOrderId || !paymentId) {
-            return res.status(400).send("Missing paymentOrderId or paymentId");
+           
+            return renderErrorPage(res, 400, "Missing paymentOrderId or paymentId", "Missing paymentOrderId or paymentId Please try again later.", '/');   
         }
         console.log("payment orderId = ",paymentOrderId," paymentId =",  paymentId)
 
         const order = await Order.findOne({ paymentOrderId });
         if (!order) {
-            return res.status(404).send("Order not found");
+          
+            return renderErrorPage(res, 404, "Order not found", "Order not found error occurred in Online payment . Please try again later.", '/');   
         }
         order.paymentStatus = "Paid";
         order.paymentId = paymentId;
@@ -344,10 +349,49 @@ const onlinePayment = async (req,res) => {
     }
 }
 
+
+
+const restoreProductQuantities = async (req, res) => {
+    try {
+        const { cartId } = req.params;
+        const { paymentOrderId } = req.query;
+
+        const cart = await Cart.findById(cartId);
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
+
+        for (let i = 0; i < cart.items.length; i++) {
+            const item = cart.items[i];
+            const product = await Product.findById(item.productId);
+            if (product) {
+                product.quantity += item.quantity;
+                await product.save();  
+            }
+        }
+
+       
+        const order = await Order.findOne({ paymentOrderId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        order.paymentStatus = "Failed";
+        await order.save(); 
+
+        res.json({ success: true, message: "Product quantities restored successfully" });
+    } catch (error) {
+        console.error('Error restoring cart items:', error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+
 module.exports = {
     confirmOrder,
     orderConfirmed,
     LoadOrderPage,
     cancelOrder,
-    onlinePayment
+    onlinePayment,
+    restoreProductQuantities
 };
