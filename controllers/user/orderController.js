@@ -149,11 +149,11 @@ const confirmOrder = async (req, res) => {
             if(!razorpayOrder){
                 return renderErrorPage(res, 400, "Online paymet issue", "error in confirm order section at else if case", '/checkout');
             }
-            console.log(razorpayOrder.id);
+            
            
             
 
-            console.log("before payment ,the payment refence ID = ", req.session.razorpayOrderId);
+
             return res.status(200).json({ 
                 OnlinePayment : true, 
                 razorpayOrderId: razorpayOrder.id,
@@ -397,7 +397,7 @@ const onlinePayment = async (req,res) => {
 const restoreProductQuantities = async (req, res) => {
     try {
         const { cartId } = req.params;
-        const { paymentOrderId } = req.query;
+       
 
         const cart = await Cart.findById(cartId);
         if (!cart) {
@@ -414,13 +414,7 @@ const restoreProductQuantities = async (req, res) => {
         }
 
        
-        const order = await Order.findOne({ paymentOrderId });
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
-
-        order.paymentStatus = "Failed";
-        await order.save(); 
+        
 
         res.json({ success: true, message: "Product quantities restored successfully" });
     } catch (error) {

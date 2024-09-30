@@ -196,15 +196,12 @@ function updateCartQuantity(productId, cartItemId) {
                                 window.location.href = `/orderconfirm/${data.groupId}?totalPrice=${data.TotalPrice}`; // Redirect to confirmation page
                             });
                         } else if (data.OnlinePayment) {
-                            Swal.fire({
-                                title: 'Pay Online',
-                                text: "For confirm your Order, please pay now",
-                                icon: 'warning',
-                                
-                                confirmButtonColor: '#3085d6',
-                                
-                                confirmButtonText: 'Pay Now'
-                            }).then(() => {
+                            if (!data.razor_key_id || !data.amount || !data.razorpayOrderId) {
+                                Swal.fire('Error!', 'Missing necessary payment details.', 'error');
+                                return;
+                            }
+                            
+
                                 var options = {
                                     "key": data.razor_key_id,
                                     "amount": data.amount * 100, // in paise
@@ -226,52 +223,43 @@ function updateCartQuantity(productId, cartItemId) {
                                         "contact": "1234567890"
                                     }
                                 };
-                                var rzp1 = new Razorpay(options);
-                                rzp1.on('payment.failed', function (response) {
-                                    // Payment failed event listener
-                                    handlePaymentFailure(data.cartId, data.razorpayOrderId, "Payment Failed", response.error);
-                                });
+                                 // Initialize Razorpay instance
+                        var rzp1 = new Razorpay(options);
 
-                                // Listen to Razorpay modal closed event
-                                rzp1.on('modal.closed', function () {
-        // User closed the payment modal without completing the payment
-                                handlePaymentFailure(data.cartId, data.razorpayOrderId, "Payment Cancelled");
-                                });
+                        // Listen for payment failure
+                        rzp1.on('payment.failed', function(response) {
+                            clearTimeout(paymentTimeout);
+                            handlePaymentFailure(data.cartId, "Payment Failed", response.error);
+                        });
+
+                        // Listen for modal closed without payment
+                        rzp1.on('modal.closed', function() {
+                            clearTimeout(paymentTimeout);
+                            handlePaymentFailure(data.cartId, "Payment Cancelled");
+                        });
+
+                        // Set a fallback timeout in case no events are triggered
+                        const paymentTimeout = setTimeout(() => {
+                            handlePaymentFailure(data.cartId, "Payment Cancelled - Timeout");
+                        }, 300000); // 5 minutes
                                 rzp1.open();
-                            });
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                'There was an issue placing your order. Please try again.',
-                                'error'
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire(
-                            'Error!',
-                            'Something went wrong with your request.',
-                            'error'
-                        );
-                    });
-                }else{
-                    Swal.fire(
-                        'Error!',
-                        'You need to fill all field. Please try again.',
-                        'error'
-                    );
+                            
+                        }   })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error!', 'Something went wrong with your request.', 'error');
+                        });
+                    }
                 }
-            }
+            });
         });
-    });
     
     
 // Custom function to handle payment failure
 
 
   // Custom function to handle payment failure or cancellation
-function handlePaymentFailure(cartId, razorpayOrderId, reason, error = {}) {
+function handlePaymentFailure(cartId,  reason, error = {}) {
     console.log(`${reason}:`, error);
 
     Swal.fire({
@@ -280,7 +268,7 @@ function handlePaymentFailure(cartId, razorpayOrderId, reason, error = {}) {
         icon: 'error',
     }).then(() => {
         // Call backend API to restore quantities
-        fetch(`/online-payment-failed/restore-cart-items/${cartId}?paymentOrderId=${razorpayOrderId}`, {
+        fetch(`/online-payment-failed/restore-cart-items/${cartId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
