@@ -292,3 +292,43 @@ function handlePaymentFailure(cartId,  reason, error = {}) {
         });
     });
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const couponInputDiv = document.getElementById('couponInputDiv');
+    const applyCouponCodeBtn = document.getElementById('applyCouponCodeBtn');
+    const couponCodeInput = document.getElementById('couponCodeInput');
+    const couponMessage = document.getElementById('couponMessage');
+    const couponAppliedMessage = document.getElementById('couponAppliedMessage');
+    const appliedCouponCode = document.getElementById('appliedCouponCode');
+    let couponApplied = false;
+
+    // Show coupon input field when 'Apply Coupon' button is clicked
+    applyCouponBtn.addEventListener('click', function() {
+        if (!couponApplied) {
+            couponInputDiv.style.display = 'block';
+            applyCouponBtn.style.display = 'none';
+        }
+    });
+
+    // Apply the coupon and handle coupon submission
+    applyCouponCodeBtn.addEventListener('click', function() {
+        const couponCode = couponCodeInput.value.trim();
+
+        if (couponCode === '') {
+            couponMessage.innerHTML = '<span class="text-danger">Please enter a valid coupon code.</span>';
+            return;
+        }
+
+        // Simulate applying the coupon (replace this with actual AJAX request if needed)
+        // For now, assume any coupon is valid for demo purposes.
+        setTimeout(() => {
+            couponApplied = true;
+            couponMessage.innerHTML = ''; // Clear any previous message
+            couponInputDiv.style.display = 'none';
+            couponAppliedMessage.style.display = 'block';
+            appliedCouponCode.textContent = couponCode;
+        }, 1000);
+    });
+});

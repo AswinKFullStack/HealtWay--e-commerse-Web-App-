@@ -1,0 +1,63 @@
+h1 {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.coupon-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.coupon-card:hover {
+    transform: scale(1.05);
+}
+
+.discount-badge {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4757;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.coupon-card h2 {
+    font-size: 1.5rem;
+    margin-top: 30px;
+    color: #34495e;
+}
+
+.coupon-card p {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    background-color: #2980b9;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #3498db;
+}
+
+@media (max-width: 768px) {
+    .coupon-card {
+        margin-bottom: 20px;
+    }
+}

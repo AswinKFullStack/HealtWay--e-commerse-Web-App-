@@ -35,8 +35,14 @@ const couponSchema = new Schema({
       },
       usedBy: [
         {
-          userId: mongoose.Schema.Types.ObjectId, // User who applied the coupon
-          count: { type: Number, default: 0 } // Number of times this user has used the coupon
+          userId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+           }, 
+          count: {
+            type: Number,
+            default: 0 
+          } // Number of times this user has used the coupon
         }
       ],
       expireDate:{
@@ -47,7 +53,7 @@ const couponSchema = new Schema({
         type: Boolean,
         default: true
       }
-},{timestamps :true})
+},{timestamps :true});
 
 const Coupon = mongoose.model("Coupon",couponSchema);
 module.exports = Coupon;
