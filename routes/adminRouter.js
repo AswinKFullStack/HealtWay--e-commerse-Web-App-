@@ -6,7 +6,8 @@ const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const brandController = require("../controllers/admin/brandController");
 const orderController = require("../controllers/admin/orderController");
-const orderUserController = require("../controllers/user/orderController"); 
+const orderUserController = require("../controllers/user/orderController");
+const couponController = require("../controllers/admin/couponController"); 
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
@@ -90,4 +91,10 @@ router.get('/orders',adminAuth,orderController.getOrders);
 router.post('/order/changeStatus/:orderIdOfCartItems/:itemOrderId',adminAuth,orderController.changeStatus);
 router.post('/order/cancel/:orderIdOfCartItems/:itemOrderId',adminAuth,orderUserController.cancelOrder);
 
+//      COUPONS
+
+router.get('/coupons',adminAuth,couponController.listAllCoupons);
+router.get('/addCoupon',adminAuth,couponController.getAddCoupon);
+router.post('/addCoupon',adminAuth,couponController.postAddCoupon);
+router.get('/deleteCoupon/:couponId',adminAuth,couponController.deleteCoupon);
 module.exports = router
