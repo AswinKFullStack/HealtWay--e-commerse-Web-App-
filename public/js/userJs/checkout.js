@@ -170,8 +170,8 @@ function updateCartQuantity(productId, cartItemId) {
                     const cartId = document.getElementById('cartId').value;
                     const selectedAddressId = selectedAddressElement.value;
                     const selectedPaymentMethod = selectedPaymentMethodElement.value;
-    
-                    console.log("Address ID =", selectedAddressId, "Payment Method =", selectedPaymentMethod);
+                    const couponId = document.getElementById('couponId').value ;
+                    console.log("Address ID =", selectedAddressId, "Payment Method =", selectedPaymentMethod,"Coupon Id = ",couponId);
     
                     // Submit form via AJAX
                     fetch(`/checkout/${cartId}`, {
@@ -182,7 +182,8 @@ function updateCartQuantity(productId, cartItemId) {
                         },
                         body: JSON.stringify({
                             addressId: selectedAddressId,
-                            paymentMethod: selectedPaymentMethod
+                            paymentMethod: selectedPaymentMethod,
+                            couponId :couponId || null
                         })
                     })
                     .then(response => response.json())
@@ -294,41 +295,66 @@ function handlePaymentFailure(cartId,  reason, error = {}) {
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    const applyCouponBtn = document.getElementById('applyCouponBtn');
-    const couponInputDiv = document.getElementById('couponInputDiv');
-    const applyCouponCodeBtn = document.getElementById('applyCouponCodeBtn');
-    const couponCodeInput = document.getElementById('couponCodeInput');
-    const couponMessage = document.getElementById('couponMessage');
-    const couponAppliedMessage = document.getElementById('couponAppliedMessage');
-    const appliedCouponCode = document.getElementById('appliedCouponCode');
-    let couponApplied = false;
+//<!-- jQuery for dynamic form updates -->
 
-    // Show coupon input field when 'Apply Coupon' button is clicked
-    applyCouponBtn.addEventListener('click', function() {
-        if (!couponApplied) {
-            couponInputDiv.style.display = 'block';
-            applyCouponBtn.style.display = 'none';
-        }
+    $(document).ready(function() {
+        // Show coupon input field when "Apply Coupon" button is clicked
+
+
+        $('#showCouponInput').on('click', function() {
+            $('#couponInputDiv').slideDown(); // Show input field
+            $(this).hide(); // Hide the apply coupon button
+        });
+        $('#cancelCouponBtn').on('click',function(){
+            $('#couponInputDiv').hide();
+            $('#showCouponInput').show();
+        })
+
+        // AJAX call to validate coupon code
+        $('#applyCouponBtn').on('click', function() {
+            const couponCode = $('#couponCode').val().trim();
+            const Price =  document.getElementById('total').innerText;
+            const TotalPrice =Price.slice(1);
+            // Clear previous errors
+            $('#couponError').text('');
+
+            if (!couponCode) {
+                $('#couponError').text('Please enter a coupon code.');
+                return;
+            }
+
+            // AJAX request to check coupon validity
+            $.ajax({
+                url: '/validateCoupon',  // Backend API to validate coupon
+                method: 'POST',
+                data: { couponCode,
+                         TotalPrice
+                        },
+                success: function(response) {
+                    if (response.isValid) {
+                        // Show success message and update order summary
+                        $('#couponAppliedMessage').show();
+                        $('#couponInputDiv').hide();
+                        $('#finalPriceRow').show();
+                        const finalPrice = (response.discountAmount ? response.discountAmount : TotalPrice).toFixed(2);
+                        $('#finalPrice').text(`₹${finalPrice}`);
+                        document.getElementById('couponId').value = response.couponId;
+                        
+
+                    } else {
+                        // Show error message
+                        $('#couponError').text(response.message);
+                    }
+                },
+                error: function(jqXHR) { // Define the parameter here
+                    // Check for response status and message
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                        $('#couponError').text(jqXHR.responseJSON.message); // Display the specific error message from the server
+                    } else {
+                        $('#couponError').text('Error validating coupon. Please try again.'); // Generic error message for unexpected errors
+                    }
+                }
+            });
+        });
     });
 
-    // Apply the coupon and handle coupon submission
-    applyCouponCodeBtn.addEventListener('click', function() {
-        const couponCode = couponCodeInput.value.trim();
-
-        if (couponCode === '') {
-            couponMessage.innerHTML = '<span class="text-danger">Please enter a valid coupon code.</span>';
-            return;
-        }
-
-        // Simulate applying the coupon (replace this with actual AJAX request if needed)
-        // For now, assume any coupon is valid for demo purposes.
-        setTimeout(() => {
-            couponApplied = true;
-            couponMessage.innerHTML = ''; // Clear any previous message
-            couponInputDiv.style.display = 'none';
-            couponAppliedMessage.style.display = 'block';
-            appliedCouponCode.textContent = couponCode;
-        }, 1000);
-    });
-});

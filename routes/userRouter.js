@@ -118,6 +118,7 @@ router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderCo
 //COUPONS
 
 router.get('/coupons',userAuth,couponController.getCoupons);
+router.post('/validateCoupon',userAuth,couponController.validateCoupon);
 
 module.exports = router
 

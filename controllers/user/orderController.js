@@ -4,6 +4,7 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
+const Coupon = require("../../models/couponShema");
 const razorpayInstance = require('../../config/razorpayConfig');
 
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
@@ -17,9 +18,10 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 
 const confirmOrder = async (req, res) => {
     try {
+        console.log(req.body.couponId)
         console.log("ordering stated")
         const { cartId } = req.params;
-        const {addressId, paymentMethod } = req.body;
+        const {addressId, paymentMethod  } = req.body;
         console.log("address ID = ",addressId,"payment Method = ", paymentMethod )
 
         const user = await User.findById(req.session.user);
@@ -41,6 +43,7 @@ const confirmOrder = async (req, res) => {
 
         let totalCartPrice = 0;
         for (let i = 0; i < cart.items.length; i++) {
+
             const item = cart.items[i];
             const product = await Product.findById(item.productId);
 
@@ -93,7 +96,61 @@ const confirmOrder = async (req, res) => {
         }
 
         console.log("cart and address  validation over ")
-       
+        console.log("checking the coupon is applied or not");
+        let discountAmount = 0;
+        let singleItemDiscountAmount = 0;
+        if(req.body.couponId){
+            const {couponId} = req.body.couponId;
+            console.log("coupon Id id =",couponId);
+            const coupon = await Coupon.aggregate([
+                {
+                  $match: {
+                    _id:couponId,
+                    minPurchase :{ $lte : cart.totalCartPrice},
+                    isActive: true, 
+                    expireDate: { $gt: new Date() } 
+                  }
+                },
+                {
+                  $addFields: {
+                    userUsage: {
+                      $filter: {
+                        input: "$usedBy", 
+                        as: "usage",
+                        cond: { $eq: ["$$usage.userId", user._id] } 
+                      }
+                    }
+                  }
+                },
+                {
+                  $match: {
+                    $or: [
+                      { "userUsage.count": { $lt: "$usageLimit" } },  
+                      { userUsage: { $eq: [] } } 
+                    ]
+                  }
+                }
+              ]);
+
+
+              const couponDoc = coupon[0];
+              if(couponDoc.discountType === 'Percentage'){
+
+                discountAmount = cart.totalCartPrice - (cart.totalCartPrice * (couponDoc.discountValue / 100));
+              }else if(couponDoc.discountType === 'Fixed') {
+                discountAmount =  cart.totalCartPrice - couponDoc.discountValue;
+              }else{
+                return res.status(400).json({ isValid: false, message: 'Invalid coupon discount type.' });
+              }
+              discountAmount = discountAmount > 0 ? discountAmount : 0;
+    
+              singleItemDiscountAmount = discountAmount/totalItems ;
+
+
+        }
+
+
+
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
             const product = await Product.findById(item.productId);
@@ -117,7 +174,7 @@ const confirmOrder = async (req, res) => {
                     userId: user._id,
                     productId :product._id ,
                     quantity : item.quantity ,
-                    totalPrice : item.totalPrice,
+                    totalPrice : item.totalPrice - singleItemDiscountAmount,
                     orderStatus : 'Confirmed' ,
                     paymentDetails :{method : paymentMethod },
                     shippingAddress ,  
@@ -132,9 +189,33 @@ const confirmOrder = async (req, res) => {
             }
     
             
-                
+                const TotalPrice = cart.totalCartPrice - discountAmount;
                 await Cart.findByIdAndDelete(cartId);
-                return res.status(200).json({ CODsuccess: true, groupId : cart._id ,TotalPrice:cart.totalCartPrice});
+                if (req.body.couponId) {
+                    const couponId = req.body.couponId;
+                
+                    // Check if the user has already used the coupon
+                    const userUsage = await Coupon.findOne({
+                        _id: couponId,
+                        "usedBy.userId": user._id
+                    });
+                
+                    if (userUsage) {
+                        // If the user has used the coupon before, increment the count
+                        await Coupon.updateOne(
+                            { _id: couponId, "usedBy.userId": user._id },
+                            { $inc: { "usedBy.$.count": 1 } }
+                        );
+                    } else {
+                        // If the user is using the coupon for the first time, push a new entry to the usedBy array
+                        await Coupon.updateOne(
+                            { _id: couponId },
+                            { $push: { usedBy: { userId: user._id, count: 1 } } }
+                        );
+                    }
+                }
+                
+                return res.status(200).json({ CODsuccess: true, groupId : cart._id ,TotalPrice});
                 
             
             
