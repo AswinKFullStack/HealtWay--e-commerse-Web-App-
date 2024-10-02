@@ -102,6 +102,7 @@ const confirmOrder = async (req, res) => {
         console.log("checking the coupon is applied or not");
         let discountAmount = 0;
         let singleItemDiscountAmount = 0;
+        let couponCode = null;
         if (couponId) {
             console.log("coupon Id =", couponId);
             console.log("user Id = ", user._id);
@@ -118,7 +119,6 @@ const confirmOrder = async (req, res) => {
                   });
                   
 
-
                     
                 if (!couponDoc) {
                     console.error("Coupon not found or invalid for current conditions.");
@@ -129,7 +129,7 @@ const confirmOrder = async (req, res) => {
                 }
         
                
-        
+                
                 if (couponDoc.discountType === 'Percentage') {
                     discountAmount = cart.totalCartPrice * (couponDoc.discountValue / 100);
                 } else if (couponDoc.discountType === 'Fixed') {
@@ -140,6 +140,7 @@ const confirmOrder = async (req, res) => {
         
                 discountAmount = discountAmount > 0 ? discountAmount : 0;
                 singleItemDiscountAmount = discountAmount / cart.items.length;
+                couponCode = couponDoc.code;
         
                 console.log("Total Discount =", discountAmount);
                 console.log("Discount for Single Item =", singleItemDiscountAmount);
@@ -182,7 +183,8 @@ const confirmOrder = async (req, res) => {
                     orderStatus : 'Confirmed' ,
                     paymentDetails :{method : paymentMethod },
                     shippingAddress ,  
-                    groupId : cart._id
+                    groupId : cart._id,
+                    couponCode :couponCode || null,
                 };
 
                 const order = new Order( newOrder);
@@ -200,8 +202,14 @@ const confirmOrder = async (req, res) => {
                     await Coupon.updateOne(
                         { _id: couponId },
                         { 
-                          $inc: { [`usedBy.${user._id}`]: 1 },  // Increment the usage count for the specific user.
-                          $set: { updatedAt: new Date() }       // Update the `updatedAt` field.
+                          $set: { 
+                            [`usedBy.${user._id}`]: { $ifNull: [`$usedBy.${user._id}`, 0] }  
+                          },
+                          $inc: { 
+                            [`usedBy.${user._id}`]: 1,  
+                            usedCount: 1                
+                          },
+                          $set: { updatedAt: new Date() }  
                         }
                       );
                       
