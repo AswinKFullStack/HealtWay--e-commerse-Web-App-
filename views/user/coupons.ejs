@@ -1,0 +1,54 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/coupons.css">
+
+
+<div class="container my-5">
+    <h1 class="text-center mb-5">Exclusive Deals Just for You!</h1>
+    
+    <!-- Check if there are any coupons -->
+    <% if (coupons.length > 0) { %>
+        <div class="row">
+            <!-- Loop through the coupons array -->
+            <% coupons.forEach(coupon => { %>
+            <div class="col-md-4 mb-4">
+                <div class="coupon-card">
+                    <!-- Display the discount type and value -->
+                    <div class="discount-badge">
+                        <% if (coupon.discountType === 'Percentage') { %>
+                            <%= coupon.discountValue %>% OFF
+                        <% } else { %> 
+                            ₹<%= coupon.discountValue %> OFF
+                        <% } %>
+                    </div>
+                    <!-- Display coupon name -->
+                    <h2><%= coupon.name %></h2>
+                    <!-- Display coupon description based on discountType -->
+                    <p>
+                        <% if (coupon.discountType === 'Percentage') { %>
+                            Save <%= coupon.discountValue %>% on your next purchase
+                        <% } else { %>
+                            Flat ₹<%= coupon.discountValue %> off on minimum purchase of ₹<%= coupon.minPurchase %>
+                        <% } %>
+                    </p>
+                    <!-- Claim button -->
+                    <button class="btn btn-primary btn-block claim-coupon" data-code="<%= coupon.code %>">Claim Coupon</button>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <!-- Message to display when no coupons are available -->
+        <div class="text-center">
+            <h3>No coupons available at the moment. Check back later!</h3>
+        </div>
+    <% } %>
+</div>
+
+<!-- Include SweetAlert and Clipboard.js -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+
+
+
+<script src="/js/userJs/coupons.js"></script>
+<%- include("../../views/partials/user/footer") %>

@@ -25,27 +25,27 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
-                    <img src="/uploads/re-image/<%= order.productDetails.productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
+                    <img src="/uploads/re-image/<%= order.productDetails[0].productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
                 </div>
                 <div class="col-md-6">
                     <h5><%= order.productDetails.productName %></h5>
-                    <p>Order Referance ID: <strong><%= order.orderedItems._id %></strong></p>
+                    <p>Order Referance ID: <strong><%= order.orderId %></strong></p>
                     <p>Order Date: <strong><%= order.createdAt %></strong></p>
-                    <p>Payment Status: <span class="badge badge-success"><%= order.orderedItems.paymentStatus %></span></p>
-                    <p>Delivery Status: <span class="badge badge-primary"><%= order.orderedItems.status %></span></p>
+                    <p>Payment Status: <span class="badge badge-success"><%= order.paymentDetails.status %></span></p>
+                    <p>Delivery Status: <span class="badge badge-primary"><%= order.orderStatus %></span></p>
                 </div>
                 <div class="col-md-3 text-center">
                     
-                    <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order.orderedItems._id %>'">Track Order</button>
-                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Delivered" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
+                    <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order._id %>'">Track Order</button>
+                    <% if (order.orderStatus  !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
                         
-                        <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>', '<%= order.orderedItems._id %>')">
+                        <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>')">
                             <i class="bi bi-trash-fill"></i> Cancel Order
                         </button>
                     
                     <% } %>
-                    <% if (order.orderedItems.status !== "Cancelled" && order.orderedItems.status !== "Returned" && order.orderedItems.status !== "Return Request") { %>
-                        <button class="btn btn-danger mb-2" onclick="location.href='/returnOrder/<%= order._id %>/<%= order.orderedItems._id %>'">Return Order</button>
+                    <% if (order.orderStatus !== "Cancelled" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
+                        <button class="btn btn-danger mb-2" onclick="confirmReturnRequest('<%= order._id %>')">Return Order</button>
                     <% } %>
                     
                 </div>

@@ -170,8 +170,8 @@ function updateCartQuantity(productId, cartItemId) {
                     const cartId = document.getElementById('cartId').value;
                     const selectedAddressId = selectedAddressElement.value;
                     const selectedPaymentMethod = selectedPaymentMethodElement.value;
-    
-                    console.log("Address ID =", selectedAddressId, "Payment Method =", selectedPaymentMethod);
+                    const couponId = document.getElementById('couponId').value  ;
+                    console.log("Address ID =", selectedAddressId, "Payment Method =", selectedPaymentMethod,"Coupon Id = ",couponId);
     
                     // Submit form via AJAX
                     fetch(`/checkout/${cartId}`, {
@@ -182,7 +182,8 @@ function updateCartQuantity(productId, cartItemId) {
                         },
                         body: JSON.stringify({
                             addressId: selectedAddressId,
-                            paymentMethod: selectedPaymentMethod
+                            paymentMethod: selectedPaymentMethod,
+                            couponId :couponId || null
                         })
                     })
                     .then(response => response.json())
@@ -196,18 +197,22 @@ function updateCartQuantity(productId, cartItemId) {
                                 window.location.href = `/orderconfirm/${data.groupId}?totalPrice=${data.TotalPrice}`; // Redirect to confirmation page
                             });
                         } else if (data.OnlinePayment) {
-                            Swal.fire({
-                                title: 'Pay Online',
-                                text: "For confirm your Order, please pay now",
-                                icon: 'warning',
-                                
-                                confirmButtonColor: '#3085d6',
-                                
-                                confirmButtonText: 'Pay Now'
-                            }).then(() => {
+                            if (!data.razor_key_id || !data.amount || !data.razorpayOrderId) {
+                                Swal.fire('Error!', 'Missing necessary payment details.', 'error');
+                                return;
+                             }
+                             
+                             if (isNaN(data.amount) || data.amount <= 0) {
+                                Swal.fire('Error!', 'Invalid amount.', 'error');
+                                return;
+                             }
+                             
+                            
+
                                 var options = {
                                     "key": data.razor_key_id,
-                                    "amount": data.amount * 100, // in paise
+                                    "amount": Math.round(data.amount * 100), // Round to avoid float issues
+ // in paise
                                     "currency": "INR",
                                     "order_id": data.razorpayOrderId, // Razorpay order ID
                                     
@@ -217,7 +222,12 @@ function updateCartQuantity(productId, cartItemId) {
                                             'Your order has been successfully placed.',
                                             'success'
                                         ).then(() => {
-                                            window.location.href = `/payment/success?cartId=${data.cartId}&razorpayOrderId=${data.razorpayOrderId}&addressId=${data.addressId}&paymentId=` + response.razorpay_payment_id;
+                                            let url = `/payment/success?cartId=${data.cartId}&razorpayOrderId=${data.razorpayOrderId}&addressId=${data.addressId}&paymentId=` + response.razorpay_payment_id;
+                                                if (data.couponId) {
+                                                url += `&couponId=${data.couponId}`;
+                                                        }
+                                                    window.location.href = url;
+                                            
                                         });
                                     },
                                     "prefill": {
@@ -226,52 +236,55 @@ function updateCartQuantity(productId, cartItemId) {
                                         "contact": "1234567890"
                                     }
                                 };
-                                var rzp1 = new Razorpay(options);
-                                rzp1.on('payment.failed', function (response) {
-                                    // Payment failed event listener
-                                    handlePaymentFailure(data.cartId, data.razorpayOrderId, "Payment Failed", response.error);
-                                });
+                                 // Initialize Razorpay instance
+                                 try {
+                                    var rzp1 = new Razorpay(options);
+                                } catch (error) {
+                                    Swal.fire('Error!', 'Failed to initialize payment gateway. Please try again.', 'error');
+                                    return;
+                                }
+                                
 
-                                // Listen to Razorpay modal closed event
-                                rzp1.on('modal.closed', function () {
-        // User closed the payment modal without completing the payment
-                                handlePaymentFailure(data.cartId, data.razorpayOrderId, "Payment Cancelled");
-                                });
+                        // Listen for payment failure
+                        rzp1.on('payment.failed', function(response) {
+                            
+                            handlePaymentFailure(data.cartId, "Payment Failed", response.error);
+                        });
+
+                        // Listen for modal closed without payment
+                        rzp1.on('modal.closed', function() {
+                            
+                            handlePaymentFailure(data.cartId, "Payment Cancelled");
+                        });
+
+                        
                                 rzp1.open();
-                            });
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                'There was an issue placing your order. Please try again.',
-                                'error'
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire(
-                            'Error!',
-                            'Something went wrong with your request.',
-                            'error'
-                        );
-                    });
-                }else{
-                    Swal.fire(
-                        'Error!',
-                        'You need to fill all field. Please try again.',
-                        'error'
-                    );
+                            
+                        }   })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Check if error response exists
+                            if (error.response && error.response.data && error.response.data.message) {
+                                // Display the detailed message from the backend
+                                Swal.fire('Error!', error.response.data.message, 'error');
+                            } else {
+                                // Fallback generic error message
+                                Swal.fire('Error!', 'Something went wrong with your request.', 'error');
+                            }
+                        });
+                    }else{
+                        Swal.fire('Error!', 'Please fill all the feild ', 'error');
+                    }
                 }
-            }
+            });
         });
-    });
     
     
 // Custom function to handle payment failure
 
 
   // Custom function to handle payment failure or cancellation
-function handlePaymentFailure(cartId, razorpayOrderId, reason, error = {}) {
+function handlePaymentFailure(cartId,  reason, error = {}) {
     console.log(`${reason}:`, error);
 
     Swal.fire({
@@ -280,7 +293,7 @@ function handlePaymentFailure(cartId, razorpayOrderId, reason, error = {}) {
         icon: 'error',
     }).then(() => {
         // Call backend API to restore quantities
-        fetch(`/online-payment-failed/restore-cart-items/${cartId}?paymentOrderId=${razorpayOrderId}`, {
+        fetch(`/online-payment-failed/restore-cart-items/${cartId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -302,3 +315,68 @@ function handlePaymentFailure(cartId, razorpayOrderId, reason, error = {}) {
         });
     });
 }
+
+
+//<!-- jQuery for dynamic form updates -->
+
+    $(document).ready(function() {
+        // Show coupon input field when "Apply Coupon" button is clicked
+
+
+        $('#showCouponInput').on('click', function() {
+            $('#couponInputDiv').slideDown(); // Show input field
+            $(this).hide(); // Hide the apply coupon button
+        });
+        $('#cancelCouponBtn').on('click',function(){
+            $('#couponInputDiv').hide();
+            $('#showCouponInput').show();
+        })
+
+        // AJAX call to validate coupon code
+        $('#applyCouponBtn').on('click', function() {
+            const couponCode = $('#couponCode').val().trim();
+            const Price =  document.getElementById('total').innerText;
+            const TotalPrice =Price.slice(1);
+            // Clear previous errors
+            $('#couponError').text('');
+
+            if (!couponCode) {
+                $('#couponError').text('Please enter a coupon code.');
+                return;
+            }
+
+            // AJAX request to check coupon validity
+            $.ajax({
+                url: '/validateCoupon',  // Backend API to validate coupon
+                method: 'POST',
+                data: { couponCode,
+                         TotalPrice
+                        },
+                success: function(response) {
+                    if (response.isValid) {
+                        // Show success message and update order summary
+                        $('#couponAppliedMessage').show();
+                        $('#couponInputDiv').hide();
+                        $('#finalPriceRow').show();
+                        const finalPrice = (response.discountAmount ? response.discountAmount : TotalPrice).toFixed(2);
+                        $('#finalPrice').text(`₹${finalPrice}`);
+                        document.getElementById('couponId').value = response.couponId;
+                        
+
+                    } else {
+                        // Show error message
+                        $('#couponError').text(response.message);
+                    }
+                },
+                error: function(jqXHR) { // Define the parameter here
+                    // Check for response status and message
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                        $('#couponError').text(jqXHR.responseJSON.message); // Display the specific error message from the server
+                    } else {
+                        $('#couponError').text('Error validating coupon. Please try again.'); // Generic error message for unexpected errors
+                    }
+                }
+            });
+        });
+    });
+

@@ -11,6 +11,7 @@ const cartController = require("../controllers/user/cartController");
 const shopController = require("../controllers/user/shopController");  
 const checkoutController = require("../controllers/user/checkoutController");  
 const orderController = require("../controllers/user/orderController"); 
+const couponController = require("../controllers/user/couponController")
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -106,12 +107,18 @@ router.post('/checkout/editAddress/:addressId' ,userAuth,addressController.postE
 router.post('/checkout/:cartId',userAuth,orderController.confirmOrder);
 router.get('/orderconfirm/:groupId',userAuth,orderController.orderConfirmed);
 router.get('/viewOrder',userAuth, orderController.LoadOrderPage);
-router.post('/cancelOrder/:orderIdOfCartItems/:itemOrderId',userAuth,orderController.cancelOrder);
+router.post('/cancelOrder/:orderId',userAuth,orderController.cancelOrder);
+router.post('/returnRequestlOrder/:orderId',userAuth,orderController.returnOrder);
 
 //Online Payment 
 
 router.get('/payment/success',userAuth,orderController.onlinePayment);
 router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderController.restoreProductQuantities);
+
+//COUPONS
+
+router.get('/coupons',userAuth,couponController.getCoupons);
+router.post('/validateCoupon',userAuth,couponController.validateCoupon);
 
 module.exports = router
 

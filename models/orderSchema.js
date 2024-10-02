@@ -17,12 +17,13 @@ const orderSchema = new Schema({
   
   orderStatus: {
     type: String,
-    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'],
+    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Refunded','Returned','Return Request'],
     default: 'Pending',
   },
 
   paymentDetails: {
     method: { type: String, enum: ["Cash on Delivery", "Online"], required: true },
+    gateway: {type : String , required:false}, 
     status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
     date: { type: Date , default: Date.now }, 
     beforePymentRefId: { 

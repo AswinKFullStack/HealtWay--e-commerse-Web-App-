@@ -1,0 +1,42 @@
+.btn-success {
+    background-color: #32CD32;
+    border-color: #32CD32;
+}
+
+/* Sidebar Styling */
+.bg-light {
+    background-color: #E0F4D2 !important;
+}
+
+/* Coupon Table Styling */
+.table-hover tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.badge-success {
+    background-color: #32CD32;
+}
+
+.badge-danger {
+    background-color: #FF4500;
+}
+
+/* Search and Filter Bar */
+.form-control {
+    border-color: #006400;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 5px #32CD32;
+    border-color: #32CD32;
+}
+
+.btn-primary {
+    background-color: #006400;
+    border-color: #006400;
+}
+
+.btn-primary:hover {
+    background-color: #32CD32;
+    border-color: #32CD32;
+}

@@ -1,0 +1,71 @@
+<%-include("../../views/partials/admin/header")%>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="/css/adminCss/addcoupons.css">
+  <!-- Create Coupon Form -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Create Coupon</h1>
+    </div>
+
+    <form id="couponForm" novalidate>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="couponCode">Coupon Code</label>
+                <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Enter coupon code">
+                <div class="invalid-feedback">Please enter a valid coupon code.</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="minPurchaseAmount">Minimum Purchase Amount</label>
+                <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" placeholder="Enter minimum purchase amount">
+                <div class="invalid-feedback">Please enter a valid minimum purchase amount.</div>
+            </div>
+        </div>
+    
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="couponName">Coupon Name</label>
+                <input type="text" class="form-control" id="couponName" name="couponName" placeholder="Enter coupon name">
+                <div class="invalid-feedback">Please enter a valid coupon name.</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="discountType">Discount Type</label>
+                <select id="discountType" class="form-control" name="discountType">
+                    <option selected disabled value="">Choose...</option>
+                    <option value="Percentage">Percentage</option>
+                    <option value="Fixed">Fixed Amount</option>
+                </select>
+                <div class="invalid-feedback">Please select a discount type.</div>
+            </div>
+        </div>
+    
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="discountValue">Discount Value</label>
+                <input type="number" class="form-control" id="discountValue" name="discountValue" placeholder="Enter discount value">
+                <div class="invalid-feedback">Please enter a valid discount value.</div>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="couponStatus">Status</label>
+                <select id="couponStatus" class="form-control" name="couponStatus">
+                    <option selected disabled value="">Choose...</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <div class="invalid-feedback">Please select a status.</div>
+            </div>
+        </div>
+    
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="endDate">End Date</label>
+                <input type="date" class="form-control" id="endDate" name="endDate">
+                <div class="invalid-feedback">Please select an end date.</div>
+            </div>
+        </div>
+    
+        <button type="submit" class="btn btn-primary">Create Coupon</button>
+    </form>
+    
+    
+<script src="/js/adminJs/addCoupon.js"></script>
+<%- include("../../views/partials/admin/footer") %>
