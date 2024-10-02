@@ -234,31 +234,35 @@
             </div>
             
 
-    <!-- Coupon Section -->
-    <div class="card mb-4">
-        <div class="card-header">Apply Coupon</div>
-        <input type="hidden" id="couponId" value="">
-        <div class="card-body">
-            <!-- Button to trigger coupon input -->
-            <button type="button" class="btn btn-outline-primary" id="showCouponInput">Apply Coupon</button>
+<!-- Coupon Section -->
+<div class="card mb-4">
+    <div class="card-header">Apply Coupon</div>
+    <input type="hidden" id="couponId" value="">
+    <div class="card-body">
+        <!-- Button to trigger coupon input -->
+        <button type="button" class="btn btn-outline-primary" id="showCouponInput">Apply Coupon</button>
 
-            <!-- Hidden coupon input field (shown when the button is clicked) -->
-            <div id="couponInputDiv" style="display: none;">
-                <div class="form-group">
-                    <input type="text" id="couponCode"  name="couponCode" class="form-control" placeholder="Enter coupon code">
-                    <button type="button" class="btn btn-success mt-2" id="applyCouponBtn">Apply</button>
-                    <button type="button" class="btn btn-success mt-2" id="cancelCouponBtn">Cancel</button>
-
-                </div>
-                <div class="text-danger" id="couponError"></div> <!-- Coupon Error Message -->
+        <!-- Hidden coupon input field (shown when the button is clicked) -->
+        <div id="couponInputDiv" style="display: none;">
+            <div class="form-group">
+                <input type="text" id="couponCode" name="couponCode" class="form-control" placeholder="Enter coupon code">
+                <button type="button" class="btn btn-success mt-2" id="applyCouponBtn">Apply</button>
+                <button type="button" class="btn btn-warning mt-2" id="cancelCouponBtn">Cancel</button>
             </div>
-
-            <!-- Coupon applied message -->
-            <div id="couponAppliedMessage" class="alert alert-success" style="display: none;">
-                Coupon applied successfully!
-            </div>
+            <div class="text-danger" id="couponError"></div> <!-- Coupon Error Message -->
         </div>
+
+        <!-- Coupon applied message -->
+        <div id="couponAppliedMessage" class="alert alert-success" style="display: none;">
+            Coupon applied successfully!
+        </div>
+
+        <!-- Remove Coupon Button (hidden initially) -->
+        <button type="button" class="btn btn-danger mt-2" id="removeCouponBtn" style="display: none;">
+            Remove Coupon
+        </button>
     </div>
+</div>
 
 
 
