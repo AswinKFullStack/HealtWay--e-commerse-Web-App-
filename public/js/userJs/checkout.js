@@ -200,12 +200,19 @@ function updateCartQuantity(productId, cartItemId) {
                             if (!data.razor_key_id || !data.amount || !data.razorpayOrderId) {
                                 Swal.fire('Error!', 'Missing necessary payment details.', 'error');
                                 return;
-                            }
+                             }
+                             
+                             if (isNaN(data.amount) || data.amount <= 0) {
+                                Swal.fire('Error!', 'Invalid amount.', 'error');
+                                return;
+                             }
+                             
                             
 
                                 var options = {
                                     "key": data.razor_key_id,
-                                    "amount": data.amount * 100, // in paise
+                                    "amount": Math.round(data.amount * 100), // Round to avoid float issues
+ // in paise
                                     "currency": "INR",
                                     "order_id": data.razorpayOrderId, // Razorpay order ID
                                     
@@ -215,7 +222,12 @@ function updateCartQuantity(productId, cartItemId) {
                                             'Your order has been successfully placed.',
                                             'success'
                                         ).then(() => {
-                                            window.location.href = `/payment/success?cartId=${data.cartId}&razorpayOrderId=${data.razorpayOrderId}&addressId=${data.addressId}&paymentId=` + response.razorpay_payment_id;
+                                            let url = `/payment/success?cartId=${data.cartId}&razorpayOrderId=${data.razorpayOrderId}&addressId=${data.addressId}&paymentId=` + response.razorpay_payment_id;
+                                                if (data.couponId) {
+                                                url += `&couponId=${data.couponId}`;
+                                                        }
+                                                    window.location.href = url;
+                                            
                                         });
                                     },
                                     "prefill": {
@@ -225,24 +237,27 @@ function updateCartQuantity(productId, cartItemId) {
                                     }
                                 };
                                  // Initialize Razorpay instance
-                        var rzp1 = new Razorpay(options);
+                                 try {
+                                    var rzp1 = new Razorpay(options);
+                                } catch (error) {
+                                    Swal.fire('Error!', 'Failed to initialize payment gateway. Please try again.', 'error');
+                                    return;
+                                }
+                                
 
                         // Listen for payment failure
                         rzp1.on('payment.failed', function(response) {
-                            clearTimeout(paymentTimeout);
+                            
                             handlePaymentFailure(data.cartId, "Payment Failed", response.error);
                         });
 
                         // Listen for modal closed without payment
                         rzp1.on('modal.closed', function() {
-                            clearTimeout(paymentTimeout);
+                            
                             handlePaymentFailure(data.cartId, "Payment Cancelled");
                         });
 
-                        // Set a fallback timeout in case no events are triggered
-                        const paymentTimeout = setTimeout(() => {
-                            handlePaymentFailure(data.cartId, "Payment Cancelled - Timeout");
-                        }, 300000); // 5 minutes
+                        
                                 rzp1.open();
                             
                         }   })

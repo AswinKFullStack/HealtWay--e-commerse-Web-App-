@@ -223,19 +223,16 @@ const confirmOrder = async (req, res) => {
             
 
         } else if (paymentMethod === "Online") {
-            //return res.redirect('/paymentGateway?orderId=' + newOrder._id);
+            const TotalPrice = cart.totalCartPrice - discountAmount;
+
             const razorpayOrder = await razorpayInstance.orders.create({
-                amount: cart.totalCartPrice * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
+                amount: TotalPrice * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
                 currency: "INR",
                 receipt: `order_rcptid_${cart._id}`
             });
             if(!razorpayOrder){
                 return renderErrorPage(res, 400, "Online paymet issue", "error in confirm order section at else if case", '/checkout');
             }
-            
-           
-            
-
 
             return res.status(200).json({ 
                 OnlinePayment : true, 
@@ -243,7 +240,9 @@ const confirmOrder = async (req, res) => {
                 amount: cart.totalCartPrice ,
                 razor_key_id: process.env.RAZORPAY_KEY_ID, 
                 addressId,
-                cartId 
+                cartId ,
+                couponId
+
             });
             
         }else {
@@ -412,7 +411,7 @@ const onlinePayment = async (req,res) => {
 
         const user = await User.findById(req.session.user);
         console.log("After online payment = order collection updation")
-        const {razorpayOrderId, paymentId ,cartId ,addressId} = req.query;
+        const {razorpayOrderId, paymentId ,cartId ,addressId,couponId} = req.query;
         console.log("shipping Address Id= ", addressId);
         if (!razorpayOrderId || !paymentId) {
            
@@ -447,21 +446,76 @@ const onlinePayment = async (req,res) => {
         const shippingAddress = userAddress[0];
         console.log("cart details = ",cart);
         
+        let discountAmount = 0;
+        let singleItemDiscountAmount = 0;
+        let couponCode = null;
+
+        if (couponId && mongoose.Types.ObjectId.isValid(couponId)) {
+            console.log("coupon Id =", couponId);
+            console.log("user Id = ", user._id);
+            try {
+                const couponDoc = await Coupon.findOne({
+                    _id: couponId,
+                    minPurchase: { $lte: cart.totalCartPrice },
+                    isActive: true,
+                    expireDate: { $gt: new Date() },
+                    $or: [
+                        { $expr: { $lt: [`$usedBy.${user._id}`, "$usageLimit"] } },  // If user has used it less than the limit.
+                      { [`usedBy.${user._id}`]: { $exists: false } }     // If user has never used it.
+                    ]
+                  });
+                  
+
+                    
+                if (!couponDoc) {
+                    console.error("Coupon not found or invalid for current conditions.");
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Coupon not found or invalid for current conditions.'
+                    });
+                }
+        
+               
+                
+                if (couponDoc.discountType === 'Percentage') {
+                    discountAmount = cart.totalCartPrice * (couponDoc.discountValue / 100);
+                } else if (couponDoc.discountType === 'Fixed') {
+                    discountAmount = couponDoc.discountValue;
+                } else {
+                    return res.status(400).json({ success: false, message: 'Invalid coupon discount type.' });
+                }
+        
+                discountAmount = discountAmount > 0 ? discountAmount : 0;
+                singleItemDiscountAmount = discountAmount / cart.items.length;
+                couponCode = couponDoc.code;
+        
+                console.log("Total Discount =", discountAmount);
+                console.log("Discount for Single Item =", singleItemDiscountAmount);
+        
+            } catch (error) {
+                console.error("Error during coupon validation:", error);
+                return res.status(500).json({ success: false, message: "An error occurred while applying the coupon." });
+            }
+        }
+        
         
 
         let OrderIds = [];
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
+            const totalPrice = item.totalPrice - singleItemDiscountAmount;
             const product = await Product.findById(item.productId);
+            
             const newOrder = {
                 userId: req.session.user,
                 productId :product._id ,
                 quantity : item.quantity ,
-                totalPrice : item.totalPrice,
+                totalPrice : totalPrice > 0 ? totalPrice : 0,
                 orderStatus : 'Confirmed' ,
                 paymentDetails :{method : "Online",gateway :"Razorpay",status:"Paid" ,beforePymentRefId:razorpayOrderId,paymentId},
                 shippingAddress ,  
-                groupId : cart._id
+                groupId : cart._id,
+                couponCode :couponCode || null,
             };
 
             const order = new Order( newOrder);
@@ -473,11 +527,34 @@ const onlinePayment = async (req,res) => {
 
         
             
+        
+        const TotalPrice = cart.totalCartPrice - discountAmount;
         await Cart.findByIdAndDelete(cartId);
-        return res.redirect(`/orderconfirm/${cart._id}?totalPrice=${cart.totalCartPrice}`);
+        if (couponId) {
+            const couponId = req.body.couponId;
+            await Coupon.updateOne(
+                { _id: couponId },
+                { 
+                  $set: { 
+                    [`usedBy.${user._id}`]: { $ifNull: [`$usedBy.${user._id}`, 0] }  
+                  },
+                  $inc: { 
+                    [`usedBy.${user._id}`]: 1,  
+                    usedCount: 1                
+                  },
+                  $set: { updatedAt: new Date() }  
+                }
+              );
+              
+        
+            
+        }
+        return res.redirect(`/orderconfirm/${cart._id}?totalPrice=${TotalPrice}`);
     } catch (error) {
-        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred in Online payment . Please try again later.", '/');   
+        console.error("Error during online payment processing:", error);
+        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred during online payment processing. Please try again later.", '/');
     }
+    
 }
 
 
