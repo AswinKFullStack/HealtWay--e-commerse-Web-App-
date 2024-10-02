@@ -33,18 +33,12 @@ const couponSchema = new Schema({
         type: Number,
         default: 0
       },
-      usedBy: [
-        {
-          userId:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-           }, 
-          count: {
-            type: Number,
-            default: 0 
-          } // Number of times this user has used the coupon
-        }
-      ],
+      
+      usedBy: {
+        type: Map,  // Use Map for a key-value structure.
+        of: Number  // Each value in the Map is a Number representing the count.
+      },
+    
       expireDate:{
         type:Date,
         required:true,

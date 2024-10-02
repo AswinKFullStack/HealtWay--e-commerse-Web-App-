@@ -170,7 +170,7 @@ function updateCartQuantity(productId, cartItemId) {
                     const cartId = document.getElementById('cartId').value;
                     const selectedAddressId = selectedAddressElement.value;
                     const selectedPaymentMethod = selectedPaymentMethodElement.value;
-                    const couponId = document.getElementById('couponId').value ;
+                    const couponId = document.getElementById('couponId').value  ;
                     console.log("Address ID =", selectedAddressId, "Payment Method =", selectedPaymentMethod,"Coupon Id = ",couponId);
     
                     // Submit form via AJAX
@@ -248,7 +248,14 @@ function updateCartQuantity(productId, cartItemId) {
                         }   })
                         .catch(error => {
                             console.error('Error:', error);
-                            Swal.fire('Error!', 'Something went wrong with your request.', 'error');
+                            // Check if error response exists
+                            if (error.response && error.response.data && error.response.data.message) {
+                                // Display the detailed message from the backend
+                                Swal.fire('Error!', error.response.data.message, 'error');
+                            } else {
+                                // Fallback generic error message
+                                Swal.fire('Error!', 'Something went wrong with your request.', 'error');
+                            }
                         });
                     }else{
                         Swal.fire('Error!', 'Please fill all the feild ', 'error');

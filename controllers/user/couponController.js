@@ -11,33 +11,20 @@ const getCoupons = async (req, res) => {
         if (!user) {
             return res.status(404).send('User not found.');
         }
-      const coupons = await Coupon.aggregate([
-        {
-          $match: {
-            isActive: true, 
-            expireDate: { $gt: new Date() } 
-          }
-        },
-        {
-          $addFields: {
-            userUsage: {
-              $filter: {
-                input: "$usedBy", 
-                as: "usage",
-                cond: { $eq: ["$$usage.userId", userId] } 
-              }
-            }
-          }
-        },
-        {
-          $match: {
-            $or: [
-              { "userUsage.count": { $lt: "$usageLimit" } },  
-              { userUsage: { $eq: [] } } 
-            ]
-          }
-        }
-      ]);
+
+        
+
+        const coupons = await Coupon.find({
+          isActive: true,
+          expireDate: { $gt: new Date() },
+          $or: [
+            { $expr: { $lt: [`$usedBy.${userId}`, "$usageLimit"] } },  // Check if the user's count is less than the coupon's usage limit.
+            { [`usedBy.${userId}`]: { $exists: false } }               // If the user has never used the coupon.
+          ]
+        });
+        
+        
+      
       console.log("coupons for this user =" ,coupons)
       res.render('coupons',{
         title :"Coupons",
@@ -72,44 +59,26 @@ const validateCoupon = async (req,res) => {
       
         
         console.log("The funtion entered");
+        const couponDoc = await Coupon.findOne({
+          code: couponCode,
+          minPurchase: { $lte: totalPriceFloat },
+          isActive: true,
+          expireDate: { $gt: new Date() },
+          $or: [
+            { $expr: { $lt: [`$usedBy.${userId}`, "$usageLimit"] } },  // If user has used it less than the limit.
+            { [`usedBy.${userId}`]: { $exists: false } }               // If user has never used it.
+          ]
+        });
         
 
-        const coupon = await Coupon.aggregate([
-            {
-              $match: {
-                code:couponCode,
-                minPurchase :{ $lte : totalPriceFloat},
-                isActive: true, 
-                expireDate: { $gt: new Date() } 
-              }
-            },
-            {
-              $addFields: {
-                userUsage: {
-                  $filter: {
-                    input: "$usedBy", 
-                    as: "usage",
-                    cond: { $eq: ["$$usage.userId", userId] } 
-                  }
-                }
-              }
-            },
-            {
-              $match: {
-                $or: [
-                  { "userUsage.count": { $lt: "$usageLimit" } },  
-                  { userUsage: { $eq: [] } } 
-                ]
-              }
-            }
-          ]);
+       
 
-          console.log("coupons for this user =" ,coupon)
-          if (!coupon || coupon.length === 0) {
+          console.log("coupons for this user =" ,couponDoc)
+          if (!couponDoc) {
             return res.status(400).json({ isValid: false, message: 'Invalid or expired coupon or Not allowed for your order.' });
         }
         
-          const couponDoc = coupon[0];
+          
 
           let discountAmount = 0;
 

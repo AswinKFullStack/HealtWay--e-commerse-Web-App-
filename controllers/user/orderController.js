@@ -21,7 +21,7 @@ const confirmOrder = async (req, res) => {
         console.log(req.body.couponId)
         console.log("ordering stated")
         const { cartId } = req.params;
-        const {addressId, paymentMethod  } = req.body;
+        const {addressId, paymentMethod ,couponId} = req.body;
         console.log("address ID = ",addressId,"payment Method = ", paymentMethod )
 
         const user = await User.findById(req.session.user);
@@ -33,10 +33,13 @@ const confirmOrder = async (req, res) => {
         const cart = await Cart.findById(cartId).populate('items.productId');
         if (!cart || !cart.items.length) {
             console.log("User doesn't have products in the cart");
-            const message = "Your cart is empty.";
-            return  res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            return res.status(400).json({ success: false, message: 'Your cart is empty' });
             
             
+        }
+
+        if (paymentMethod !== "Cash on Delivery" && paymentMethod !== "Online") {
+            return res.status(400).json({ success: false, message: 'Invalid payment method selected' });
         }
 
         
@@ -99,55 +102,55 @@ const confirmOrder = async (req, res) => {
         console.log("checking the coupon is applied or not");
         let discountAmount = 0;
         let singleItemDiscountAmount = 0;
-        if(req.body.couponId){
-            const {couponId} = req.body.couponId;
-            console.log("coupon Id id =",couponId);
-            const coupon = await Coupon.aggregate([
-                {
-                  $match: {
-                    _id:couponId,
-                    minPurchase :{ $lte : cart.totalCartPrice},
-                    isActive: true, 
-                    expireDate: { $gt: new Date() } 
-                  }
-                },
-                {
-                  $addFields: {
-                    userUsage: {
-                      $filter: {
-                        input: "$usedBy", 
-                        as: "usage",
-                        cond: { $eq: ["$$usage.userId", user._id] } 
-                      }
-                    }
-                  }
-                },
-                {
-                  $match: {
+        if (couponId) {
+            console.log("coupon Id =", couponId);
+            console.log("user Id = ", user._id);
+            try {
+                const couponDoc = await Coupon.findOne({
+                    _id: couponId,
+                    minPurchase: { $lte: cart.totalCartPrice },
+                    isActive: true,
+                    expireDate: { $gt: new Date() },
                     $or: [
-                      { "userUsage.count": { $lt: "$usageLimit" } },  
-                      { userUsage: { $eq: [] } } 
+                        { $expr: { $lt: [`$usedBy.${user._id}`, "$usageLimit"] } },  // If user has used it less than the limit.
+                      { [`usedBy.${user._id}`]: { $exists: false } }     // If user has never used it.
                     ]
-                  }
+                  });
+                  
+
+
+                    
+                if (!couponDoc) {
+                    console.error("Coupon not found or invalid for current conditions.");
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Coupon not found or invalid for current conditions.'
+                    });
                 }
-              ]);
-
-
-              const couponDoc = coupon[0];
-              if(couponDoc.discountType === 'Percentage'){
-
-                discountAmount = cart.totalCartPrice - (cart.totalCartPrice * (couponDoc.discountValue / 100));
-              }else if(couponDoc.discountType === 'Fixed') {
-                discountAmount =  cart.totalCartPrice - couponDoc.discountValue;
-              }else{
-                return res.status(400).json({ isValid: false, message: 'Invalid coupon discount type.' });
-              }
-              discountAmount = discountAmount > 0 ? discountAmount : 0;
-    
-              singleItemDiscountAmount = discountAmount/totalItems ;
-
-
+        
+               
+        
+                if (couponDoc.discountType === 'Percentage') {
+                    discountAmount = cart.totalCartPrice * (couponDoc.discountValue / 100);
+                } else if (couponDoc.discountType === 'Fixed') {
+                    discountAmount = couponDoc.discountValue;
+                } else {
+                    return res.status(400).json({ success: false, message: 'Invalid coupon discount type.' });
+                }
+        
+                discountAmount = discountAmount > 0 ? discountAmount : 0;
+                singleItemDiscountAmount = discountAmount / cart.items.length;
+        
+                console.log("Total Discount =", discountAmount);
+                console.log("Discount for Single Item =", singleItemDiscountAmount);
+        
+            } catch (error) {
+                console.error("Error during coupon validation:", error);
+                return res.status(500).json({ success: false, message: "An error occurred while applying the coupon." });
+            }
         }
+        
+
 
 
 
@@ -169,12 +172,13 @@ const confirmOrder = async (req, res) => {
                let OrderIds = [];
             for (let i = 0; i < cart.items.length; i++) {
                 const item = cart.items[i];
+                const totalPrice = item.totalPrice - singleItemDiscountAmount;
                 const product = await Product.findById(item.productId);
                 const newOrder = {
                     userId: user._id,
                     productId :product._id ,
                     quantity : item.quantity ,
-                    totalPrice : item.totalPrice - singleItemDiscountAmount,
+                    totalPrice : totalPrice > 0 ? totalPrice : 0,
                     orderStatus : 'Confirmed' ,
                     paymentDetails :{method : paymentMethod },
                     shippingAddress ,  
@@ -193,26 +197,16 @@ const confirmOrder = async (req, res) => {
                 await Cart.findByIdAndDelete(cartId);
                 if (req.body.couponId) {
                     const couponId = req.body.couponId;
+                    await Coupon.updateOne(
+                        { _id: couponId },
+                        { 
+                          $inc: { [`usedBy.${user._id}`]: 1 },  // Increment the usage count for the specific user.
+                          $set: { updatedAt: new Date() }       // Update the `updatedAt` field.
+                        }
+                      );
+                      
                 
-                    // Check if the user has already used the coupon
-                    const userUsage = await Coupon.findOne({
-                        _id: couponId,
-                        "usedBy.userId": user._id
-                    });
-                
-                    if (userUsage) {
-                        // If the user has used the coupon before, increment the count
-                        await Coupon.updateOne(
-                            { _id: couponId, "usedBy.userId": user._id },
-                            { $inc: { "usedBy.$.count": 1 } }
-                        );
-                    } else {
-                        // If the user is using the coupon for the first time, push a new entry to the usedBy array
-                        await Coupon.updateOne(
-                            { _id: couponId },
-                            { $push: { usedBy: { userId: user._id, count: 1 } } }
-                        );
-                    }
+                    
                 }
                 
                 return res.status(200).json({ CODsuccess: true, groupId : cart._id ,TotalPrice});
@@ -250,7 +244,8 @@ const confirmOrder = async (req, res) => {
 
     } catch (error) {
         console.error("Error during order confirmation:", error);
-        return renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred. Please try again later.", '/');
+        
+        return res.status(500).json({ success: false, message: "An error occurred while confirming your order. Please try again later." });
     }
 };
 
