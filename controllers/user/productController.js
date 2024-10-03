@@ -17,7 +17,6 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
     });
 };
 
-// Render the product view page
 const getProductView = async (req, res) => {
     try {
         const productId = req.params.productId;

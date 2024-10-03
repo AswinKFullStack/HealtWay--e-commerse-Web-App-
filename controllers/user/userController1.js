@@ -2,6 +2,8 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
+const Cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema")
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { render } = require("ejs");
@@ -71,6 +73,33 @@ const loadHomepage = async (req, res) => {
                   : null;
 
 
+                  
+                  
+                  let cartProductIds = []; 
+                  let wishlistProductIds = [];
+                  if (user) {
+                      const userCart = await Cart.findOne({ userId: user._id }).lean();
+                      if (userCart && userCart.items) {
+                          cartProductIds = userCart.items.map(item => item.productId.toString());
+          
+                          
+                          
+                          
+                      } else {
+                          console.log("Cart is empty.");
+                      }
+                      //wishlist
+                      const userWishlist = await Wishlist.findOne({ userId: user._id }).lean();
+                      if (userWishlist && userWishlist.products.length > 0) {
+                          wishlistProductIds = userWishlist.products.map(productId => productId.toString());
+                          
+                      }
+          
+          
+                  } else {
+                      console.log("No user found.");
+                  }
+
         res.render("home", {
             user,
             products, 
@@ -79,7 +108,9 @@ const loadHomepage = async (req, res) => {
             searchTerm,
             categories,
             categoryProducts,
-            title: 'Home Page'  
+            title: 'Home Page'  ,
+            cartProductIds: cartProductIds, 
+            wishlistProductIds: wishlistProductIds,
         });
     } catch (error) {
         console.error("Error loading homepage", error);
