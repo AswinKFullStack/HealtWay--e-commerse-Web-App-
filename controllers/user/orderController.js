@@ -5,6 +5,7 @@ const Cart = require("../../models/cartSchema");
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
 const Coupon = require("../../models/couponShema");
+const Wallet = require("../../models/walletSchema");
 const razorpayInstance = require('../../config/razorpayConfig');
 
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
@@ -362,7 +363,7 @@ const cancelOrder = async (req,res) => {
         
         const updateResult = await Order.updateOne(
             { _id: orderDoc._id},
-            { $set: { "orderStatus": "Cancelled" } }
+            { $set: { "orderStatus": "Cancelled", cancellationDate: new Date() } }
           );
 
           if (updateResult.modifiedCount === 0) {
@@ -376,16 +377,45 @@ const cancelOrder = async (req,res) => {
 
             console.log("Product quantity update result:", productUpdateResult);
             
-            if (orderDoc.paymentMethod === 'Razorpay') {
-                
-                const paymentId = orderDoc.paymentDetails.paymentId; 
-                const refundAmount = orderDoc.totalPrice * 100; 
+            if (orderDoc.paymentDetails.status === 'Paid') {
+                const refundAmount = orderDoc.totalPrice;
+                let walletDoc = await Wallet.findOne({ userId: orderDoc.userId });
+
+                if (!walletDoc) {
+                    // Create a new wallet if not exists
+                    walletDoc = new Wallet({
+                        userId: orderDoc.userId,
+                        balance: refundAmount,
+                        transactions: [{
+                            type: 'credit',
+                            amount: refundAmount,
+                            description: `Refund for cancelled order ${orderDoc._id}`
+                        }]
+                    });
+                    await walletDoc.save();
+                } else {
+                    // Update wallet balance and add transaction
+                    walletDoc.balance += refundAmount;
+                    walletDoc.transactions.push({
+                        type: 'credit',
+                        amount: refundAmount,
+                        description: `Refund for cancelled order ${orderDoc._id}`
+                    });
+                    await walletDoc.save();
+                }
     
-                const refund = await razorpayInstance.payments.refund(paymentId, {
-                    amount: refundAmount, // Amount should be in paise (for example, Rs.100 is 10000 paise)
-                });
+               
     
-                console.log("Refund successful:", refund);
+                await Order.updateOne(
+                    { _id: orderDoc._id },
+                    { 
+                        $set: { 
+                            "orderStatus": "Refunded",  
+                            "paymentDetails.refundAmount": refundAmount,
+                            "paymentDetails.refundStatus": "Full"  
+                        }
+                    }
+                );
             }
             return res.status(200).json({ success: true, message: 'Order cancelled !' });
 

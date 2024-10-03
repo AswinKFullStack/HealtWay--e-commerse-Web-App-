@@ -32,6 +32,7 @@ const orderSchema = new Schema({
     },     //for razro payment ,before payment 
     paymentId: { type: String ,required : false},   // after successfully payment
     refundAmount: { type: Number, default: 0 }, 
+    refundStatus: { type: String, enum: ['Not Initiated', 'Partial', 'Full'], default: 'Not Initiated' },
   },
 
   shippingAddress: {

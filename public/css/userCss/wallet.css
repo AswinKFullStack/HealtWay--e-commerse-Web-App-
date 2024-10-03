@@ -1,0 +1,131 @@
+
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.wallet-card {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    border-radius: 10px;
+    color: rgb(0, 0, 0);
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.balance-amount {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #218838;
+}
+
+.alert {
+    transition: opacity 0.5s ease;
+}
+
+
+
+
+
+
+ /* CSS for refund form with unique class names  */
+
+    .refund-section {
+        width: 100%;
+        max-width: 450px;
+        margin: 2rem auto;
+    }
+
+    .refund-card {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+    }
+
+    .refund-card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .refund-card-body {
+        padding: 1.5rem;
+    }
+
+    .refund-form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .refund-input {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: border-color 0.3s ease;
+    }
+
+    .refund-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .refund-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        border-radius: 5px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .refund-btn:hover {
+        background-color: #c82333;
+    }
+
+    .refund-alert {
+        padding: 0.75rem 1rem;
+        border-radius: 5px;
+    }
+
+    .refund-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .refund-error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .d-none {
+        display: none;
+    }
+

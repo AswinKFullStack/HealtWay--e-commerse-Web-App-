@@ -37,14 +37,14 @@
                 <div class="col-md-3 text-center">
                     
                     <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order._id %>'">Track Order</button>
-                    <% if (order.orderStatus  !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
+                    <% if (order.orderStatus  !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request" && order.orderStatus !== "Refunded") { %>
                         
                         <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>')">
                             <i class="bi bi-trash-fill"></i> Cancel Order
                         </button>
                     
                     <% } %>
-                    <% if (order.orderStatus !== "Cancelled" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
+                    <% if (order.orderStatus !== "Cancelled" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request" && order.orderStatus !== "Refunded") { %>
                         <button class="btn btn-danger mb-2" onclick="confirmReturnRequest('<%= order._id %>')">Return Order</button>
                     <% } %>
                     

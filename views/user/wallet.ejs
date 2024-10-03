@@ -1,0 +1,96 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/wallet.css">
+
+
+    <div class="container mt-5">
+        <div class="wallet-overview mb-4">
+            <h2 class="text-center">Your Wallet</h2>
+            <div class="wallet-card">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h3>Current Balance</h3>
+                        <p class="balance-amount">$<%= wallet.balance %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="transactions-container mt-5">
+            <h2 class="text-center">Transactions</h2>
+            <ul class="list-group">
+                <% wallet.transactions.forEach(function(transaction) { %>
+                    <li class="list-group-item transaction-item">
+                        <div class="transaction-details">
+                            <strong><%= transaction.type %>:</strong> $<%= transaction.amount %>
+                            <span class="transaction-date">on <%= transaction.transactionDate.toLocaleDateString() %></span>
+                        </div>
+                        <div class="transaction-description">
+                            <small>(Description: <%= transaction.description || 'N/A' %>)</small>
+                        </div>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+        
+        <div class="add-money-form">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h2>Add Money to Wallet</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/wallet/addFunds" method="POST" id="addMoneyForm">
+                        <div class="form-group">
+                            <label for="amount">Enter Amount ($)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" placeholder="Enter amount" required min="0.01" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Select Payment Method</label>
+                            <select class="form-control" id="paymentMethod" name="paymentMethod" required>
+                                <option value="" disabled selected>Select payment method</option>
+                                <option value="creditCard">Credit Card</option>
+                                <option value="debitCard">Debit Card</option>
+                                <option value="netBanking">Net Banking</option>
+                                <option value="upi">UPI</option>
+                                <option value="wallet">Wallet</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Add Money</button>
+                    </form>
+                    <div id="confirmationMessage" class="alert alert-success mt-3 d-none" role="alert">
+                        Money added successfully!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Refund Request Form with unique class names to avoid conflicts -->
+<div class="refund-section">
+    <div class="refund-card shadow-sm">
+        <div class="refund-card-header text-center">
+            <h2>Request Refund</h2>
+        </div>
+        <div class="refund-card-body">
+            <form id="refundForm" action="/wallet/refund" method="POST">
+                <div class="refund-form-group">
+                    <label for="refundAmount">Refund Amount ($)</label>
+                    <input type="number" class="refund-input" id="refundAmount" name="amount" placeholder="Enter amount to refund" required>
+                </div>
+                <button type="submit" class="refund-btn">Request Refund</button>
+            </form>
+
+            <!-- Success and Error messages (hidden by default) -->
+            <div id="refundSuccessMessage" class="refund-alert refund-success mt-3 d-none" role="alert">
+                Refund requested successfully!
+            </div>
+            <div id="refundErrorMessage" class="refund-alert refund-error mt-3 d-none" role="alert">
+                Error processing your refund request. Please try again.
+            </div>
+        </div>
+    </div>
+</div>
+        
+    </div>
+    
+
+
+<%- include("../../views/partials/user/footer") %>

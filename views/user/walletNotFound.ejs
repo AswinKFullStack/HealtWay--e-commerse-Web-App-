@@ -1,0 +1,14 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/walletNotFound.css">
+
+<div>
+<h1>Wallet Not Found</h1>
+<p>You currently do not have a wallet. Would you like to create one?</p>
+
+<form action="/wallet/create" method="POST">
+    <button type="submit">Create Wallet</button>
+</form>
+
+</div>
+
+<%- include("../../views/partials/user/footer") %>
