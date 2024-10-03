@@ -44,7 +44,7 @@
                         </button>
                     
                     <% } %>
-                    <% if (order.orderStatus !== "Cancelled" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request" && order.orderStatus !== "Refunded") { %>
+                    <% if (order.orderStatus === "Delivered") { %>
                         <button class="btn btn-danger mb-2" onclick="confirmReturnRequest('<%= order._id %>')">Return Order</button>
                     <% } %>
                     
