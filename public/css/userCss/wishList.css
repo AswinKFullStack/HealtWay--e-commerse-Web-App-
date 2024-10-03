@@ -1,0 +1,18 @@
+/* General wishlist button styling */
+.wishlist-btn {
+    background-color: white; /* Default white background */
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+}
+
+/* Wishlist button when the product is added (red background) */
+.wishlist-btn i.in-wishlist {
+    background-color: red; /* Red background when product is in wishlist */
+    color: white;
+}
+
+/* Icon inside the button */
+.wishlist-btn i {
+    font-size: 20px;
+}

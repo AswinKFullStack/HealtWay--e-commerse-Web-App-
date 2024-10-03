@@ -1,6 +1,7 @@
 <%- include("../../views/partials/user/header") %>
 <link rel="stylesheet" href="/css/userCss/productView.css">
 <link rel="stylesheet" href="/css/userCss/home.css">
+<link rel="stylesheet" href="/css/userCss/wishList.css">
 
 
 <!-- Current Offers Section -->
@@ -34,6 +35,13 @@
 
                     <div class="position-absolute top-0 end-0 p-2">
                         <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </div>
+
+                     <!-- Heart Icon Button -->
+                     <div class="position-absolute top-0 end-0 p-2">
+                        <button class="btn  wishlist-btn" data-product-id="<%= product._id %>">
                             <i class="bi bi-heart"></i>
                         </button>
                     </div>
@@ -126,7 +134,7 @@
     <% }); %>
 </div>
 
-
+<script src="/js/userJs/wishList.js"></script>
 <%- include("../../views/partials/user/footer") %>
 
 

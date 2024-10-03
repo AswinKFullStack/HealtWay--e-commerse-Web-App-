@@ -24,25 +24,44 @@ const userAuth = async (req, res, next) => {
                 return next();
             } else {
                 console.log("User authentication failed: Blocked or not found");
-                return renderErrorPage(
-                    res, 
-                    401, 
-                    "Unauthorized", 
-                    "Access denied. Please login.", 
-                    "/login"
-                );
+
+                if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                    // If it's an AJAX request, send a JSON response
+                    return res.status(401).json({
+                        success: false,
+                        message: "Access denied. Please log in.",
+                        redirectUrl: "/login"
+                    });
+                } else {
+                    // For normal requests, redirect to login page
+                    return renderErrorPage(
+                        res, 
+                        401, 
+                        "Unauthorized", 
+                        "Access denied. Please login.", 
+                        "/login"
+                    );
+                }
             }
         } else {
             console.log("Session not found");
             req.session.userReturnTo = req.originalUrl;
-
-            return renderErrorPage(
-                res, 
-                401, 
-                "Unauthorized", 
-                "Session expired. Please login again.", 
-                backLink 
-            );
+    
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Session expired. Please log in.",
+                    redirectUrl: "/login"
+                });
+            } else {
+                return renderErrorPage(
+                    res, 
+                    401, 
+                    "Unauthorized", 
+                    "Session expired. Please login again.", 
+                    "/login"
+                );
+            }
         }
     } catch (error) {
         console.error("Error during user authentication:", error);
