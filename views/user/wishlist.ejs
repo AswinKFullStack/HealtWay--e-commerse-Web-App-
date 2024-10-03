@@ -1,0 +1,56 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/css/userCss/productView.css">
+<link rel="stylesheet" href="/css/userCss/home.css">
+<link rel="stylesheet" href="/css/userCss/wishList.css">
+
+<div class="container mt-4">
+    <h2 class="text-center">My Wishlist</h2>
+
+    <% if (wishlistItems && wishlistItems.length > 0) { %>
+        <div class="row">
+            <% wishlistItems.forEach(function(product) { %>  <!-- product instead of item -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <% if (product.productImages && product.productImages.length > 0) { %>
+                        <a href="/product/view/<%= product._id %>">
+                            <img src="/uploads/re-image/<%= product.productImages[0] %>" alt="<%= product.productName %> Image" class="card-img-top">
+                        </a>
+                    <% } else { %>
+                        <a href="/product/view/<%= product._id %>">
+                            <img src="/path-to-placeholder-image.jpg" class="card-img-top" alt="Product Image">
+                        </a>
+                    <% } %>
+                    
+                    <div class="card-body">
+                        <a href="/product/view/<%= product._id %>" class="custom-link">
+                            <h5 class="card-title"><%= product.productName %></h5>
+                        </a>
+                        <p class="card-text">₹<%= product.salePrice %></p>
+                        
+                        <!-- Heart Icon Button -->
+                        <!-- <div class="position-absolute top-0 end-0 p-2"> -->
+                            <button class="btn wishlist-btn" data-product-id="<%= product._id %>">
+                                <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'bi bi-heart-fill' : 'bi bi-heart' %>"></i>
+                            </button>
+                        <!-- </div> -->
+                        
+                        
+                        <!-- Add to Cart button (Dynamic) -->
+                        <% if (product.status !== "Available") { %>
+                            <button class="btn btn-success mt-2" onclick="location.href='/notifyMe/product/<%= product._id %>'">Notify Me</button>
+                        <% } else { %>
+                            <button class="btn btn-success mt-2" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
+                        <% }; %>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="alert alert-info text-center">Your wishlist is empty.</div>
+    <% } %>
+</div>
+
+
+<script src="/js/userJs/wishList.js"></script>
+<%- include("../../views/partials/user/footer") %>

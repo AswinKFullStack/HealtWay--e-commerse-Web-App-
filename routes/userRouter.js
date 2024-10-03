@@ -121,7 +121,10 @@ router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderCo
 router.get('/coupons',userAuth,couponController.getCoupons);
 router.post('/validateCoupon',userAuth,couponController.validateCoupon);
 
+
+//wishlist 
 router.post('/wishlist/toggle/:productId',userAuth,wishListController.wishListToggle);
+router.get('/wishlistView',userAuth,wishListController.loadWishlistPage);
 
 module.exports = router
 
