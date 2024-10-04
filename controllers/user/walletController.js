@@ -77,38 +77,29 @@ const refundInWallet = async (req, res) => {
     try {
         const amount = parseFloat(req.body.amount);
 
-        // Validate if the amount is a valid number
         if (isNaN(amount) || amount <= 0) {
             return renderErrorPage(res, 400, "Invalid Amount", "Please enter a valid amount greater than zero.", "/wallet");
         }
 
-        // Find the user's wallet based on session user ID
         const wallet = await Wallet.findOne({ userId: req.session.user });
 
-        // If no wallet found, return an error
         if (!wallet) {
             return renderErrorPage(res, 404, "Wallet Not Found", "You do not have a wallet. Please create one first.", "/create-wallet");
         }
 
-        // Check if sufficient funds exist in the wallet for the refund
         if (wallet.balance < amount) {
             return renderErrorPage(res, 400, "Insufficient Funds", "You do not have enough balance to issue this refund.", "/wallet");
         }
 
-        // Debit the refund amount from the wallet
         await wallet.debit(amount, "Refund issued");
 
-        // Log refund transaction for debugging and audits
         console.log(`Refund of $${amount} issued for user ${req.session.user}`);
 
-        // Redirect to wallet page after refund
         return res.redirect('/wallet');
 
     } catch (error) {
-        // Enhanced error logging for debugging
         console.error("Refund processing error: ", error);
 
-        // Render error page in case of unexpected errors
         return renderErrorPage(res, 500, "Unexpected Error", "An error occurred while processing your refund. Please try again later.", "/wallet");
     }
 };

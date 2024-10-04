@@ -59,6 +59,15 @@ const postAddOffer = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid input. Please check all required fields.' });
         }
 
+         if (type === 'Referral') {
+            const existingReferralOffer = await Offer.findOne({ type: 'Referral' , isActive :true });
+
+            if (existingReferralOffer) {
+                return res.status(400).json({ success: false, message: 'Referral offer already exists.' });
+            }
+        }
+        
+
         const newOffer = new Offer({
             type,
             title,
@@ -121,65 +130,45 @@ const editOffer = async (req, res) => {
     }
 }
 
-const postEditOffer  = async (req,res) => {
-    try {
-        const { type, title, discount, details } = req.body;
-        const image = req.file ?  + req.file.filename : req.body.currentImage;
-        await Offer.findByIdAndUpdate(req.params.id, { type, title, discount, details, image });
-        res.redirect('/admin/offers');
-        
-    } catch (error) {
-        res.status(500).send(error);
-        
-    }
-}
+
 
 const deleteOffer = async (req, res) => {
     try {
         const offerId = req.params.offerId;
 
-        // Find the offer by its ID
         const offer = await Offer.findById(offerId);
         if (!offer) {
             return res.status(404).json({ success: false, message: 'Offer not found' });
         }
 
-        // Remove the offer from the Offer collection
         await Offer.findByIdAndDelete(offerId);
 
-        // Check if the offer is active before making any updates to products
         if (!offer.isActive) {
             return res.status(200).json({ success: true, message: 'Inactive offer deleted without affecting products.' });
         }
 
-        // If the offer was a category-wide offer, remove it from all products in the category
         if (offer.type === 'Category') {
             const offerProducts = await Product.find({ category: offer.category });
 
             for (let product of offerProducts) {
-                // Remove the offer from the appliedOffers array
                 product.appliedOffers = product.appliedOffers.filter(
                     appliedOffer => appliedOffer.offerId.toString() !== offerId
                 );
 
-                // Recalculate the sale price only if the offer was active
                 product.salePrice = calculateFinalPrice(product);
                 await product.save();
             }
 
-        // If the offer was for a single product, remove it from that product
         } else if (offer.type === 'Product') {
             const offerProduct = await Product.findById(offer.product);
             if (!offerProduct) {
                 return res.status(404).json({ success: false, message: 'Product not found' });
             }
 
-            // Remove the offer from the appliedOffers array
             offerProduct.appliedOffers = offerProduct.appliedOffers.filter(
                 appliedOffer => appliedOffer.offerId.toString() !== offerId
             );
 
-            // Recalculate the sale price only if the offer was active
             offerProduct.salePrice = calculateFinalPrice(offerProduct);
             await offerProduct.save();
         }
@@ -277,7 +266,6 @@ module.exports= {
     getOfferAddPage,
     postAddOffer,
     editOffer ,
-    postEditOffer ,
     deleteOffer,
     activateOffer,
     deactivateOffer

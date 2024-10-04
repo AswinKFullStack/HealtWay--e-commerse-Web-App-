@@ -106,7 +106,7 @@ router.get("/offers",adminAuth,offerController.loadOffers);
 router.get("/offerAdd",adminAuth,offerController.getOfferAddPage);
 router.post('/offerAdd',adminAuth,upload.single('image'),offerController.postAddOffer);
 router.get("/edit-offer/:id",adminAuth,offerController.editOffer);
-router.post("/edit-offer/:id",adminAuth,offerController.postEditOffer);
+
 router.post("/delete-offer/:offerId",adminAuth,offerController.deleteOffer);
 
 router.get("/activate-offer/:offerId", adminAuth, offerController.activateOffer);
