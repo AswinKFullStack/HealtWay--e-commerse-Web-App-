@@ -14,6 +14,7 @@ const orderController = require("../controllers/user/orderController");
 const couponController = require("../controllers/user/couponController")
 const wishListController = require("../controllers/user/wishListController");
 const walletController = require("../controllers/user/walletController");
+const offerController = require("../controllers/user/offerController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -133,6 +134,11 @@ router.get('/wallet',userAuth,walletController.loadWallet);
 router.post('/wallet/addFunds',userAuth,walletController.addFundInWallet);
 router.post('/wallet/refund',userAuth,walletController.refundInWallet)
 router.post('/wallet/create',userAuth,walletController.createWallet)
+
+
+//offer
+
+router.get('/offers',offerController.loadOffers);
 
 module.exports = router
 

@@ -1,0 +1,23 @@
+<form action="/admin/edit-offer/<%= offer._id %>" method="POST" enctype="multipart/form-data">
+    <label for="type">Offer Type:</label>
+    <select name="type" required>
+        <option value="Product" <%= offer.type === 'Product' ? 'selected' : '' %>>Product</option>
+        <option value="Category" <%= offer.type === 'Category' ? 'selected' : '' %>>Category</option>
+        <option value="Referral" <%= offer.type === 'Referral' ? 'selected' : '' %>>Referral</option>
+    </select>
+
+    <label for="title">Title:</label>
+    <input type="text" name="title" value="<%= offer.title %>" required>
+
+    <label for="discount">Discount (%):</label>
+    <input type="number" name="discount" value="<%= offer.discount %>" required>
+
+    <label for="details">Details:</label>
+    <textarea name="details"><%= offer.details %></textarea>
+
+    <label for="image">Change Offer Image:</label>
+    <input type="file" name="image">
+    <input type="hidden" name="currentImage" value="<%= offer.image %>">
+
+    <button type="submit">Update Offer</button>
+</form>

@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.offer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.offer-table th, .offer-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.offer-image {
+    max-width: 100px;
+    height: auto;
+}
+
+.btn {
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 4px;
+    background-color: #28a745;
+}
+
+.btn.edit-btn {
+    background-color: #007bff;
+}
+
+.btn.delete-btn {
+    background-color: #dc3545;
+}
+
+.btn.add-offer-btn {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #28a745;
+    text-align: center;
+}

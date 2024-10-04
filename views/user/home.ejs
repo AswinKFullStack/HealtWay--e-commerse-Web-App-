@@ -2,16 +2,27 @@
 <link rel="stylesheet" href="/css/userCss/productView.css">
 <link rel="stylesheet" href="/css/userCss/home.css">
 <link rel="stylesheet" href="/css/userCss/wishList.css">
-
+<link rel="stylesheet" href="/css/userCss/currentOffer.css">
 
 <!-- Current Offers Section -->
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <div class="alert alert-success text-center" role="alert">
         <h4 class="alert-heading">Special Offers!</h4>
-        <p>Don't miss out on our limited-time discounts! Click the button below to view all current offers.</p>
-        <button class="btn btn-success" onclick="location.href='/offers'">View All Offers</button>
+        <div class="slideshow-container">
+            <div class="slides-wrapper">
+                <% offers.forEach(offer => { %>
+                    <% if (offer.image) { %>
+                        <div class="slide">
+                            <img src="/uploads/re-image/<%= offer.image %>" class="offer-image" alt="<%= offer.title %>">
+                            <div class="text"><%= offer.title %></div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+        </div>
     </div>
 </div>
+
 
 <!-- Product Section -->
 <div class="container mt-4">
@@ -138,7 +149,7 @@
         <% } %>
     <% }); %>
 </div>
-
+<script src="/js/userJs/slideshow.js"></script>
 <script src="/js/userJs/wishList.js"></script>
 <%- include("../../views/partials/user/footer") %>
 

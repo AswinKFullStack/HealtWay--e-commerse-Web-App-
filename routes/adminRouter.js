@@ -8,6 +8,7 @@ const brandController = require("../controllers/admin/brandController");
 const orderController = require("../controllers/admin/orderController");
 const orderUserController = require("../controllers/user/orderController");
 const couponController = require("../controllers/admin/couponController"); 
+const offerController = require("../controllers/admin/offerController"); 
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
@@ -97,4 +98,18 @@ router.get('/coupons',adminAuth,couponController.listAllCoupons);
 router.get('/addCoupon',adminAuth,couponController.getAddCoupon);
 router.post('/addCoupon',adminAuth,couponController.postAddCoupon);
 router.get('/deleteCoupon/:couponId',adminAuth,couponController.deleteCoupon);
+
+
+//offer 
+
+router.get("/offers",adminAuth,offerController.loadOffers);
+router.get("/offerAdd",adminAuth,offerController.getOfferAddPage);
+router.post('/offerAdd',adminAuth,upload.single('image'),offerController.postAddOffer);
+router.get("/edit-offer/:id",adminAuth,offerController.editOffer);
+router.post("/edit-offer/:id",adminAuth,offerController.postEditOffer);
+router.post("/delete-offer/:id",adminAuth,offerController.deletOffer);
+
+router.get("/activate-offer/:offerId", adminAuth, offerController.activateOffer);
+router.get("/deactivate-offer/:offerId", adminAuth, offerController.deactivateOffer);
+
 module.exports = router

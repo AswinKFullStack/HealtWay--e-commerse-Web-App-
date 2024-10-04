@@ -4,6 +4,7 @@ const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
 const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema")
+const Offer = require('../../models/offerSchema');
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { render } = require("ejs");
@@ -100,6 +101,10 @@ const loadHomepage = async (req, res) => {
                       console.log("No user found.");
                   }
 
+
+                  const offers = await Offer.find({});
+
+
         res.render("home", {
             user,
             products, 
@@ -111,6 +116,7 @@ const loadHomepage = async (req, res) => {
             title: 'Home Page'  ,
             cartProductIds: cartProductIds, 
             wishlistProductIds: wishlistProductIds,
+            offers
         });
     } catch (error) {
         console.error("Error loading homepage", error);

@@ -1,0 +1,73 @@
+<%- include("../../views/partials/admin/header") %>
+
+<link rel="stylesheet" href="/css/adminCss/customers.css">
+
+<h2 class="my-4">Offer Management</h2>
+<div class="mb-3">
+  <a href="/admin/offerAdd" class="btn btn-primary">Create Offer</a>
+</div>
+<div class="form-group mb-4">
+
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Discount (%)</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="offerTable">
+    <% offers.forEach(function(offer) { %>
+      <tr>
+        <td>
+          <% if (offer.image) { %>
+            <img src="/uploads/re-image/<%= offer.image %>" alt="Offer Image" width="50" height="50">
+          <% } else { %>
+            No image
+          <% } %>
+        </td>
+        <td><%= offer.title %></td>
+        <td><%= offer.discount %></td>
+        <td><%= offer.details %></td>
+        <td>
+          <% if (offer.isActive) { %>
+            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+          <% } else { %>
+            <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+          <% } %>
+        </td>
+        <td>
+          <% if (offer.isActive) { %>
+            <button class="btn btn-warning btn-sm" onclick="location.href='/admin/deactivate-offer/<%= offer._id %>'">
+              <i class="bi bi-unlock-fill"></i> Deactivate
+            </button>
+          <% } else { %>
+            <button class="btn btn-success btn-sm" onclick="location.href='/admin/activate-offer/<%= offer._id %>'">
+              <i class="bi bi-lock-fill"></i> Activate
+            </button>
+          <% } %>
+          <a href="/admin/edit-offer/<%= offer._id %>" class="btn btn-info btn-sm">
+            <i class="bi bi-pencil-square"></i> Edit
+          </a>
+          <form action="/admin/delete-offer/<%= offer._id %>" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>
+
+<!-- Pagination Controls -->
+
+
+<script src="/js/adminJs/offers.js"></script>
+<%- include("../../views/partials/admin/footer") %>
+
