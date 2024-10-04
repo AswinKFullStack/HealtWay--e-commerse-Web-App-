@@ -26,10 +26,10 @@ const offerSchema = new Schema({
     image: {
         type: String
     },
-    products: [{  // Products linked to this offer (if Product offer)
+    product: {  // Products linked to this offer (if Product offer)
         type: Schema.Types.ObjectId,
         ref: 'Product'
-    }],
+    },
     category: {  // Category linked to this offer (if Category offer)
         type: Schema.Types.ObjectId,
         ref: 'Category'

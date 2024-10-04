@@ -14,8 +14,10 @@
   <thead>
     <tr>
       <th>Image</th>
+      <th>Type</th>
       <th>Title</th>
-      <th>Discount (%)</th>
+      <th>Discount Type</th>
+      <th>Discount (%/$)</th>
       <th>Description</th>
       <th>Status</th>
       <th>Actions</th>
@@ -31,8 +33,10 @@
             No image
           <% } %>
         </td>
+        <td><%= offer.type %></td>
         <td><%= offer.title %></td>
-        <td><%= offer.discount %></td>
+        <td><%= offer.discountType %></td>
+        <td><%= offer.discountValue %></td>                       
         <td><%= offer.details %></td>
         <td>
           <% if (offer.isActive) { %>

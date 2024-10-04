@@ -1,17 +1,22 @@
 function toggleOfferFields() {
+    
     const offerType = document.getElementById('offerType').value;
     const productFields = document.getElementById('productOfferFields');
     const categoryFields = document.getElementById('categoryOfferFields');
+    const discountType = document.getElementById('discountTypeDiv');
     
     // Hide all offer-specific fields initially
     productFields.style.display = 'none';
     categoryFields.style.display = 'none';
-    
+    discountType.style.display = 'block';
     // Show specific fields based on offer type selection
     if (offerType === 'Product') {
         productFields.style.display = 'block';
     } else if (offerType === 'Category') {
         categoryFields.style.display = 'block';
+    }else if (offerType === 'Referral') {
+        discountType.style.display = 'none';
+        
     }
 }
 
@@ -34,6 +39,12 @@ function toggleOfferFields() {
             offerType.nextElementSibling.style.display = 'block';
             isValid = false;
         }
+        const discountType = document.getElementById('discountType');
+       if(offerType.value === "Referral"){
+        
+        discountType.value = 'amount'
+       }
+       
 
         // Offer Title Validation
         const offerTitle = document.getElementById('offerTitle');
@@ -43,8 +54,7 @@ function toggleOfferFields() {
             isValid = false;
         }
 
-        // Discount Type Validation
-        const discountType = document.getElementById('discountType');
+        
         if (!discountType.value) {
             discountType.nextElementSibling.textContent = 'Please select a discount type.';
             discountType.nextElementSibling.style.display = 'block';

@@ -30,8 +30,8 @@
 
     <!-- Offer-Specific Fields -->
     <div id="productOfferFields" class="offer-specific-fields" style="display: none;">
-        <label for="productSelect">Select Products</label>
-        <select class="custom-select" id="productSelect" name="products[]" multiple>
+        <label for="productSelect">Select Product</label>
+        <select class="custom-select" id="productSelect" name="product" >
             <% products.forEach(product => { %>
                 <option value="<%= product._id %>"><%= product.productName %></option>
             <% }); %>
@@ -50,7 +50,7 @@
 
     <!-- Discount and Other Common Fields -->
     <div class="form-row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3" id="discountTypeDiv">
             <label for="discountType">Discount Type</label>
             <select id="discountType" class="form-control" name="discountType" required>
                 <option selected disabled value="">Choose...</option>
