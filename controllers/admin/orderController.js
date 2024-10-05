@@ -29,17 +29,18 @@ const getAllOrders = async (req, res) => {
         let query = {};
         if (searchTerm) {
             query = {
-                "productDetails.productName": { $regex: searchTerm, $options: 'i' },
+                "productId.productName": { $regex: searchTerm, $options: 'i' },
             };
         }
 
         const [orders, totalOrders] = await Promise.all([
             Order.find()
-              .populate('userId', 'name') // Fetch user name (Assuming 'name' is a field in User schema)
+              .populate('userId', 'name')
+              .populate('productId', 'productName')  
               .skip(skip)
               .limit(limit)
               .sort({ updatedAt :-1}),
-            Order.countDocuments()
+            Order.countDocuments(query)
           ]);
 
 
