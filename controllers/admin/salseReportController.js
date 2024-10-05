@@ -53,10 +53,10 @@ const getSalesReport = async (req, res) => {
             {
                 $group: {
                     _id: null,
-                    totalSales: { $sum: '$totalPrice' },  // Total sales amount
+                    totalSales: { $sum: '$finalTotalPriceWithAllDiscount' },  // Total sales amount
                     totalDiscount: { $sum: '$discount' }, // Total discount
                     totalOrders: { $sum: 1 },             // Total number of orders
-                    couponUsage: { $push: '$couponCode' } // Track used coupon codes
+                    totalCouponDeduction: { $sum: '$couponDiscount' } // Track used coupon codes
                 }
             }
         ]);
@@ -66,6 +66,7 @@ const getSalesReport = async (req, res) => {
             totalSales: 0,
             totalOrders: 0,
             totalDiscount: 0,
+            totalCouponDeduction: 0,
         };
 
         // Render the report page with the required data
