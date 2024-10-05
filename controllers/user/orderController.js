@@ -182,6 +182,7 @@ const confirmOrder = async (req, res) => {
                     quantity : item.quantity ,
                     totalPrice : totalPrice > 0 ? totalPrice : 0,
                     orderStatus : 'Confirmed' ,
+                    discount : singleItemDiscountAmount || 0,
                     paymentDetails :{method : paymentMethod },
                     shippingAddress ,  
                     groupId : cart._id,

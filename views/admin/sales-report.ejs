@@ -1,0 +1,39 @@
+<%- include("../../views/partials/admin/header") %>
+
+<h2 class="my-4">Sales Report</h2>
+
+<form class="mb-4" method="GET" action="/admin/sales-report">
+  <div class="form-row">
+    <div class="col">
+      <label for="startDate">Start Date</label>
+      <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>">
+    </div>
+    <div class="col">
+      <label for="endDate">End Date</label>
+      <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>">
+    </div>
+    <div class="col">
+      <label>&nbsp;</label>
+      <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Total Orders</th>
+      <th>Total Sales (₹)</th>
+      <th>Total Discount (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><%= reportData.totalOrders %></td>
+      <td><%= reportData.totalSales %></td>
+      <td><%= reportData.totalDiscount %></td>
+    </tr>
+  </tbody>
+</table>
+
+<%- include("../../views/partials/admin/footer") %>

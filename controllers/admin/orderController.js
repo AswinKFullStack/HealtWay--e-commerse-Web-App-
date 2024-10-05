@@ -19,10 +19,11 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
 };
 
 // Loading Products list
-const getOrders = async (req, res) => {
+const getAllOrders = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 3;
+        const skip = (page - 1) * limit;
         const searchTerm = req.query.search || '';
 
         let query = {};
@@ -32,62 +33,28 @@ const getOrders = async (req, res) => {
             };
         }
 
-        const ordersDetailList = await Order.aggregate([
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "userId",
-                    foreignField: "_id",
-                    as: "userDetails"
-                }
-            },
-            {
-                $lookup: {
-                    from: "addresses",
-                    let: { addressId: "$address", userId: "$userId" },
-                    pipeline: [
-                        { $match: { $expr: { $and: [ { $eq: ["$userId", "$$userId"] }, { $in: ["$$addressId", "$address._id"] } ] } } },
-                        { $unwind: "$address" },
-                        { $match: { $expr: { $eq: ["$address._id", "$$addressId"] } } },
-                        { $replaceRoot: { newRoot: "$address" } }
-                    ],
-                    as: "deliveryAddress"
-                }
-            },
-            {
-                $unwind: "$orderedItems" 
-            },
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "orderedItems.productId",
-                    foreignField: "_id",
-                    as: "productDetails"
-                }
-            },
-            { 
-                $match: query 
-            }
-        ]);
+        const [orders, totalOrders] = await Promise.all([
+            Order.find()
+              .populate('userId', 'name') // Fetch user name (Assuming 'name' is a field in User schema)
+              .skip(skip)
+              .limit(limit)
+              .sort({ updatedAt :-1}),
+            Order.countDocuments()
+          ]);
 
-        const sortedOrdersDetailList = ordersDetailList.sort((a, b) => {
-            const dateA = a.orderedItems.createdAt ? new Date(a.orderedItems.createdAt) : a.orderedItems._id.getTimestamp();
-            const dateB = b.orderedItems.createdAt ? new Date(b.orderedItems.createdAt) : b.orderedItems._id.getTimestamp();
-            return dateB - dateA;
-        });
 
-        const totalOrders = ordersDetailList.length;
+      
+
         const totalPages = Math.ceil(totalOrders / limit);
-        const currentPage = Math.max(1, Math.min(page, totalPages));
-        const paginatedOrders = sortedOrdersDetailList.slice((currentPage - 1) * limit, currentPage * limit);
+       
         
 
 
         res.render('orders', {
             
             
-            orders: paginatedOrders,
-            currentPage,
+            orders,
+            currentPage: page,
             totalPages,
             searchTerm
 
@@ -101,23 +68,22 @@ const getOrders = async (req, res) => {
 };
 
 
-const changeStatus = async (req,res) => {
+const updateOrderStatus = async (req,res) => {
     try {
         
-        const { orderIdOfCartItems, itemOrderId } = req.params;
+        const { orderId } = req.params;
         const { status } = req.body;
 
        
 
-        const updatedResult = await Order.updateOne(
-            { _id: orderIdOfCartItems, 'orderedItems._id': itemOrderId },
-            { $set: { 'orderedItems.$.status': status } })
+        await Order.findByIdAndUpdate(orderId, { orderStatus: status });
+        
 
             
 
-         if(updatedResult.modifiedCount === 0){
-            return res.status(500).json({ success: false, message: 'Error updating status' });
-         }   
+        //  if(updatedResult.modifiedCount === 0){
+        //     return res.status(500).json({ success: false, message: 'Error updating status' });
+        //  }   
          return res.status(200).json({ success: true, message: 'Status updated successfully' });
     } catch (error) {
         
@@ -127,6 +93,6 @@ const changeStatus = async (req,res) => {
 
 
 module.exports ={
-    getOrders,
-    changeStatus
+    getAllOrders,
+    updateOrderStatus
 }
