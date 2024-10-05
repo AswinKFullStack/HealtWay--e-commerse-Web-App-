@@ -9,15 +9,8 @@
         required:true
     },
     products:[{
-        productId:{
-            type:Schema.Types.ObjectId,
-            ref:"Product",
-            required:true
-        },
-        addedOn:{
-            type:Date,
-            default:Date.now
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
     }]
 
   })

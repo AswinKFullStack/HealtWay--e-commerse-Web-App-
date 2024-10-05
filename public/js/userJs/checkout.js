@@ -361,7 +361,9 @@ function handlePaymentFailure(cartId,  reason, error = {}) {
                         const finalPrice = (response.discountAmount ? response.discountAmount : TotalPrice).toFixed(2);
                         $('#finalPrice').text(`₹${finalPrice}`);
                         document.getElementById('couponId').value = response.couponId;
-                        
+                                            // Show the Remove Coupon button
+                    $('#removeCouponBtn').show();
+
 
                     } else {
                         // Show error message
@@ -378,5 +380,28 @@ function handlePaymentFailure(cartId,  reason, error = {}) {
                 }
             });
         });
+
+
+
+
+            // Remove coupon functionality
+    $('#removeCouponBtn').on('click', function() {
+        // Hide applied coupon message and reset coupon details
+        $('#couponAppliedMessage').hide();
+        $('#couponInputDiv').hide();
+        $('#finalPriceRow').hide();
+        $('#showCouponInput').show();
+        $('#finalPriceRow').hide();
+        $('#couponCode').val('');
+        $('#couponId').val('');
+        $('#removeCouponBtn').hide(); // Hide the remove button
+
+        // Reset total price to original (assuming you update #finalPrice to original price)
+        const originalPrice = document.getElementById('total').innerText;
+        $('#finalPrice').text(originalPrice);
     });
+});
+
+        
+
 

@@ -1,0 +1,154 @@
+/* General container styles */
+.container {
+    max-width: 1200px; /* Set a max width for larger screens */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Add padding for breathing space */
+}
+
+/* Wallet overview styles */
+.wallet-overview {
+    margin-bottom: 40px; /* Increased space below wallet overview */
+}
+
+.wallet-card {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    border-radius: 10px;
+    color: rgb(0, 0, 0);
+    margin: 20px 0; /* Space below the wallet card */
+    padding: 20px; /* Add padding for content */
+}
+
+.balance-amount {
+    font-size: 2em; /* Larger font size for balance amount */
+    color: #28a745; /* Green color for positive balance */
+    font-weight: bold;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 10px; /* Rounded corners for the card */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Transactions styles */
+.transactions-container {
+    margin-bottom: 40px; /* Space below transactions */
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between; /* Space between details */
+    align-items: center; /* Center items vertically */
+    padding: 15px; /* Add padding */
+    background-color: #ffffff; /* White background for items */
+    margin-bottom: 10px; /* Space between transaction items */
+    border-radius: 5px; /* Rounded corners for items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.transaction-details {
+    flex: 1; /* Allow details to take up available space */
+}
+
+.transaction-date {
+    font-size: 0.9em; /* Smaller font for date */
+    color: #777; /* Gray color for date */
+}
+
+/* Form styles */
+.add-money-form,
+.refund-section {
+    margin-top: 40px; /* Increased space above forms */
+}
+
+.btn-primary,
+.refund-btn {
+    width: 100%; /* Full width buttons */
+    padding: 12px; /* Padding for buttons */
+    font-size: 1.1em; /* Increased font size */
+    border-radius: 5px; /* Rounded corners for buttons */
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.btn-primary {
+    background-color: #28a745; /* Primary button color */
+}
+
+.btn-primary:hover {
+    background-color: #218838; /* Primary button hover color */
+}
+
+.refund-btn {
+    background-color: #dc3545; /* Refund button color */
+}
+
+.refund-btn:hover {
+    background-color: #c82333; /* Refund button hover color */
+}
+
+/* Refund form styles */
+.refund-card {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.refund-card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 10px 10px 0 0;
+}
+
+.refund-card-body {
+    padding: 1.5rem;
+}
+
+.refund-form-group {
+    margin-bottom: 1.25rem; /* Space between input fields */
+}
+
+.refund-input {
+    width: 100%; /* Full width input */
+    padding: 10px; /* Padding for input */
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease; /* Smooth transition for border */
+}
+
+.refund-input:focus {
+    outline: none;
+    border-color: #007bff; /* Border color on focus */
+}
+
+/* Alert styles */
+.alert,
+.refund-alert {
+    transition: opacity 0.5s ease; /* Smooth transition for alerts */
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+}
+
+.refund-success {
+    background-color: #d4edda;
+    color: #155724; /* Success message color */
+}
+
+.refund-error {
+    background-color: #f8d7da;
+    color: #721c24; /* Error message color */
+}
+
+.d-none {
+    display: none; /* Hide elements */
+}

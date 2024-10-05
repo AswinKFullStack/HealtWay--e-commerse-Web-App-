@@ -1,6 +1,7 @@
 <%- include("../../views/partials/user/header") %>
 <title><%= product ? product.productName : 'Product' %> | My E-Commerce Store</title>
 <link rel="stylesheet" href="/css/userCss/productView.css">
+<link rel="stylesheet" href="/public/css/userCss/wishList.css">
  <!-- Breadcrumbs -->
  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -102,9 +103,12 @@
     <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
 <% } %>   
     <button class="btn btn-success" onclick="location.href='/product/buyNow/<%= product._id %>'">Buy Now</button>
-    <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-        <i class="bi bi-heart"></i> Add to Wishlist
-    </button>
+    
+    <button class="btn btn-light wishlist-btn" data-product-id="<%= product._id %>">
+      <i class="<%= iswishlistItem ? 'bi bi-heart-fill' : 'bi bi-heart' %>"></i>
+      Add to Wishlist
+  </button>
+  
     <% }; %>
 <% } %>
 
@@ -155,10 +159,13 @@
               <% } %>
 
               <div class="position-absolute top-0 end-0 p-2">
-                  <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-                      <i class="bi bi-heart"></i>
-                  </button>
-              </div>
+                <button class="btn btn-light wishlist-btn" data-product-id="<%= product._id %>">
+                    <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'bi bi-heart-fill' : 'bi bi-heart' %>"></i>
+                </button>
+            </div>
+        
+          
+           
               
               <div class="card-body">
                   <a href="/product/view/<%= product._id %>" class="custom-link">
@@ -198,6 +205,6 @@
 
 
 
-
+<script src="/js/userJs/wishList.js"></script>
 <script src="/js/userJs/productView.js"></script>
 <%- include("../../views/partials/user/footer") %>

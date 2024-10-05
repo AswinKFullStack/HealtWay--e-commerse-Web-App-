@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offers</title>
+    <link rel="stylesheet" href="/public/css/userCss/offerList.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/offers">Offers</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <h1>Available Offers</h1>
+        <div class="offer-grid">
+            <% offers.forEach(offer => { %>
+                <div class="offer-card">
+                    <% if (offer.image) { %>
+                        <img src="/uploads/re-image/<%= offer.image %>" alt="Offer Image" class="offer-image">
+                    <% } %>
+                    <h3><%= offer.title %></h3>
+                    <p>Discount: <%= offer.discount %>%</p>
+                    <p><%= offer.details %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</body>
+</html>

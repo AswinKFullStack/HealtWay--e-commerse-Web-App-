@@ -20,10 +20,10 @@ document.getElementById('searchOrder').addEventListener('input', function() {
 document.querySelectorAll('.order-status').forEach((element) => {
     element.addEventListener('change', function() {
         const orderId = this.getAttribute('data-order-id');
-        const itemOrderId = this.getAttribute('data-item-orderId');
+        
         const newStatus = this.value;
 
-        fetch(`/admin/order/changeStatus/${orderId}/${itemOrderId}`, {
+        fetch(`/admin/orders/update-status/${orderId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ document.querySelectorAll('.order-status').forEach((element) => {
                     location.reload();
                 });
              } else {
-                Swal.fire('Error', data.message  || 'There was an issue Error updating status of the Order.', 'error');
+                Swal.fire('Error', data.message  || 'Failed to update order status.', 'error');
             }
         })
         .catch(error => {

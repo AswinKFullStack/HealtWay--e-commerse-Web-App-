@@ -21,18 +21,24 @@
         ref:"Category",
         required:true
     },
-    regularPrice:{
-        type:Number,
-        required:true
+    regularPrice: {
+        type: Number,
+        required: true
     },
-    salePrice:{
-        type:Number,
-        required:true
+    salePrice: {
+        type: Number,
+        required: true
     },
-    productOffer:{
-        type:Number,
-        default:0
-    },
+    appliedOffers: [
+        {
+            offerId: {
+                type: Schema.Types.ObjectId,
+                ref: "Offer"
+            },
+            discountValue: Number,   
+            discountType: String     
+        }
+    ],
     weight: {
         type: String, 
         required: false

@@ -1,0 +1,59 @@
+<%- include("../../views/partials/admin/header") %>
+
+<h2 class="my-4">Sales Report</h2>
+
+<form class="mb-4" method="GET" action="/admin/sales-report">
+  <div class="form-row">
+    <div class="col">
+      <label for="reportType">Report Type</label>
+      <select class="form-control" id="reportType" name="reportType" onchange="toggleDateInputs()">
+        <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Date</option>
+        <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+        <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+        <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+      </select>
+    </div>
+    <div class="col">
+      <label for="startDate">Start Date</label>
+      <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
+    </div>
+    <div class="col">
+      <label for="endDate">End Date</label>
+      <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
+    </div>
+    <div class="col">
+      <label>&nbsp;</label>
+      <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
+    </div>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Total Orders</th>
+      <th>Total Sales (₹)</th>
+      <th>Total Discount (₹)</th>
+      <th>Total Coupon  deduction (₹)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><%= reportData.totalOrders %></td>
+      <td><%= reportData.totalSales %></td>
+      <td><%= reportData.totalDiscount %></td>
+      <td><%= reportData.totalCouponDeduction %></td>
+    </tr>
+  </tbody>
+</table>
+
+<%- include("../../views/partials/admin/footer") %>
+
+<script>
+  function toggleDateInputs() {
+    const reportType = document.getElementById('reportType').value;
+    document.getElementById('startDate').disabled = reportType !== 'custom';
+    document.getElementById('endDate').disabled = reportType !== 'custom';
+  }
+</script>
+

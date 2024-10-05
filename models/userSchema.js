@@ -19,10 +19,13 @@
         spare:true, 
         default:null
     },
-    googleId:{
-        type:String,
-        unique:true
-    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true  // Ensure this line is present
+    }
+    ,
+    
     password:{
         type:String,
         required:false
@@ -52,19 +55,29 @@
         default:Date.now,
 
     },
-    referalCode:{
-        type:String,
-         required:false
+    referralCode: { // Each user has a referral code
+        type: String,
+        unique: true
     },
-    redeemed:{
-        type:Boolean,
-        default: false
+    referrer: { // Track who referred the new user
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        default: null
     },
-    redeemUser:[{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        
+    redeemedOffers: [{  // Track which referral offers the user has redeemed
+        offerId: {
+            type: Schema.Types.ObjectId,
+            ref: "Offer"
+        },
+        redeemedOn: {
+            type: Date,
+            default: Date.now
+        }
     }],
+    referralRewards: { // Track the total rewards earned by referring others
+        type: Number,
+        default: 0
+    },
     searchHistory:[{
         category:{
             type:Schema.Types.ObjectId,

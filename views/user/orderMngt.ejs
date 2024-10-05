@@ -28,23 +28,33 @@
                     <img src="/uploads/re-image/<%= order.productDetails[0].productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
                 </div>
                 <div class="col-md-6">
-                    <h5><%= order.productDetails.productName %></h5>
-                    <p>Order Referance ID: <strong><%= order.orderId %></strong></p>
-                    <p>Order Date: <strong><%= order.createdAt %></strong></p>
+                    <h5><%= order.productDetails[0].productName %></h5> <!-- Fix to correctly access productName -->
+                    <p>Order Reference ID: <strong><%= order.orderId %></strong></p>
+                    <p>Order Date: <strong><%= new Date(order.createdAt).toLocaleDateString() %></strong></p> <!-- Display Date -->
                     <p>Payment Status: <span class="badge badge-success"><%= order.paymentDetails.status %></span></p>
                     <p>Delivery Status: <span class="badge badge-primary"><%= order.orderStatus %></span></p>
+
+                    <p>Quantity: <strong><%= order.quantity %></strong></p>
+                    <p>Total Price: <strong>₹<%= order.totalPrice %></strong></p>
+                    <% if (order.couponCode) { %>
+                        <p>Coupon: <strong><%= order.couponCode %></strong></p>
+                        <p>Coupon Discount: <strong>₹<%= order.couponDiscount %></strong></p>
+                    <% } %>
+                    <p>Final Price: <strong>₹<%= order.finalTotalPriceWithAllDiscount %></strong></p>
+
+                    <p>Shipping Address: <strong><%= order.shippingAddress.name %>, <%= order.shippingAddress.houseName %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.pincode %></strong></p>
                 </div>
                 <div class="col-md-3 text-center">
                     
                     <button class="btn btn-secondary mb-2" onclick="location.href='/orderView/<%= order._id %>'">Track Order</button>
-                    <% if (order.orderStatus  !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
+                    <% if (order.orderStatus  !== "Cancelled" && order.orderStatus !== "Delivered" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request" && order.orderStatus !== "Refunded") { %>
                         
                         <button type="button" class="btn custom-remove-btn" onclick="confirmRemove('<%= order._id %>')">
                             <i class="bi bi-trash-fill"></i> Cancel Order
                         </button>
                     
                     <% } %>
-                    <% if (order.orderStatus !== "Cancelled" && order.orderStatus !== "Returned" && order.orderStatus !== "Return Request") { %>
+                    <% if (order.orderStatus === "Delivered") { %>
                         <button class="btn btn-danger mb-2" onclick="confirmReturnRequest('<%= order._id %>')">Return Order</button>
                     <% } %>
                     

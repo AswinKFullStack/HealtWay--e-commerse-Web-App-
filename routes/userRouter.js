@@ -12,6 +12,9 @@ const shopController = require("../controllers/user/shopController");
 const checkoutController = require("../controllers/user/checkoutController");  
 const orderController = require("../controllers/user/orderController"); 
 const couponController = require("../controllers/user/couponController")
+const wishListController = require("../controllers/user/wishListController");
+const walletController = require("../controllers/user/walletController");
+const offerController = require("../controllers/user/offerController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -119,6 +122,23 @@ router.post('/online-payment-failed/restore-cart-items/:cartId',userAuth,orderCo
 
 router.get('/coupons',userAuth,couponController.getCoupons);
 router.post('/validateCoupon',userAuth,couponController.validateCoupon);
+
+
+//wishlist 
+router.post('/wishlist/toggle/:productId',userAuth,wishListController.wishListToggle);
+router.get('/wishlistView',userAuth,wishListController.loadWishlistPage);
+
+//wallet 
+
+router.get('/wallet',userAuth,walletController.loadWallet);
+router.post('/wallet/addFunds',userAuth,walletController.addFundInWallet);
+router.post('/wallet/refund',userAuth,walletController.refundInWallet)
+router.post('/wallet/create',userAuth,walletController.createWallet)
+
+
+//offer
+
+router.get('/offers',offerController.loadOffers);
 
 module.exports = router
 

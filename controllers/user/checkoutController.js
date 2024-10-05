@@ -62,6 +62,7 @@ const checkoutLoad = async (req, res) => {
       let cart;
       let paginatedCartItems = [];
       let totalCartPrice = 0;
+      let totalDiscount = 0;
       let totalCartPages = 1;
       let currentCartPage = cartPage;
   
@@ -73,19 +74,28 @@ const checkoutLoad = async (req, res) => {
   
             try {
               const product = await Product.findById(item.productId);
-  
-              if (!product || product.isDeleted || product.status !== "Available" || product.quantity === 0) {
-                cart.items.splice(i, 1);  // Remove invalid item
-                i--;  // Adjust index
+
+              const isProductAvailable = (product) => {
+                return product && !product.isDeleted && product.status === "Available" && product.quantity > 0;
+              };
+    
+              if (!isProductAvailable(product)) {
+                cart.items.splice(i, 1);  
+                i--; 
                 continue;
               }
   
-              if (product.quantity < item.quantity) {
+              if (product.quantity < item.quantity || product.salePrice !== (item.price - item.discount)) {
+                item.price = product.regularPrice;
                 item.quantity = product.quantity;
-                item.totalPrice = product.salePrice * item.quantity;
+                item.totalPrice = product.regularPrice * item.quantity;
+                item.discount = product.regularPrice - product.salePrice || 0;
+                item.finalTotalPrice = (product.salePrice || product.regularPrice) * item.quantity;
               }
   
-              totalCartPrice += item.totalPrice;
+              totalCartPrice += item.finalTotalPrice;
+              totalDiscount += item.discount * item.quantity;
+            
             } catch (productError) {
               console.error(`Error fetching product for item ${item.productId}:`, productError);
               cart.items.splice(i, 1);  // Remove item if there's an error with the product
@@ -93,8 +103,8 @@ const checkoutLoad = async (req, res) => {
             }
           }
   
-          // Update cart total price
-          cart.totalCartPrice = totalCartPrice;
+          cart.totalCartPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+          cart.finalTotalCartPrice = totalCartPrice;
           await cart.save();
   
           const totalCartItems = cart.items.length;
@@ -112,7 +122,6 @@ const checkoutLoad = async (req, res) => {
         cart = { items: [], totalCartPrice: 0 };  // Default empty cart on error
       }
   
-      // Render the checkout page
       res.render('checkout', {
         title: "Check Out Page",
         user,
@@ -120,7 +129,9 @@ const checkoutLoad = async (req, res) => {
         addresses: paginatedAddresses,
         cart: {
           items: paginatedCartItems,
-          totalCartPrice: cart.totalCartPrice
+          totalCartPrice: cart.totalCartPrice,
+          finalTotalCartPrice: cart.finalTotalCartPrice,
+          totalDiscount
         },
         currentAddressPage,
         currentCartPage,

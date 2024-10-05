@@ -32,6 +32,7 @@ const orderSchema = new Schema({
     },     //for razro payment ,before payment 
     paymentId: { type: String ,required : false},   // after successfully payment
     refundAmount: { type: Number, default: 0 }, 
+    refundStatus: { type: String, enum: ['Not Initiated', 'Partial', 'Full'], default: 'Not Initiated' },
   },
 
   shippingAddress: {
@@ -90,8 +91,12 @@ const orderSchema = new Schema({
 
   discount: { type: Number, default: 0 }, 
   couponCode: { type: String }, 
+  couponDiscount: { type: Number, default: 0 },
+  finalTotalPrice: { type: Number, required: true }, 
+  finalTotalPriceWithAllDiscount: { type: Number,required: true  },
   groupId: { type: String },
   invoiceDate: { type: Date },
+
   cancellationDate: { type: Date }, 
 
 }, { timestamps: true });

@@ -1,16 +1,28 @@
 <%- include("../../views/partials/user/header") %>
 <link rel="stylesheet" href="/css/userCss/productView.css">
 <link rel="stylesheet" href="/css/userCss/home.css">
-
+<link rel="stylesheet" href="/css/userCss/wishList.css">
+<link rel="stylesheet" href="/css/userCss/currentOffer.css">
 
 <!-- Current Offers Section -->
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <div class="alert alert-success text-center" role="alert">
         <h4 class="alert-heading">Special Offers!</h4>
-        <p>Don't miss out on our limited-time discounts! Click the button below to view all current offers.</p>
-        <button class="btn btn-success" onclick="location.href='/offers'">View All Offers</button>
+        <div class="slideshow-container">
+            <div class="slides-wrapper">
+                <% offers.forEach(offer => { %>
+                    <% if (offer.image) { %>
+                        <div class="slide">
+                            <img src="/uploads/re-image/<%= offer.image %>" class="offer-image" alt="<%= offer.title %>">
+                            <div class="text"><%= offer.title %></div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+        </div>
     </div>
 </div>
+
 
 <!-- Product Section -->
 <div class="container mt-4">
@@ -32,9 +44,14 @@
                         </a>
                     <% } %>
 
-                    <div class="position-absolute top-0 end-0 p-2">
-                        <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-                            <i class="bi bi-heart"></i>
+                    
+
+                     <!-- Heart Icon Button -->
+                     <div class="position-absolute top-0 end-0 p-2">
+                        <button class="btn  wishlist-btn" data-product-id="<%= product._id %>">
+                            
+                            <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'bi bi-heart-fill' : 'bi bi-heart' %>"></i>
+                            
                         </button>
                     </div>
                     
@@ -45,6 +62,9 @@
                         <p class="card-text">₹<%= product.salePrice %></p>
                         <% if (product.status !== "Available") { %>
                             <button class="btn btn-success" onclick="location.href='/notifyMe/product/<%= product._id %>'">Notify Me</button>
+                            <% } else if (cartProductIds && cartProductIds.includes(product._id.toString())) { %>
+                                <button class="btn btn-secondary" disabled>Already in Cart</button>
+                            
                             <% } else { %>
                         <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
                         <% }; %>
@@ -85,11 +105,13 @@
                             <a href="/product/view/<%= product._id %>">
                                 <img src="/uploads/re-image/<%= product.productImages[0] %>" class="card-img-top" alt="<%= product.productName %> Image">
                             </a>
-                            <div class="position-absolute top-0 end-0 p-2">
-                                <button class="btn btn-light" onclick="location.href='/product/addWishlist/<%= product._id %>'">
-                                    <i class="bi bi-heart"></i>
-                                </button>
-                            </div>
+                            
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn  wishlist-btn" data-product-id="<%= product._id %>">   
+                                        <i class="<%= wishlistProductIds.includes(product._id.toString()) ? 'bi bi-heart-fill' : 'bi bi-heart' %>"></i>
+                                    </button>
+                                </div>
+                            
                             <div class="card-body">
                                 <a href="/product/view/<%= product._id %>" class="custom-link">
                                     <h5 class="card-title"><%= product.productName %></h5>
@@ -98,6 +120,8 @@
                                 <p class="card-text">₹<%= product.salePrice %></p>
                                 <% if (product.status !== "Available") { %>
                                     <button class="btn btn-success" onclick="location.href='/notifyMe/product/<%= product._id %>'">Notify Me</button>
+                                    <% } else if (cartProductIds && cartProductIds.includes(product._id.toString())) { %>
+                                        <button class="btn btn-secondary" disabled>Already in Cart</button>
                                     <% } else { %>
                                 <button class="btn btn-success" onclick="location.href='/product/addCart/<%= product._id %>'">Add to Cart</button>
                                 <% }; %>
@@ -125,8 +149,8 @@
         <% } %>
     <% }); %>
 </div>
-
-
+<script src="/js/userJs/slideshow.js"></script>
+<script src="/js/userJs/wishList.js"></script>
 <%- include("../../views/partials/user/footer") %>
 
 

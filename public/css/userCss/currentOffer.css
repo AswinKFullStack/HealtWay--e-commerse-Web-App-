@@ -1,0 +1,42 @@
+/* Special Offers Banner Styling */
+.container-fluid {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.alert-success {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.slideshow-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 20px 0;
+}
+
+.slides-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 300%; /* Adjust according to how many images you want visible */
+}
+
+.slide {
+    min-width: 33.33%; /* Show 3 slides at a time */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.offer-image {
+    width: 100%;
+    height: 150px; /* Adjust height to fit a small banner */
+    object-fit: cover;
+}
+
+.text {
+    font-size: 14px;
+    padding: 10px;
+    color: #333;
+}

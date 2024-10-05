@@ -8,6 +8,8 @@ const brandController = require("../controllers/admin/brandController");
 const orderController = require("../controllers/admin/orderController");
 const orderUserController = require("../controllers/user/orderController");
 const couponController = require("../controllers/admin/couponController"); 
+const offerController = require("../controllers/admin/offerController"); 
+const salesReportController = require("../controllers/admin/salseReportController"); 
 const { route } = require("./userRouter");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
@@ -86,9 +88,9 @@ router.get('/product/unblock/:id',adminAuth,productController.unblockProduct);
 
 
                                 //listing orders
-router.get('/orders',adminAuth,orderController.getOrders);
+router.get('/orders',adminAuth,orderController.getAllOrders);
 
-router.post('/order/changeStatus/:orderIdOfCartItems/:itemOrderId',adminAuth,orderController.changeStatus);
+router.post('/orders/update-status/:orderId',adminAuth,orderController.updateOrderStatus);
 router.post('/order/cancel/:orderIdOfCartItems/:itemOrderId',adminAuth,orderUserController.cancelOrder);
 
 //      COUPONS
@@ -97,4 +99,23 @@ router.get('/coupons',adminAuth,couponController.listAllCoupons);
 router.get('/addCoupon',adminAuth,couponController.getAddCoupon);
 router.post('/addCoupon',adminAuth,couponController.postAddCoupon);
 router.get('/deleteCoupon/:couponId',adminAuth,couponController.deleteCoupon);
+
+
+//offer 
+
+router.get("/offers",adminAuth,offerController.loadOffers);
+router.get("/offerAdd",adminAuth,offerController.getOfferAddPage);
+router.post('/offerAdd',adminAuth,upload.single('image'),offerController.postAddOffer);
+router.get("/edit-offer/:id",adminAuth,offerController.editOffer);
+
+router.post("/delete-offer/:offerId",adminAuth,offerController.deleteOffer);
+
+router.get("/activate-offer/:offerId", adminAuth, offerController.activateOffer);
+router.get("/deactivate-offer/:offerId", adminAuth, offerController.deactivateOffer);
+
+
+//Report
+
+router.get("/sales-report", adminAuth ,salesReportController.getSalesReport);
+
 module.exports = router

@@ -19,7 +19,7 @@
     status: {
         type: String,
         enum: ['Listed', 'Unlisted'],
-        default: 'Unlisted'
+        default: 'Listed'
 
     },
     isDeleted: {

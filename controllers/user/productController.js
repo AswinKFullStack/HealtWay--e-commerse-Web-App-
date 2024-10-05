@@ -3,6 +3,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
 const Review = require("../../models/reviewSchema");
+const Wishlist = require("../../models/wishlistSchema");
 const Cart = require("../../models/cartSchema");
 const mongoose = require('mongoose');
 
@@ -16,7 +17,6 @@ const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLin
     });
 };
 
-// Render the product view page
 const getProductView = async (req, res) => {
     try {
         const productId = req.params.productId;
@@ -29,8 +29,9 @@ const getProductView = async (req, res) => {
 
         const user = req.session.user ? await User.findById(req.session.user) : null;
         let isCartItem = null;
+        let iswishlistItem = null;
         let cartProductIds = []; 
-
+        let wishlistProductIds = [];
         if (user) {
             const userCart = await Cart.findOne({ userId: user._id }).lean();
             if (userCart && userCart.items) {
@@ -46,6 +47,14 @@ const getProductView = async (req, res) => {
             } else {
                 console.log("Cart is empty.");
             }
+            //wishlist
+            const userWishlist = await Wishlist.findOne({ userId: user._id }).lean();
+            if (userWishlist && userWishlist.products.length > 0) {
+                wishlistProductIds = userWishlist.products.map(productId => productId.toString());
+                iswishlistItem = wishlistProductIds.includes(productId);
+            }
+
+
         } else {
             console.log("No user found.");
         }
@@ -86,7 +95,9 @@ const getProductView = async (req, res) => {
             user,
             message,
             isCartItem: isCartItem || null, 
+            iswishlistItem :iswishlistItem || null,
             cartProductIds: cartProductIds, 
+            wishlistProductIds: wishlistProductIds,
         });
     } catch (error) {
         console.error("Error fetching product details:", error);
