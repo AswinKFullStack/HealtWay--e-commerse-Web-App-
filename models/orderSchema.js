@@ -91,8 +91,12 @@ const orderSchema = new Schema({
 
   discount: { type: Number, default: 0 }, 
   couponCode: { type: String }, 
+  couponDiscount: { type: Number, default: 0 },
+  finalTotalPrice: { type: Number, required: true }, 
+  finalTotalPriceWithAllDiscount: { type: Number,required: true  },
   groupId: { type: String },
   invoiceDate: { type: Date },
+
   cancellationDate: { type: Date }, 
 
 }, { timestamps: true });

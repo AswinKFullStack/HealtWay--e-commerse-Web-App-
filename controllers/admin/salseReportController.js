@@ -7,23 +7,49 @@ const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 
 
+const moment = require("moment");  // Import moment for date handling
+
 const getSalesReport = async (req, res) => {
     try {
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, reportType = 'custom' } = req.query;
+
+        // Initialize date range variables
+        let start = null;
+        let end = null;
+
+        // Determine date ranges based on report type
+        switch (reportType) {
+            case 'daily':
+                start = moment().startOf('day').toDate();
+                end = moment().endOf('day').toDate();
+                break;
+            case 'weekly':
+                start = moment().startOf('isoWeek').toDate();  // Start of current ISO week
+                end = moment().endOf('isoWeek').toDate();      // End of current ISO week
+                break;
+            case 'yearly':
+                start = moment().startOf('year').toDate();     // Start of the current year
+                end = moment().endOf('year').toDate();         // End of the current year
+                break;
+            case 'custom':
+                // Use the dates provided in the request
+                start = startDate ? new Date(startDate) : null;
+                end = endDate ? new Date(endDate) : null;
+                break;
+        }
+
+        // Build query for MongoDB based on the selected date range
         let query = {};
-
-        if (startDate && endDate) {
+        if (start && end) {
             query = {
-              createdAt: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate),
-              },
+                createdAt: {
+                    $gte: start,
+                    $lte: end,
+                },
             };
-          }
+        }
 
-
-
-
+        // Aggregation to compute sales report
         const salesData = await Order.aggregate([
             { $match: query },
             {
@@ -37,25 +63,27 @@ const getSalesReport = async (req, res) => {
             }
         ]);
 
+        // Default report data if no sales are found
         const reportData = salesData.length > 0 ? salesData[0] : {
             totalSales: 0,
             totalOrders: 0,
             totalDiscount: 0,
-          };
-      
+        };
 
-          res.render("sales-report", {
+        // Render the report page with the required data
+        res.render("sales-report", {
             reportData,
-            startDate,
-            endDate,
-          });
-
+            startDate: start ? moment(start).format('YYYY-MM-DD') : '',
+            endDate: end ? moment(end).format('YYYY-MM-DD') : '',
+            reportType
+        });
 
     } catch (error) {
         console.error('Error generating sales report:', error);
-         res.status(500).json({ error: "Server error generating sales report" });
+        res.status(500).json({ error: "Server error generating sales report" });
     }
 };
+
 
 
 

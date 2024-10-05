@@ -75,12 +75,16 @@ const addCart = async (req, res) => {
                 const message = `The product (${product.productName}) is already in your cart. To modify its quantity, please use the cart update option.`;
                 return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${currentPage}`);
             } else {
-             
+                const price = product.salePrice || product.regularPrice;
+                const discount = product.salePrice ? product.regularPrice - product.salePrice : 0;
                 cartDoc.items.push({
                     productId: product._id,
-                    price: product.salePrice,
+                    price: product.regularPrice,
                     quantity: cartItemQuantity,
-                    totalPrice: product.salePrice * cartItemQuantity
+                    totalPrice: product.regularPrice * cartItemQuantity,
+                    discount : discount,
+                    finalTotalPrice : price * cartItemQuantity,
+
                 });
             }
         } else {
@@ -89,9 +93,11 @@ const addCart = async (req, res) => {
                 userId: user._id,
                 items: [{
                     productId: product._id,
-                    price: product.salePrice,
+                    price: product.regularPrice,
                     quantity: cartItemQuantity,
-                    totalPrice: product.salePrice * cartItemQuantity
+                    totalPrice: product.regularPrice * cartItemQuantity,
+                    discount : product.regularPrice - product.salePrice,
+                    finalTotalPrice : product.salePrice * cartItemQuantity,
                 }]
             });
         }
@@ -147,26 +153,38 @@ const LoadCartPage = async (req, res) => {
         }
 
         let totalCartPrice = 0;
+        let totalDiscount = 0;
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
             const product = await Product.findById(item.productId);
 
-            if (!product || product.isDeleted || product.status !== "Available" || product.quantity === 0) {
+            const isProductAvailable = (product) => {
+                return product && !product.isDeleted && product.status === "Available" && product.quantity > 0;
+            };
+            
+            if (!isProductAvailable(product)) {
                 cart.items.splice(i, 1);
-                i--;  
+                i--;
                 continue;
             }
+            
 
-            if (product.quantity < item.quantity || product.salePrice !== item.price) {
-                item.quantity = product.quantity;
-                item.totalPrice = product.salePrice * item.quantity;
-            }
+            if (product.quantity < item.quantity || product.salePrice !== (item.price - item.discount)) {
+                item.price = product.regularPrice;
+                item.quantity = product.quantity; 
+                item.totalPrice = product.regularPrice * item.quantity;
+                item.discount = product.regularPrice - product.salePrice || 0;
+                item.finalTotalPrice = (product.salePrice || product.regularPrice) * item.quantity;
+            }            
 
-            totalCartPrice += item.totalPrice;
+            totalCartPrice += item.finalTotalPrice;
+            totalDiscount += item.discount * item.quantity;
         }
 
-        cart.totalCartPrice = totalCartPrice;
+        cart.totalCartPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        cart.finalTotalCartPrice = totalCartPrice;
         await cart.save();
+        
 
         const totalItems = cart.items.length;
         const totalPages = Math.ceil(totalItems / limit);
@@ -180,7 +198,9 @@ const LoadCartPage = async (req, res) => {
             cart: {
             
                 items: paginatedItems,
-                totalCartPrice: cart.totalCartPrice
+                totalCartPrice: cart.totalCartPrice,
+                totalDiscount ,
+                finalTotalCartPrice :  cart.finalTotalCartPrice,
             },
             message,
             currentPage,
@@ -277,9 +297,15 @@ const cartUpdate = async (req, res) => {
         if (cartDoc) {
             const cartItem = cartDoc.items.id(cartItemId);
             if (cartItem) {
-                cartItem.price = product.salePrice;
+                const regularPrice = product.regularPrice;
+                const salePrice = product.salePrice;
+                const discount = regularPrice - salePrice;
+                
                 cartItem.quantity = cartItemNewQuantity;
-                cartItem.totalPrice = cartItemNewQuantity * product.salePrice;
+                cartItem.price = regularPrice;  
+                cartItem.discount = discount || 0;
+                cartItem.totalPrice = cartItemNewQuantity * regularPrice;
+                cartItem.finalTotalPrice = cartItemNewQuantity * salePrice;
 
                 await cartDoc.updateTotal();
                 
@@ -301,11 +327,14 @@ const cartUpdate = async (req, res) => {
                 userId: user._id,
                 items: [{
                     productId: product._id,
-                    price: product.salePrice,
+                    price: product.regularPrice,
+                    discount: product.regularPrice - product.salePrice || 0,
                     quantity: cartItemNewQuantity,
-                    totalPrice: cartItemNewQuantity * product.salePrice
+                    totalPrice: cartItemNewQuantity * product.regularPrice,
+                    finalTotalPrice: cartItemNewQuantity * product.salePrice
                 }]
             });
+
 
             await cartDoc.updateTotal();
             
@@ -359,7 +388,7 @@ const removeCartItem = async (req, res) => {
             return res.status(200).json({ success: true, message: 'Cart is now empty.' });
         }
 
-        await cartDoc.save();
+        await cartDoc.updateTotal();
 
         return res.status(200).json({ success: true, message: 'Item removed from cart successfully!' });
     } catch (error) {

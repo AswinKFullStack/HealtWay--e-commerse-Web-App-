@@ -5,12 +5,21 @@
 <form class="mb-4" method="GET" action="/admin/sales-report">
   <div class="form-row">
     <div class="col">
+      <label for="reportType">Report Type</label>
+      <select class="form-control" id="reportType" name="reportType" onchange="toggleDateInputs()">
+        <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Date</option>
+        <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+        <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+        <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+      </select>
+    </div>
+    <div class="col">
       <label for="startDate">Start Date</label>
-      <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>">
+      <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
     </div>
     <div class="col">
       <label for="endDate">End Date</label>
-      <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>">
+      <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
     </div>
     <div class="col">
       <label>&nbsp;</label>
@@ -37,3 +46,12 @@
 </table>
 
 <%- include("../../views/partials/admin/footer") %>
+
+<script>
+  function toggleDateInputs() {
+    const reportType = document.getElementById('reportType').value;
+    document.getElementById('startDate').disabled = reportType !== 'custom';
+    document.getElementById('endDate').disabled = reportType !== 'custom';
+  }
+</script>
+

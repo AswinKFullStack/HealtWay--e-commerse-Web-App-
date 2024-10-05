@@ -57,27 +57,31 @@ const confirmOrder = async (req, res) => {
                 continue;
             }
 
-            if (product.quantity < item.quantity || product.salePrice !== item.price) {
+            if (product.quantity < item.quantity ||  product.salePrice !== (item.price - item.discount)) {
+                item.price = product.regularPrice;
                 item.quantity = product.quantity;
-                item.totalPrice = product.salePrice * item.quantity;
+                item.totalPrice = product.regularPrice * item.quantity;
+                item.discount = product.regularPrice - product.salePrice || 0;
+                item.finalTotalPrice = (product.salePrice || product.regularPrice) * item.quantity;
             }
 
-            totalCartPrice += item.totalPrice;
+            totalCartPrice += item.finalTotalPrice;
         }
 
-         console.log("old Total cart Price =" ,cart.totalCartPrice);
+         console.log("old Total cart Price =" ,cart.finalTotalCartPrice);
          console.log("Updated cart total price = ",totalCartPrice);
-        if (cart.totalCartPrice !== totalCartPrice) {
-            cart.totalCartPrice = totalCartPrice;
+        if (cart.finalTotalCartPrice !== totalCartPrice) {
+            cart.totalCartPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+            cart.finalTotalCartPrice = totalCartPrice;
             await cart.save();
             const message = "The price of one or more items in your cart has been updated. Please review the updated total before proceeding with the payment.";
             console.log(message)
-            return  res.status(409).res.redirect(`/checkout?cartMessage=${encodeURIComponent(message)}`);
+            return  res.status(409).redirect(`/checkout?cartMessage=${encodeURIComponent(message)}`);
         }
 
         console.log("Cart validation finished")
         console.log(addressId);
-        if (!mongoose.Types.ObjectId.isValid(addressId)) {
+        if (!addressId || !mongoose.Types.ObjectId.isValid(addressId)){
             const message = "The requested address could not be found. Please check the address ID and try again."
             console.log(message)
             return res.status(404).redirect(`/checkout?cartMessage=${encodeURIComponent(message)}`);
@@ -162,8 +166,12 @@ const confirmOrder = async (req, res) => {
             product.quantity -= item.quantity;
             await product.save();
         }
-        const shippingAddress = userAddress[0];
 
+        const shippingAddress = userAddress && userAddress[0];
+        if (!shippingAddress) {
+            return res.status(404).json({ success: false, message: 'Shipping address not found.' });
+        }
+        
         
         
       
@@ -174,15 +182,18 @@ const confirmOrder = async (req, res) => {
                let OrderIds = [];
             for (let i = 0; i < cart.items.length; i++) {
                 const item = cart.items[i];
-                const totalPrice = item.totalPrice - singleItemDiscountAmount;
+               
                 const product = await Product.findById(item.productId);
                 const newOrder = {
                     userId: user._id,
                     productId :product._id ,
                     quantity : item.quantity ,
-                    totalPrice : totalPrice > 0 ? totalPrice : 0,
+                    totalPrice : item.totalPrice > 0 ? item.totalPrice : 0,
                     orderStatus : 'Confirmed' ,
-                    discount : singleItemDiscountAmount || 0,
+                    discount : item.discount * item.quantity,
+                    couponDiscount: singleItemDiscountAmount || 0,
+                    finalTotalPrice : item.finalTotalPrice,
+                    finalTotalPriceWithAllDiscount : item.finalTotalPrice - singleItemDiscountAmount,
                     paymentDetails :{method : paymentMethod },
                     shippingAddress ,  
                     groupId : cart._id,
@@ -197,7 +208,7 @@ const confirmOrder = async (req, res) => {
             }
     
             
-                const TotalPrice = cart.totalCartPrice - discountAmount;
+                const TotalPrice = cart.finalTotalCartPrice - discountAmount;
                 await Cart.findByIdAndDelete(cartId);
                 if (req.body.couponId) {
                     const couponId = req.body.couponId;
@@ -225,7 +236,7 @@ const confirmOrder = async (req, res) => {
             
 
         } else if (paymentMethod === "Online") {
-            const TotalPrice = cart.totalCartPrice - discountAmount;
+            const TotalPrice = cart.finalTotalCartPrice - discountAmount;
 
             const razorpayOrder = await razorpayInstance.orders.create({
                 amount: TotalPrice * 100, // Razorpay requires amount in paise (1 INR = 100 paise)
@@ -239,7 +250,7 @@ const confirmOrder = async (req, res) => {
             return res.status(200).json({ 
                 OnlinePayment : true, 
                 razorpayOrderId: razorpayOrder.id,
-                amount: cart.totalCartPrice ,
+                amount: cart.finalTotalCartPrice ,
                 razor_key_id: process.env.RAZORPAY_KEY_ID, 
                 addressId,
                 cartId ,
@@ -261,7 +272,7 @@ const confirmOrder = async (req, res) => {
 
 
 
-///Confirmed bill
+///Confirmed bill ,User side giving Confirm page
 
 const orderConfirmed = async (req,res) => {
 
@@ -316,7 +327,14 @@ const LoadOrderPage = async (req, res) => {
         ]);
 
         if (!ordersDetailList.length) {
-            return renderErrorPage(res, 404, 'No Orders Found', 'This user has no orders to display.', '/back-to-home');
+            //return renderErrorPage(res, 404, 'No Orders Found', 'This user has no orders to display.', '/back-to-home');
+            return res.render('orderMngt',{
+                title : "My Orders",
+                user,
+                orders : [],
+                currentPage : page,
+                totalPages : page
+            });
         }
 
         const sortedOrdersDetailList = ordersDetailList.sort((a, b) => {
@@ -379,7 +397,7 @@ const cancelOrder = async (req,res) => {
             console.log("Product quantity update result:", productUpdateResult);
             
             if (orderDoc.paymentDetails.status === 'Paid') {
-                const refundAmount = orderDoc.totalPrice;
+                const refundAmount = orderDoc.finalTotalPriceWithAllDiscount;
                 let walletDoc = await Wallet.findOne({ userId: orderDoc.userId });
 
                 if (!walletDoc) {
@@ -534,15 +552,19 @@ const onlinePayment = async (req,res) => {
         let OrderIds = [];
         for (let i = 0; i < cart.items.length; i++) {
             const item = cart.items[i];
-            const totalPrice = item.totalPrice - singleItemDiscountAmount;
+            
             const product = await Product.findById(item.productId);
             
             const newOrder = {
-                userId: req.session.user,
-                productId :product._id ,
-                quantity : item.quantity ,
-                totalPrice : totalPrice > 0 ? totalPrice : 0,
+                userId: user._id,
+                productId: product._id,
+                quantity: item.quantity,
+                totalPrice: item.totalPrice > 0 ? item.totalPrice : 0,
                 orderStatus : 'Confirmed' ,
+                discount: item.discount * item.quantity,
+                finalTotalPrice: item.finalTotalPrice,
+                couponDiscount: singleItemDiscountAmount || 0,
+                finalTotalPriceWithAllDiscount: item.finalTotalPrice - singleItemDiscountAmount,
                 paymentDetails :{method : "Online",gateway :"Razorpay",status:"Paid" ,beforePymentRefId:razorpayOrderId,paymentId},
                 shippingAddress ,  
                 groupId : cart._id,
@@ -559,7 +581,7 @@ const onlinePayment = async (req,res) => {
         
             
         
-        const TotalPrice = cart.totalCartPrice - discountAmount;
+        const TotalPrice = cart.finalTotalCartPrice - discountAmount;
         await Cart.findByIdAndDelete(cartId);
         if (couponId) {
             const couponId = req.body.couponId;

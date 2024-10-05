@@ -28,11 +28,21 @@
                     <img src="/uploads/re-image/<%= order.productDetails[0].productImages[0] || '/path/to/default.jpg' %>" alt="Ordered Product Image[0]" class="img-fluid">
                 </div>
                 <div class="col-md-6">
-                    <h5><%= order.productDetails.productName %></h5>
-                    <p>Order Referance ID: <strong><%= order.orderId %></strong></p>
-                    <p>Order Date: <strong><%= order.createdAt %></strong></p>
+                    <h5><%= order.productDetails[0].productName %></h5> <!-- Fix to correctly access productName -->
+                    <p>Order Reference ID: <strong><%= order.orderId %></strong></p>
+                    <p>Order Date: <strong><%= new Date(order.createdAt).toLocaleDateString() %></strong></p> <!-- Display Date -->
                     <p>Payment Status: <span class="badge badge-success"><%= order.paymentDetails.status %></span></p>
                     <p>Delivery Status: <span class="badge badge-primary"><%= order.orderStatus %></span></p>
+
+                    <p>Quantity: <strong><%= order.quantity %></strong></p>
+                    <p>Total Price: <strong>₹<%= order.totalPrice %></strong></p>
+                    <% if (order.couponCode) { %>
+                        <p>Coupon: <strong><%= order.couponCode %></strong></p>
+                        <p>Coupon Discount: <strong>₹<%= order.couponDiscount %></strong></p>
+                    <% } %>
+                    <p>Final Price: <strong>₹<%= order.finalTotalPriceWithAllDiscount %></strong></p>
+
+                    <p>Shipping Address: <strong><%= order.shippingAddress.name %>, <%= order.shippingAddress.houseName %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.pincode %></strong></p>
                 </div>
                 <div class="col-md-3 text-center">
                     
