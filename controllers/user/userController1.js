@@ -260,7 +260,7 @@ const verifyOtp = async (req, res) => {
                 phone: user.phone,
                 password: passwordHash,
                 referralCode: generateReferralCode(),
-                redeemed: false,
+                
                 
             });
 
@@ -273,7 +273,9 @@ const verifyOtp = async (req, res) => {
                 const referralOffer = await Offer.findOne({ type: 'Referral', isActive: true });
                 console.log("referralOffer =",referralOffer )
                 console.log("referrer.redeemed =",referrer.redeemed)
-                if (referralOffer && !referrer.redeemed) {
+                if (referralOffer) {
+                    const hasRedeemed = referrer.redeemedOffers.some(offer => offer.offerId.equals(referralOffer._id));
+                    if (!hasRedeemed) {
                     try {
                     const referrerWallet = await Wallet.findOne({ userId: referrer._id }) || new Wallet({ userId: referrer._id, balance: 0, transactions: [] });
                     const referrerReward =  referralOffer.discountValue;
@@ -298,7 +300,7 @@ const verifyOtp = async (req, res) => {
                     });
                     await newUserWallet.save();
 
-                    referrer.redeemed = true;
+                    referrer.redeemedOffers.push({ offerId: referralOffer._id });
                     await referrer.save();
                 } catch (walletError) {
                     console.error("Error updating wallets", walletError);
@@ -309,6 +311,9 @@ const verifyOtp = async (req, res) => {
                         });
                    
                 }
+            } else {
+                console.log("Referrer has already redeemed this offer.");
+            }
             }
         }
 

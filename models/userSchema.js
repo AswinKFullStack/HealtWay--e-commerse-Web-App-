@@ -64,10 +64,16 @@
         ref: "User",
         default: null
     },
-    redeemed: { // Check if user has already used a referral
-        type: Boolean,
-        default: false
-    },
+    redeemedOffers: [{  // Track which referral offers the user has redeemed
+        offerId: {
+            type: Schema.Types.ObjectId,
+            ref: "Offer"
+        },
+        redeemedOn: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     referralRewards: { // Track the total rewards earned by referring others
         type: Number,
         default: 0
