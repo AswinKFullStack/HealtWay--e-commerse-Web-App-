@@ -9,35 +9,40 @@ const moment = require("moment");  // Import moment for date handling
 
 const getSalesReport = async (req, res) => {
     try {
-        const { startDate, endDate, reportType = 'custom' } = req.query;
+        const { startDate, endDate, reportType = 'custom' ,page = 1} = req.query;
+        const pageSize = 3;
 
-        // Initialize date range variables
         let start = null;
         let end = null;
 
-        // Determine date ranges based on report type
         switch (reportType) {
             case 'daily':
                 start = moment().startOf('day').toDate();
                 end = moment().endOf('day').toDate();
                 break;
             case 'weekly':
-                start = moment().startOf('isoWeek').toDate();  // Start of current ISO week
-                end = moment().endOf('isoWeek').toDate();      // End of current ISO week
+                start = moment().startOf('isoWeek').toDate();  
+                end = moment().endOf('isoWeek').toDate();      
                 break;
             case 'yearly':
-                start = moment().startOf('year').toDate();     // Start of the current year
-                end = moment().endOf('year').toDate();         // End of the current year
+                start = moment().startOf('year').toDate();     
+                end = moment().endOf('year').toDate();         
                 break;
             case 'custom':
-                // Use the dates provided in the request
-                start = startDate ? new Date(startDate) : null;
-                end = endDate ? new Date(endDate) : null;
+                if (startDate && endDate) {
+                    start = new Date(startDate);
+                    end = new Date(endDate);
+                        
+                        // If startDate and endDate are the same, adjust the end date to include the entire day
+                    if (startDate === endDate) {
+                            end.setHours(23, 59, 59, 999);  // End of the day
+                        }
+                    }
                 break;
         }
 
-        // Build query for MongoDB based on the selected date range
         let query = {};
+
         if (start && end) {
             query = {
                 createdAt: {
@@ -47,21 +52,27 @@ const getSalesReport = async (req, res) => {
             };
         }
 
-        // Aggregation to compute sales report
+        const orders = await Order.find(query)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate('productId');
+
+        const totalOrdersCount = await Order.countDocuments(query);
+        const totalPages = Math.ceil(totalOrdersCount / pageSize);
+
         const salesData = await Order.aggregate([
             { $match: query },
             {
                 $group: {
                     _id: null,
-                    totalSales: { $sum: '$finalTotalPriceWithAllDiscount' },  // Total sales amount
-                    totalDiscount: { $sum: '$discount' }, // Total discount
-                    totalOrders: { $sum: 1 },             // Total number of orders
-                    totalCouponDeduction: { $sum: '$couponDiscount' } // Track used coupon codes
+                    totalSales: { $sum: '$finalTotalPriceWithAllDiscount' },  
+                    totalDiscount: { $sum: '$discount' },
+                    totalOrders: { $sum: 1 },             
+                    totalCouponDeduction: { $sum: '$couponDiscount' } 
                 }
             }
         ]);
 
-        // Default report data if no sales are found
         const reportData = salesData.length > 0 ? salesData[0] : {
             totalSales: 0,
             totalOrders: 0,
@@ -69,9 +80,15 @@ const getSalesReport = async (req, res) => {
             totalCouponDeduction: 0,
         };
 
-        // Render the report page with the required data
+        if (req.xhr) {
+            return res.json({ orders, totalPages, currentPage: page });
+        }
+
         res.render("sales-report", {
             reportData,
+            orders,
+            totalPages,
+            currentPage: parseInt(page),
             startDate: start ? moment(start).format('YYYY-MM-DD') : '',
             endDate: end ? moment(end).format('YYYY-MM-DD') : '',
             reportType

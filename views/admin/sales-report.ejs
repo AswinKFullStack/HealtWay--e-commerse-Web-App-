@@ -2,7 +2,7 @@
 
 <h2 class="my-4">Sales Report</h2>
 
-<form class="mb-4" method="GET" action="/admin/sales-report">
+<form class="mb-4" method="GET" action="/admin/sales-reportPagination">
   <div class="form-row">
     <div class="col">
       <label for="reportType">Report Type</label>
@@ -28,6 +28,18 @@
   </div>
 </form>
 
+
+<!-- Sales report corresponding orders listing table with basic detail  -->
+
+
+<div id="ordersTable">
+
+</div>
+
+<nav id="paginationNav">
+
+</nav>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -50,10 +62,118 @@
 <%- include("../../views/partials/admin/footer") %>
 
 <script>
+
   function toggleDateInputs() {
     const reportType = document.getElementById('reportType').value;
-    document.getElementById('startDate').disabled = reportType !== 'custom';
-    document.getElementById('endDate').disabled = reportType !== 'custom';
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+
+    if (reportType === 'custom') {
+      startDate.disabled = false;
+      endDate.disabled = false;
+    } else {
+      startDate.disabled = true;
+      endDate.disabled = true;
+      startDate.value = ''; // Clear the value to avoid conflicts
+      endDate.value = ''; // Clear the value to avoid conflicts
+    }
   }
+
+  // Call this function on page load to ensure proper state if a type was previously selected
+  window.onload = toggleDateInputs;
+
+
+
+
+
+
+
+  function loadSalesReport(page = 1) {
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    $.ajax({
+      url: `/admin/sales-reportPagination?page=${page}`,
+      method: 'GET',
+      data: {
+        reportType,
+        startDate,
+        endDate
+      },
+      success: function(data) {
+        // Replace the orders table with the new data
+        $('#ordersTable').html(`
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Quantity Of Items</th>
+                <th>Regular Total Price</th>
+                <th>Discount</th>
+                <th>Coupons Deduction</th>
+                <th>Sold Price (with All Deduction)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.orders.map(order => `
+                <tr>
+                  <td>${order.orderId}</td>
+                  <td>${order.productId.name}</td>
+                  <td>${order.quantity}</td>
+                  <td>${order.totalPrice}</td>
+                  <td>${order.discount}</td>
+                  <td>${order.couponDiscount}</td>
+                  <td>${order.finalTotalPriceWithAllDiscount}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `);
+
+        // Update pagination links
+        const paginationHtml = [];
+        if (data.currentPage > 1) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${data.currentPage - 1})" class="btn btn-outline-secondary mr-2">Previous</a>`);
+        }
+
+        for (let i = 1; i <= data.totalPages; i++) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${i})" class="btn btn-outline-primary ${i === data.currentPage ? 'active' : ''} mr-1">${i}</a>`);
+        }
+
+        if (data.currentPage < data.totalPages) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${data.currentPage + 1})" class="btn btn-outline-secondary ml-2">Next</a>`);
+        }
+
+        $('#paginationNav').html(paginationHtml.join(''));
+      }
+    });
+  }
+
+  // Initial load
+  loadSalesReport();
+
+  // Reload when filters change
+  document.getElementById('reportType').addEventListener('change', () => loadSalesReport());
+  document.getElementById('startDate').addEventListener('change', () => loadSalesReport());
+  document.getElementById('endDate').addEventListener('change', () => loadSalesReport());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
