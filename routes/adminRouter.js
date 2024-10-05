@@ -117,5 +117,7 @@ router.get("/deactivate-offer/:offerId", adminAuth, offerController.deactivateOf
 //Report
 
 router.get("/sales-report", adminAuth ,salesReportController.getSalesReport);
-router.get('/sales-reportPagination',adminAuth,salesReportController.getSalesReport)
+router.get('/sales-report-pagination',adminAuth,salesReportController.getSalesReport);
+router.get('/sales-report-download',adminAuth,salesReportController.getSalesReport);
+router.get("/sales-report-filter", adminAuth ,salesReportController.getSalesReport);
 module.exports = router

@@ -1,64 +1,48 @@
 
-
-
-
 const Order = require("../../models/orderSchema");
-const mongoose = require("mongoose");
-const moment = require("moment");  // Import moment for date handling
+const PDFDocument = require('pdfkit');
+const ExcelJS = require('exceljs');
+const moment = require('moment');
 
 
 const getSalesReport = async (req, res) => {
-    try {
-        const { startDate, endDate, reportType = 'custom' ,page = 1} = req.query;
-        const pageSize = 3;
+    try{
+    const { startDate, endDate, reportType = 'custom', page = 1 ,format} = req.query;
+    const pageSize = 5;
 
-        let start = null;
-        let end = null;
+    let start = null, end = null;
 
-        switch (reportType) {
-            case 'daily':
-                start = moment().startOf('day').toDate();
-                end = moment().endOf('day').toDate();
-                break;
-            case 'weekly':
-                start = moment().startOf('isoWeek').toDate();  
-                end = moment().endOf('isoWeek').toDate();      
-                break;
-            case 'yearly':
-                start = moment().startOf('year').toDate();     
-                end = moment().endOf('year').toDate();         
-                break;
-            case 'custom':
-                if (startDate && endDate) {
-                    start = new Date(startDate);
-                    end = new Date(endDate);
-                        
-                        // If startDate and endDate are the same, adjust the end date to include the entire day
-                    if (startDate === endDate) {
-                            end.setHours(23, 59, 59, 999);  // End of the day
-                        }
-                    }
-                break;
+    switch (reportType) {
+      case 'daily':
+        start = moment().startOf('day').toDate();
+        end = moment().endOf('day').toDate();
+        break;
+      case 'weekly':
+        start = moment().startOf('isoWeek').toDate();
+        end = moment().endOf('isoWeek').toDate();
+        break;
+      case 'yearly':
+        start = moment().startOf('year').toDate();
+        end = moment().endOf('year').toDate();
+        break;
+      case 'custom':
+        if (startDate && endDate) {
+          start = new Date(startDate);
+          end = new Date(endDate);
+          if (startDate === endDate) end.setHours(23, 59, 59, 999);
         }
+        break;
+    }
 
-        let query = {};
+    const query = start && end ? { createdAt: { $gte: start, $lte: end } } : {};
 
-        if (start && end) {
-            query = {
-                createdAt: {
-                    $gte: start,
-                    $lte: end,
-                },
-            };
-        }
+    const orders = await Order.find(query)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .populate('productId');
 
-        const orders = await Order.find(query)
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .populate('productId');
-
-        const totalOrdersCount = await Order.countDocuments(query);
-        const totalPages = Math.ceil(totalOrdersCount / pageSize);
+    const totalOrdersCount = await Order.countDocuments(query);
+    const totalPages = Math.ceil(totalOrdersCount / pageSize);
 
         const salesData = await Order.aggregate([
             { $match: query },
@@ -79,6 +63,12 @@ const getSalesReport = async (req, res) => {
             totalDiscount: 0,
             totalCouponDeduction: 0,
         };
+
+        if (format === 'pdf') {
+            return generatePDFReport(orders, reportData, res);
+          } else if (format === 'excel') {
+            return generateExcelReport(orders, reportData, res);
+          }
 
         if (req.xhr) {
             return res.json({ orders, totalPages, currentPage: page });
@@ -104,52 +94,79 @@ const getSalesReport = async (req, res) => {
 
 
 
-const generateExcelReport = async (req, res, salesData) => {
+// Function to generate Excel report
+const generateExcelReport = async (orders, reportData, res) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Sales Report');
-
-    sheet.columns = [
-        { header: 'Total Sales', key: 'totalSales', width: 15 },
-        { header: 'Total Discount', key: 'totalDiscount', width: 15 },
-        { header: 'Total Orders', key: 'totalOrders', width: 15 }
-    ];
-
-    sheet.addRow({
-        totalSales: salesData.totalSales,
-        totalDiscount: salesData.totalDiscount,
-        totalOrders: salesData.totalOrders
+  
+    // Report Summary
+    sheet.addRow(['Total Sales', reportData.totalSales]);
+    sheet.addRow(['Total Orders', reportData.totalOrders]);
+    sheet.addRow(['Total Discount', reportData.totalDiscount]);
+    sheet.addRow(['Total Coupon Deduction', reportData.totalCouponDeduction]);
+    sheet.addRow([]);
+  
+    // Table Header
+    sheet.addRow(['Order ID', 'Product Name', 'Quantity', 'Total Price']);
+    
+    // Populate the order rows
+    orders.forEach(order => {
+      sheet.addRow([
+        order._id.toString(),
+        order.productId.name,
+        order.quantity,
+        order.finalTotalPriceWithAllDiscount,
+      ]);
     });
-
+  
+    const fileName = `sales_report_${moment().format('YYYYMMDDHHmmss')}.xlsx`;
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="sales_report.xlsx"');
-
+  
     await workbook.xlsx.write(res);
     res.end();
-};
+  };
 
 
 
-const generatePdfReport = (req, res, salesData) => {
+// Function to generate PDF report
+const generatePDFReport = (orders, reportData, res) => {
     const doc = new PDFDocument();
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
-
-    doc.pipe(res);
-
-    doc.fontSize(18).text('Sales Report', { align: 'center' });
-    doc.fontSize(12).text(`Total Sales: $${salesData.totalSales}`);
-    doc.text(`Total Discount: $${salesData.totalDiscount}`);
-    doc.text(`Total Orders: ${salesData.totalOrders}`);
+    const fileName = `sales_report_${moment().format('YYYYMMDDHHmmss')}.pdf`;
     
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.setHeader('Content-Type', 'application/pdf');
+  
+    doc.pipe(res);
+  
+    doc.fontSize(20).text('Sales Report', { align: 'center' });
+    doc.moveDown();
+    
+    // Report Summary
+    doc.fontSize(12).text(`Total Sales: ₹${reportData.totalSales}`);
+    doc.text(`Total Orders: ${reportData.totalOrders}`);
+    doc.text(`Total Discount: ₹${reportData.totalDiscount}`);
+    doc.text(`Total Coupon Deduction: ₹${reportData.totalCouponDeduction}`);
+    doc.moveDown();
+  
+    // Orders Table
+    doc.fontSize(15).text('Order Details', { underline: true });
+    orders.forEach(order => {
+      doc.moveDown();
+      doc.fontSize(10).text(`Order ID: ${order._id}`);
+      doc.text(`Product Name: ${order.productId.name}`);
+      doc.text(`Quantity: ${order.quantity}`);
+      doc.text(`Total Price: ₹${order.finalTotalPriceWithAllDiscount}`);
+    });
+  
     doc.end();
-};
+  };
+  
 
 
 
 
 module.exports= {
     getSalesReport,
-    generateExcelReport,
-    generatePdfReport 
+   
 }
