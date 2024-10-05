@@ -39,7 +39,8 @@ const getSalesReport = async (req, res) => {
     const orders = await Order.find(query)
       .skip((page - 1) * pageSize)
       .limit(pageSize)
-      .populate('productId');
+      .populate('productId')
+      .sort({createdAt:-1});
 
     const totalOrdersCount = await Order.countDocuments(query);
     const totalPages = Math.ceil(totalOrdersCount / pageSize);
@@ -64,11 +65,7 @@ const getSalesReport = async (req, res) => {
             totalCouponDeduction: 0,
         };
 
-        if (format === 'pdf') {
-            return generatePDFReport(orders, reportData, res);
-          } else if (format === 'excel') {
-            return generateExcelReport(orders, reportData, res);
-          }
+    
 
         if (req.xhr) {
             return res.json({ orders, totalPages, currentPage: page });
@@ -92,6 +89,84 @@ const getSalesReport = async (req, res) => {
 
 
 
+const downloadSaleReport = async (req, res) => {
+    try {
+      const { startDate, endDate, reportType = 'custom', format } = req.query;
+  
+      let start = null, end = null;
+  
+      switch (reportType) {
+        case 'daily':
+          start = moment().startOf('day').toDate();
+          end = moment().endOf('day').toDate();
+          break;
+        case 'weekly':
+          start = moment().startOf('isoWeek').toDate();
+          end = moment().endOf('isoWeek').toDate();
+          break;
+        case 'yearly':
+          start = moment().startOf('year').toDate();
+          end = moment().endOf('year').toDate();
+          break;
+        case 'custom':
+          if (startDate && endDate) {
+            start = new Date(startDate);
+            end = new Date(endDate);
+            if (startDate === endDate) end.setHours(23, 59, 59, 999);
+          }
+          break;
+        default:
+          throw new Error('Invalid report type provided.');
+      }
+  
+      const query = start && end ? { createdAt: { $gte: start, $lte: end } } : {};
+  
+      const orders = await Order.find(query).populate('productId').sort({createdAt :-1});
+      if (!orders) {
+        throw new Error('Failed to retrieve orders.');
+      }
+  
+    
+  
+      const salesData = await Order.aggregate([
+        { $match: query },
+        {
+          $group: {
+            _id: null,
+            totalSales: { $sum: '$finalTotalPriceWithAllDiscount' },
+            totalDiscount: { $sum: '$discount' },
+            totalOrders: { $sum: 1 },
+            totalCouponDeduction: { $sum: '$couponDiscount' }
+          }
+        }
+      ]);
+  
+      const reportData = salesData.length > 0 ? salesData[0] : {
+        totalSales: 0,
+        totalOrders: 0,
+        totalDiscount: 0,
+        totalCouponDeduction: 0,
+      };
+  
+      if (format === 'pdf') {
+        return generatePDFReport(orders, reportData, res);
+      } else if (format === 'excel') {
+        return generateExcelReport(orders, reportData, res);
+      } else {
+        throw new Error('Invalid format specified. Supported formats are pdf and excel.');
+      }
+  
+    } catch (error) {
+      console.error('Error generating sales report:', error);
+  
+      return res.status(500).json({
+        error: error.message || 'An unexpected error occurred while generating the sales report.'
+      });
+    }
+  };
+  
+
+
 
 
 // Function to generate Excel report
@@ -113,7 +188,7 @@ const generateExcelReport = async (orders, reportData, res) => {
     orders.forEach(order => {
       sheet.addRow([
         order._id.toString(),
-        order.productId.name,
+        order.productId.productName,
         order.quantity,
         order.finalTotalPriceWithAllDiscount,
       ]);
@@ -126,6 +201,8 @@ const generateExcelReport = async (orders, reportData, res) => {
     await workbook.xlsx.write(res);
     res.end();
   };
+
+
 
 
 
@@ -154,7 +231,7 @@ const generatePDFReport = (orders, reportData, res) => {
     orders.forEach(order => {
       doc.moveDown();
       doc.fontSize(10).text(`Order ID: ${order._id}`);
-      doc.text(`Product Name: ${order.productId.name}`);
+      doc.text(`Product Name: ${order.productId.productName}`);
       doc.text(`Quantity: ${order.quantity}`);
       doc.text(`Total Price: ₹${order.finalTotalPriceWithAllDiscount}`);
     });
@@ -168,5 +245,6 @@ const generatePDFReport = (orders, reportData, res) => {
 
 module.exports= {
     getSalesReport,
+    downloadSaleReport
    
 }
