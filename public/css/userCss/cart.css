@@ -71,3 +71,27 @@ body {
     opacity: 0;
     transition: opacity 1s ease-out; /* Adjust the duration and easing as needed */
 }
+
+
+/* pagination's alignment */
+
+.pagination {
+    justify-content: center;
+    display: flex;
+    margin-top: 20px;
+}
+
+.pagination .btn {
+    margin-right: 5px;
+}
+
+.pagination .btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+
+
+.card {
+    margin-bottom: 15px;
+}

@@ -1,17 +1,3 @@
-
-let typingTimer;
-const doneTypingInterval = 1000; // 1 second
-
-document.querySelectorAll('.quantity-input').forEach(input => {
-  const cartItemId = input.id.split('-')[1]; // Extract cartItemId from input's ID
-  input.addEventListener('input', function() {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      document.getElementById(`cart-form-${cartItemId}`).submit();
-    }, doneTypingInterval);
-  });
-});
-
   
 /// Script to hide message after some seconds -->
 
@@ -28,14 +14,7 @@ document.querySelectorAll('.quantity-input').forEach(input => {
             }, 1000); // Match this timeout with the duration in your CSS transition
         }, 3000); // Show for 5 seconds before starting to fade out
     }
-    
-
-
-   
-
-
-
-    
+        
     function confirmRemove(productId, cartItemId) {
         Swal.fire({
             title: 'Are you sure?',
@@ -75,4 +54,78 @@ document.querySelectorAll('.quantity-input').forEach(input => {
             }
         });
     }
+
+
+
+
+
+    // JavaScript for Quantity Update with AJAX
+    function updateQuantity(cartItemId, action, productId) {
+        const quantityInput = document.getElementById(`quantity-${cartItemId}`);
+        let currentQuantity = parseInt(quantityInput.value);
+       
+        if (action === 'decrease' && currentQuantity > 1) {
+            currentQuantity -= 1;
+        } else if (action === 'increase') {
+            currentQuantity += 1;
+        }
+    
+        
+    
+        fetch(`/cart/update/${cartItemId}/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity: currentQuantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update total price and other relevant data in the DOM
+                updateCartItemTotal(cartItemId, currentQuantity, data.itemTotalPrice, data.itemFinalPrice);
+                updateOrderSummary( data.cartSummarySubtotal ,data.cartSummaryTotal);
+            } else {
+               
+                Swal.fire('Error', data.message, 'error');
+                
+                
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', "Server error", 'error');
+            
+
+        });
+    }
+
+
+
+
+    function updateCartItemTotal(cartItemId, newQuantity, itemTotalPrice, itemFinalPrice) {
+        // Update the item's total price and final price
+        const itemTotalElement = document.querySelector(`#item-total-price-${cartItemId}`);
+        const itemFinalElement = document.querySelector(`#item-final-price-${cartItemId}`);
+        const itemCurrentQnty = document.getElementById(`quantity-${cartItemId}`);
+        if (itemTotalElement && itemFinalElement) {
+            itemTotalElement.textContent = `$${itemTotalPrice.toFixed(2)}`;
+            itemFinalElement.textContent = `$${itemFinalPrice.toFixed(2)}`;
+            itemCurrentQnty.value = newQuantity;
+        }
+    }
+    
+    function updateOrderSummary(subtotal,total) {
+        const discount = subtotal-total;
+        // Update the order summary values
+        const subtotalElement = document.querySelector('#cart-subtotal');
+        const discountElement = document.querySelector('#cart-discount');
+        const totalElement = document.querySelector('#cart-total');
+        
+        if (subtotalElement && discountElement && totalElement) {
+            subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            discountElement.textContent = `$${discount.toFixed(2)}`;
+            totalElement.textContent = `$${total.toFixed(2)}`;
+        }
+    }
+    
+    
 
