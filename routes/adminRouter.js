@@ -21,6 +21,7 @@ const upload = require("../helpers/multer");
 
 
 
+
 //Admin loging mnagment 
 router.get("/login",adminController1.loadLogin);
 router.post("/login",adminController1.login);
@@ -69,10 +70,14 @@ router.get('/brand/delete/:id',adminAuth,brandController.deleteBrand);
 //Product management
 
 
-router.get('/addProduct',adminAuth,productController.getProductAddPage);
+
 // Product management
-router.get('/addProduct', adminAuth, productController.getProductAddPage);
-router.post('/addProduct', adminAuth, upload.array('productImage', 5), productController.postAddProduct);
+router.get('/addProduct',  productController.getProductAddPage);
+router.post('/addProduct', upload.fields([
+        { name: 'productImage1', maxCount: 1 },
+        { name: 'productImage2', maxCount: 1 },
+        { name: 'productImage3', maxCount: 1 }
+    ]), productController.postAddProduct);
                                 //listing product
 router.get("/products",adminAuth,productController.getProducts);
 router.route('/product/edit/:id')

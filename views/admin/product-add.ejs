@@ -73,18 +73,9 @@
                 Please select a valid weight.
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <label for="productImage">Product Images (min. 3)</label>
-            <input type="file" class="form-control-file" id="productImage" name="productImage" multiple required accept="image/*">
-            <div class="invalid-feedback">
-                Please upload at least three product images.
-            </div>
-        </div>
+        
     </div>
-        <!-- Preview and cropping section -->
-    <div id="imagePreviewContainer" class="form-row">
-        <!-- Dynamically generated previews will be placed here -->
-    </div>
+
     <div class="form-row">
         <div class="col-md-12 mb-3">
             <label for="productDescription">Description</label>
@@ -94,6 +85,33 @@
             </div>
         </div>
     </div>
+
+
+
+    <div class="form-row">
+        <div class="col-md-4">
+            <label for="productImage1">Product Image 1</label>
+            <input type="file" id="productImage1" name="productImage1" accept="image/*" required>
+            <div id="imagePreview1" class="image-preview"></div>
+            <button type="button" id="cropBtn1" class="btn btn-primary">Crop Image 1</button>
+            <input type="hidden" id="croppedImage1" name="croppedImage1">
+        </div>
+        <div class="col-md-4">
+            <label for="productImage2">Product Image 2</label>
+            <input type="file" id="productImage2" name="productImage2" accept="image/*" required>
+            <div id="imagePreview2" class="image-preview"></div>
+            <button type="button" id="cropBtn2" class="btn btn-primary">Crop Image 2</button>
+            <input type="hidden" id="croppedImage2" name="croppedImage2">
+        </div>
+        <div class="col-md-4">
+            <label for="productImage3">Product Image 3</label>
+            <input type="file" id="productImage3" name="productImage3" accept="image/*" required>
+            <div id="imagePreview3" class="image-preview"></div>
+            <button type="button" id="cropBtn3" class="btn btn-primary">Crop Image 3</button>
+            <input type="hidden" id="croppedImage3" name="croppedImage3">
+        </div>
+    </div>
+
     <button id="submitProductBtn" class="btn btn-primary" type="submit">Add Product</button>
     <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
 </form>

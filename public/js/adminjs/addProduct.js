@@ -1,126 +1,73 @@
-var submitButton = document.getElementById('submitProductBtn');
-
-// Listen to the submit button click event
-submitButton.addEventListener('click', function(event) {
-    var form = document.getElementById('addProductForm');
+document.addEventListener('DOMContentLoaded', function() {
+    var submitButton = document.getElementById('submitProductBtn');
+    const imageFields = ['productImage1', 'productImage2', 'productImage3'];
     
-    if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
-    } else {
-        // Ensure at least 3 images are selected
-        const files = document.getElementById('productImage').files;
-        if (files.length < 3) {
+    // Add validation for each image field
+    submitButton.addEventListener('click', function(event) {
+        var form = document.getElementById('addProductForm');
+        if (form.checkValidity() === false) {
             event.preventDefault();
             event.stopPropagation();
-            const imageErrorDiv = document.querySelector('#productImage + .invalid-feedback');
-            imageErrorDiv.innerText = 'Please upload at least three images.';
-            imageErrorDiv.style.display = 'block'; // Ensure it is visible
         }
-    }
-    form.classList.add('was-validated');
-});
+        
+        // Ensure each image field is populated
+        var allImagesSelected = imageFields.every(function(fieldId) {
+            var fileInput = document.getElementById(fieldId);
+            return fileInput.files.length > 0;
+        });
 
-// Handle image selection and cropping logic
-document.getElementById('productImage').addEventListener('change', function(event) {
-    const files = event.target.files;
-    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    imagePreviewContainer.innerHTML = ''; // Clear previous previews
-
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    let invalidFiles = 0;
-
-    Array.from(files).forEach(file => {
-        if (!validTypes.includes(file.type)) {
-            invalidFiles++;
+        if (!allImagesSelected) {
+            event.preventDefault();
+            event.stopPropagation();
+            alert('Please upload images for all three fields.');
         }
+
+        form.classList.add('was-validated');
     });
 
-    if (files.length < 3) {
-        alert("Please upload at least three images.");
-        return;
-    }
+    // Setup cropper for each image field
+    imageFields.forEach((fieldId, index) => {
+        const imageInput = document.getElementById(fieldId);
+        const cropBtn = document.getElementById(`cropBtn${index + 1}`);
+        const imagePreview = document.getElementById(`imagePreview${index + 1}`);
+        let cropper;
 
-    if (invalidFiles > 0) {
-        alert("Only image files (jpg, png, gif) are allowed.");
-        return;
-    }
+        // Handle file selection and preview
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '200px';
+                    imagePreview.innerHTML = ''; // Clear previous preview
+                    imagePreview.appendChild(img);
 
-    Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.maxWidth = '200px';
-            img.style.margin = '10px';
-            img.classList.add('img-preview');
+                    // Initialize cropper
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-            const imgContainer = document.createElement('div');
-            imgContainer.appendChild(img);
+         // Crop and replace the input file with cropped version
+         cropBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (cropper) {
+                const croppedCanvas = cropper.getCroppedCanvas();
+                croppedCanvas.toBlob(function(blob) {
+                    const croppedFile = new File([blob], `cropped_${fieldId}.jpg`, { type: blob.type });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(croppedFile);
+                    imageInput.files = dataTransfer.files;
 
-            // Add cropping functionality
-            const cropBtn = document.createElement('button');
-            cropBtn.innerText = 'Crop';
-            cropBtn.classList.add('btn', 'btn-primary', 'btn-sm');
-            imgContainer.appendChild(cropBtn);
-
-            // Prevent the form from submitting when "Crop" button is clicked
-            cropBtn.addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent form submission when cropping
-
-                const existingSaveBtn = imgContainer.querySelector('.btn-success');
-                if (existingSaveBtn) {
-                    // Prevent adding multiple save buttons
-                    return;
-                }
-                
-                const cropper = new Cropper(img, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    crop(event) {
-                        // Cropping logic
-                    }
+                    // Display the cropped image in the preview
+                    const croppedImgURL = URL.createObjectURL(croppedFile);
+                    imagePreview.innerHTML = `<img src="${croppedImgURL}" style="max-width: 200px;">`;
                 });
-
-                // Add a Save button to save the cropped image
-                const saveBtn = document.createElement('button');
-                saveBtn.innerText = 'Save Crop';
-                saveBtn.classList.add('btn', 'btn-success', 'btn-sm');
-                imgContainer.appendChild(saveBtn);
-
-                // Prevent the form from submitting when "Save Crop" is clicked
-                saveBtn.addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevent form submission when saving the cropped image
-
-                    const croppedCanvas = cropper.getCroppedCanvas();
-                    croppedCanvas.toBlob(blob => {
-                        if (!blob) {
-                            console.error('Canvas is empty');
-                            return;
-                        }
-                        const croppedFile = new File([blob], `cropped_${file.name}`, { type: blob.type });
-                        
-                        // Remove any previously saved cropped image before adding the new one
-                        const previousCroppedImg = imgContainer.querySelector('.cropped-preview');
-                        if (previousCroppedImg) {
-                            imgContainer.removeChild(previousCroppedImg);
-                        }
-
-                        // Create a new image element for the cropped version
-                        const croppedImgURL = URL.createObjectURL(croppedFile);
-                        const previewImg = document.createElement('img');
-                        previewImg.src = croppedImgURL;
-                        previewImg.style.maxWidth = '200px';
-                        previewImg.classList.add('cropped-preview'); // Add a class to easily identify this element
-
-                        // Append the new cropped image
-                        imgContainer.appendChild(previewImg);
-                    });
-                });
-            });
-
-            imagePreviewContainer.appendChild(imgContainer);
-        };
-        reader.readAsDataURL(file);
+            }
+        });
     });
 });

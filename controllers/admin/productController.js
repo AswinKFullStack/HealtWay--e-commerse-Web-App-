@@ -3,9 +3,10 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Brand = require("../../models/brandSchema");
-const fs = require("fs");
-const sharp = require('sharp');
-const path = require("path");
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
 
 // Function to handle rendering an error page with details
 const renderErrorPage = (res, errorCode, errorMessage, errorDescription, backLink) => {
@@ -66,22 +67,21 @@ const getProductAddPage = async (req, res) => {
 
 const postAddProduct = async (req, res) => {
     try {
-        if (!req.files || req.files.length < 3) {
-            return res.status(400).send('Please upload at least three images.');
-        }
-
         const { productName, description, brand, category, regularPrice, salePrice, weight, quantity } = req.body;
+        const images = req.files;
+    
 
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
             return res.status(400).send('All fields are required.');
         }
 
-        const outputDir = path.join(__dirname, "../public/uploads/re-image");
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
-        }
+        const productImages = [
+            images['productImage1'][0].filename,
+            images['productImage2'][0].filename,
+            images['productImage3'][0].filename
+        ];
 
-        const productImages = req.files.map(file => file.filename);
+       
 
         const newProduct = new Product({
             productName,
