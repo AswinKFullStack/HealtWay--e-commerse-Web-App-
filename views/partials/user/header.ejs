@@ -40,7 +40,7 @@
                 </li>
             </ul>
            <!-- Search Form -->
-           <form class="form-inline mx-auto" action="/shop" method="GET">
+           <form class="form-inline mx-auto" id="shopSearchForm" action="/shop" method="GET">
             <input class="form-control mr-sm-2" type="search" name="search" 
                    value="<%= typeof searchTerm !== 'undefined' ? searchTerm : '' %>" 
                    placeholder="Search Products" aria-label="Search">
