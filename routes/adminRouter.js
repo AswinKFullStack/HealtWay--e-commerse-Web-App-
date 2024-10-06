@@ -72,8 +72,8 @@ router.get('/brand/delete/:id',adminAuth,brandController.deleteBrand);
 
 
 // Product management
-router.get('/addProduct',  productController.getProductAddPage);
-router.post('/addProduct', upload.fields([
+router.get('/addProduct', adminAuth, productController.getProductAddPage);
+router.post('/addProduct', adminAuth,upload.fields([
         { name: 'productImage1', maxCount: 1 },
         { name: 'productImage2', maxCount: 1 },
         { name: 'productImage3', maxCount: 1 }
@@ -82,7 +82,11 @@ router.post('/addProduct', upload.fields([
 router.get("/products",adminAuth,productController.getProducts);
 router.route('/product/edit/:id')
     .get(adminAuth, productController.getEditProduct)
-    .post(adminAuth, upload.array('productImage', 5), productController.postEditProduct);
+    .post(adminAuth, upload.fields([
+        { name: 'productImage1', maxCount: 1 },
+        { name: 'productImage2', maxCount: 1 },
+        { name: 'productImage3', maxCount: 1 }
+    ]), productController.postEditProduct);
 
                         // Route to view product details
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);

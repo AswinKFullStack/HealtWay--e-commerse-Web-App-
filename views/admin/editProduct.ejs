@@ -72,24 +72,10 @@
                 Please select a valid weight.
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <label for="productImage">Product Images (min. 3)</label>
-            <input type="file" class="form-control-file" id="productImage" name="productImage" multiple accept="image/*">
-            <div class="invalid-feedback">
-                Please upload at least three product images.
-            </div>
-        </div>
+       
     </div>
-    <!-- Preview and cropping section for existing and new images -->
-    <div id="imagePreviewContainer" class="form-row">
-        <% product.productImages.forEach((image, index) => { %>
-            <div class="col-md-3 mb-3">
-                <img src="/uploads/re-image/<%= image %>" class="img-preview mb-2" style="max-width: 100%;" alt="Product Image <%= index + 1 %>">
-                <input type="hidden" name="existingImages[]" value="<%= image %>">
-                <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image="<%= image %>" aria-label="Remove image <%= index + 1 %>">Remove</button>
-            </div>
-        <% }); %>
-    </div>
+
+    
     
 
     <div class="form-row">
@@ -100,6 +86,22 @@
                 Please provide a description.
             </div>
         </div>
+    </div>
+    <div class="form-row">
+        <% product.productImages.forEach((image, index) => { %>
+            <div class="col-md-4">
+                <label for="productImage<%= index + 1 %>">Product Image <%= index + 1 %></label>
+                <input type="file" id="productImage<%= index + 1 %>" name="productImage<%= index + 1 %>" accept="image/*">
+                <div id="imagePreview<%= index + 1 %>" class="image-preview">
+                    <img src="/uploads/re-image/<%= image %>" style="max-width: 200px;" id="existingImagePreview<%= index + 1 %>">
+                    <button type="button" class="btn btn-danger" onclick="removeImage('<%= index + 1 %>')">Remove Image <%= index + 1 %></button>
+                    <button type="button" id="cropExistingBtn<%= index + 1 %>" class="btn btn-primary">Crop Existing Image <%= index + 1 %></button>
+                </div>
+                <button type="button" id="cropBtn<%= index + 1 %>" class="btn btn-primary">Crop Image <%= index + 1 %></button>
+                <input type="hidden" id="croppedImage<%= index + 1 %>" name="croppedImage<%= index + 1 %>">
+                <input type="hidden" data-existing-image="<%= image %>">
+            </div>
+        <% }); %>
     </div>
     <button id="submitProductBtn" class="btn btn-primary" type="submit">Update Product</button>
     <button class="btn btn-secondary" type="button" onclick="window.location.href='dashboard.html';">Cancel</button>
