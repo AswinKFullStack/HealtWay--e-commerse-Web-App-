@@ -72,21 +72,24 @@ router.get('/brand/delete/:id',adminAuth,brandController.deleteBrand);
 
 
 // Product management
-router.get('/addProduct', adminAuth, productController.getProductAddPage);
+router.get('/addProduct', productController.getProductAddPage);
 router.post('/addProduct', adminAuth,upload.fields([
         { name: 'productImage1', maxCount: 1 },
         { name: 'productImage2', maxCount: 1 },
         { name: 'productImage3', maxCount: 1 }
     ]), productController.postAddProduct);
                                 //listing product
-router.get("/products",adminAuth,productController.getProducts);
+router.get("/products",productController.getProducts);
 router.route('/product/edit/:id')
-    .get(adminAuth, productController.getEditProduct)
-    .post(adminAuth, upload.fields([
+    .get( productController.getEditProduct)
+    .post( upload.fields([
         { name: 'productImage1', maxCount: 1 },
         { name: 'productImage2', maxCount: 1 },
         { name: 'productImage3', maxCount: 1 }
     ]), productController.postEditProduct);
+
+
+      
 
                         // Route to view product details
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);

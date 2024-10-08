@@ -69,6 +69,8 @@ const postAddProduct = async (req, res) => {
     try {
         const { productName, description, brand, category, regularPrice, salePrice, weight, quantity } = req.body;
         const images = req.files;
+
+
     
 
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
@@ -115,6 +117,7 @@ const getEditProduct = async (req, res) => {
         const categories = await Category.find({});
         const brands = await Brand.find({});
         res.render('editProduct', { product, categories, brands });
+        console.log("work success");
     } catch (error) {
         console.error('Error fetching product for editing:', error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while fetching the product for editing.", '/admin/products');
@@ -125,21 +128,20 @@ const postEditProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const product = await Product.findById(productId);
-
         if (!product) {
             return renderErrorPage(res, 404, "Product Not Found", "The product you are trying to update does not exist.", '/admin/products');
         }
 
         const { productName, description, brand, category, regularPrice, salePrice, weight, quantity } = req.body;
+        console.log("catogry = ", category);
 
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
             return res.status(400).send('All fields are required.');
         }
 
-        // Handle deleting images
+
         if (req.body.imagesToDelete) {
             const imagesToDelete = Array.isArray(req.body.imagesToDelete) ? req.body.imagesToDelete : [req.body.imagesToDelete];
-            
             imagesToDelete.forEach(imageName => {
                 const imagePath = path.join(__dirname, "../public/uploads/re-image", imageName);
                 if (fs.existsSync(imagePath)) {
@@ -151,30 +153,33 @@ const postEditProduct = async (req, res) => {
                 }
             });
         }
+        console.log(req.files)
+        const images = req.files || {}; 
+        const productImages = [];
 
-        const newImages = [];
-        if (req.files) {
-            Object.keys(req.files).forEach(fieldName => {
-                const files = req.files[fieldName];
-                if (Array.isArray(files)) {
-                    newImages.push(...files.map(file => file.filename));
-                }
-            });
+        if (images['productImage1'] && images['productImage1'][0]) {
+            productImages.push(images['productImage1'][0].filename);
+        }
+        if (images['productImage2'] && images['productImage2'][0]) {
+            productImages.push(images['productImage2'][0].filename);
+        }
+        if (images['productImage3'] && images['productImage3'][0]) {
+            productImages.push(images['productImage3'][0].filename);
         }
 
-        // Handle cropped images sent via hidden fields
-        for (let i = 1; i <= 3; i++) {
-            const croppedImage = req.body[`croppedImage${i}`];
-            if (croppedImage) {
-                newImages.push(croppedImage);
-            }
+
+        if (productImages.length > 0) {
+            product.productImages.push(...productImages);
         }
 
-        if (product.productImages.length + newImages.length < 3) {
+
+
+        if (product.productImages.length < 3) {
             return res.status(400).send('Please ensure there are at least three images in total.');
         }
 
-        // Update product fields
+        
+
         product.productName = productName;
         product.description = description;
         product.brand = brand;
@@ -184,11 +189,11 @@ const postEditProduct = async (req, res) => {
         product.weight = weight;
         product.quantity = quantity;
 
-        // Push new images to the existing array
-        product.productImages.push(...newImages);
-        await product.save();
+        await product.save(); 
+        res.redirect("/admin/products");
 
-        res.redirect('/admin/products');
+
+        
     } catch (error) {
         console.error('Error editing product:', error);
         renderErrorPage(res, 500, "Server Error", "An unexpected error occurred while editing the product.", '/admin/products');

@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!allImagesSelected) {
             event.preventDefault();
             event.stopPropagation();
-            alert('Please upload images for all three fields.');
         }
 
         form.classList.add('was-validated');
@@ -32,10 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const imagePreview = document.getElementById(`imagePreview${index + 1}`);
         let cropper;
 
+        
         // Handle file selection and preview
         imageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
+            
             if (file) {
+                while (imagePreview.firstChild) {
+                    imagePreview.removeChild(imagePreview.firstChild);
+                }
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = document.createElement('img');
@@ -45,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     imagePreview.appendChild(img);
 
                     // Initialize cropper
+                    cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
                     if (cropper) cropper.destroy();
                     cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
                 };
