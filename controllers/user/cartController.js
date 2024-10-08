@@ -222,135 +222,84 @@ const LoadCartPage = async (req, res) => {
 const cartUpdate = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { productId, cartItemId  } = req.params;
-
-        const { redirectPath } = req.body;
+        const {  cartItemId ,productId } = req.params;
         const cartItemNewQuantity = parseInt(req.body.quantity, 10);
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            if(redirectPath === '/checkout'){
-                return res.status(400).json({ success: false, message: 'Invalid User ID.' });
-                ;
-            }
-            return res.status(400).send('Invalid user ID.');
+        if (![userId, productId, cartItemId].every(mongoose.Types.ObjectId.isValid)) {
+            return res.status(400).json({ success: false, message: 'Invalid User ID, Product ID, or Cart Item ID.' });
         }
+        
+
         const user = await User.findById(userId);
-        if (!user) {
-            if(redirectPath === '/checkout'){
-                return res.status(404).json({ success: false, message: 'User not found.' });
-            }
-            return res.status(404).send('User not found.');
+        if (!user) {    
+            return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(cartItemId)) {
-            const message = "Invalid Product ID or Cart Item ID.";
-            if(redirectPath === '/checkout'){
-                return res.status(400).json({ success: false, message });
-            }
-            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
-        }
+       
 
         const product = await Product.findOne({ _id: productId, isDeleted: false });
         if (!product) {
             const message = "Product not found or has been deleted.";
-            if(redirectPath === '/checkout'){
-                return res.status(404).json({ success: false, message });
-            }
-            return res.status(404).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+           
+            return res.status(404).json({ success: false, message });
         }
 
         if (product.status !== "Available") {
             const message = `This product is currently ${product.status}.`;
-
-            if(redirectPath === '/checkout'){
-            return res.status(400).json({ success: false, message });
-            }
-            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            return res.status(404).json({ success: false, message });
         }
 
         if (product.quantity < 1) {
-            const message = "Product is out of stock.";
-            if(redirectPath === '/checkout'){
-                return res.status(400).json({ success: false, message });
-            }
-            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            return res.status(404).json({ success: false, message: "Product is out of stock." });
         }
+        
 
         const userBuyLimitInQuantity = product.userBuyLimitInQuantity || 10;
         if (cartItemNewQuantity < 1) {
             const message = `Quantity cannot be less than 1 for ${product.productName}.`;
-            if(redirectPath === '/checkout'){
-                return res.status(400).json({ success: false, message });
-            }
-            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}`);
+            
+            return res.status(404).json({ success: false, message });
         }
         if (cartItemNewQuantity > userBuyLimitInQuantity) {
             const message = `Only ${userBuyLimitInQuantity} unit(s) allowed per order for ${product.productName}.`;
-            if(redirectPath === '/checkout'){
+            
                 return res.status(400).json({ success: false, message });
-            }
-            return res.status(400).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${req.query.page || 1}`);
+            
+            
         }
 
         let cartDoc = await Cart.findOne({ userId: user._id });
-
         if (cartDoc) {
             const cartItem = cartDoc.items.id(cartItemId);
             if (cartItem) {
-                const regularPrice = product.regularPrice;
-                const salePrice = product.salePrice;
+                const regularPrice = product.regularPrice || 0;
+                const salePrice = product.salePrice || regularPrice;
                 const discount = regularPrice - salePrice;
-                
+
                 cartItem.quantity = cartItemNewQuantity;
-                cartItem.price = regularPrice;  
+                cartItem.price = regularPrice;
                 cartItem.discount = discount || 0;
                 cartItem.totalPrice = cartItemNewQuantity * regularPrice;
                 cartItem.finalTotalPrice = cartItemNewQuantity * salePrice;
 
                 await cartDoc.updateTotal();
-                
 
-                const successMessage = `Successfully updated ${cartItemNewQuantity} unit(s) of ${product.productName} in your cart.`;
-                if(redirectPath === '/checkout'){
-                    return res.status(200).json({ success: true, message: successMessage });
-                }
-                return res.redirect(`/cartView?message=${encodeURIComponent(successMessage)}&page=${req.query.page || 1}`);
-            } else {
-                const message = "Cart item not found.";
-                if(redirectPath === '/checkout'){
-                    return res.status(404).json({ success: false, message });
-                }
-                return res.status(404).redirect(`/cartView?message=${encodeURIComponent(message)}&page=${req.query.page || 1}`);
+               
+
+                return res.status(200).json({
+                    success: true,
+                    message: `Updated cart.`,
+                    itemTotalPrice: cartItem.totalPrice,
+                    itemFinalPrice: cartItem.finalTotalPrice,
+                    cartSummarySubtotal: cartDoc.totalCartPrice,
+                    cartSummaryTotal: cartDoc.finalTotalCartPrice,
+                });
             }
-        } else {
-            cartDoc = new Cart({
-                userId: user._id,
-                items: [{
-                    productId: product._id,
-                    price: product.regularPrice,
-                    discount: product.regularPrice - product.salePrice || 0,
-                    quantity: cartItemNewQuantity,
-                    totalPrice: cartItemNewQuantity * product.regularPrice,
-                    finalTotalPrice: cartItemNewQuantity * product.salePrice
-                }]
-            });
-
-
-            await cartDoc.updateTotal();
-            
-
-            const message = `Successfully added ${product.productName} to your cart.`;
-            if(redirectPath === '/checkout'){
-                return res.status(200).json({ success: true, message });
-            }
-            return res.status(200).redirect(`/cartView?message=${encodeURIComponent(message)}`);
         }
 
     } catch (error) {
-        console.error("Error in cartUpdate:", error);
-        
-        const backLink = req.headers.referer || `/cartView`;
-        renderErrorPage(res, 500, "Internal Server Error", "An unexpected error occurred while updating the cart.", backLink);
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error.' });
     }
 };
 

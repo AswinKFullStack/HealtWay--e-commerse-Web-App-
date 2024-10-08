@@ -1,4 +1,17 @@
+// Get the type (signup or edit) from the server-side rendered data
+let otpForm = document.getElementById("otp-form");
+let type = otpForm.getAttribute('data-type');
+console.log("Type =",type)
+// Adjust form submission URLs dynamically based on the type
+
+if (type === 'signup') {
+    otpForm.action = "/verify-otp";  // For signup
+} else if (type === 'edit') {
+    otpForm.action = "/verificationForUserAndEmail";  // For profile editing
+}
+
 // Countdown timer logic
+
 let countdown = 90;
 let countdownInterval = setInterval(() => {
     document.getElementById("countdown").innerText = "You can resend OTP in " + countdown + " seconds";
@@ -16,9 +29,13 @@ document.getElementById("resend-btn").style.display = "none";
 // OTP validation and form submission
 document.getElementById("otp-form").addEventListener("submit", function(event) {
     event.preventDefault();  // Prevent the default form submission
+    console.log("verify button clicked");
+    alert("verify button clicked")
+    console.log("type of route =",type);
 
+    let Url = (type === 'signup') ? '/verify-otp' : '/verificationForUserAndEmail';
     let otp = document.getElementById("otp-input").value;
-
+    console.log(Url);
     if (otp === "") {
         Swal.fire({
             icon: 'error',
@@ -28,7 +45,7 @@ document.getElementById("otp-form").addEventListener("submit", function(event) {
     } else {
         // Simulating AJAX for OTP verification
         $.ajax({
-            url: '/verify-otp',  // This should match your backend API endpoint
+            url: Url,  // This should match your backend API endpoint
             type: 'POST',
             data: { otp: otp },
             success: function(response) {
@@ -64,8 +81,9 @@ document.getElementById("otp-form").addEventListener("submit", function(event) {
 
 // Resend OTP functionality
 document.getElementById("resend-btn").addEventListener("click", function() {
+    let resendUrl = (type === 'signup') ? '/resend-otp' : '/resent-verificationForUserAndEmail';
     $.ajax({
-        url: '/resend-otp',
+        url: resendUrl,
         type: 'POST',
         success: function(response) {
             if(response.success){

@@ -1,59 +1,151 @@
 <%- include("../../views/partials/admin/header") %>
 
-<h2 class="my-4">Sales Report</h2>
+<div class="container my-4">
+  <h2 class="text-center">Sales Report</h2>
 
-<form class="mb-4" method="GET" action="/admin/sales-report">
-  <div class="form-row">
-    <div class="col">
-      <label for="reportType">Report Type</label>
-      <select class="form-control" id="reportType" name="reportType" onchange="toggleDateInputs()">
-        <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Date</option>
-        <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
-        <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
-        <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
-      </select>
+  <form class="mb-4" method="GET" action="/admin/sales-report-filter">
+    <div class="form-row align-items-end">
+      <div class="col-md-3">
+        <label for="reportType">Report Type</label>
+        <select class="form-control" id="reportType" name="reportType" onchange="toggleDateInputs()">
+          <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Date</option>
+          <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+          <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+          <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="startDate">Start Date</label>
+        <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
+      </div>
+      <div class="col-md-3">
+        <label for="endDate">End Date</label>
+        <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
+      </div>
     </div>
-    <div class="col">
-      <label for="startDate">Start Date</label>
-      <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
-    </div>
-    <div class="col">
-      <label for="endDate">End Date</label>
-      <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>" <%= reportType !== 'custom' ? 'disabled' : '' %>>
-    </div>
-    <div class="col">
-      <label>&nbsp;</label>
-      <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
-    </div>
+  </form>
+
+  <div class="text-right mb-3">
+    <button id="downloadPdf" class="btn btn-danger"><i class="fas fa-download"></i> Sales Report PDF</button>
+    <button id="downloadExcel" class="btn btn-success"><i class="fas fa-download"></i> Sales Report Excel</button>
   </div>
-</form>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Total Orders</th>
-      <th>Total Sales (₹)</th>
-      <th>Total Discount (₹)</th>
-      <th>Total Coupon  deduction (₹)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><%= reportData.totalOrders %></td>
-      <td><%= reportData.totalSales %></td>
-      <td><%= reportData.totalDiscount %></td>
-      <td><%= reportData.totalCouponDeduction %></td>
-    </tr>
-  </tbody>
-</table>
+  <div id="ordersTable" class="table-responsive">
+
+  </div>
+
+  <nav id="paginationNav" class="d-flex justify-content-center my-3">
+
+  </nav>
+
+  <table class="table table-bordered text-center">
+    <thead class="thead-dark">
+      <tr>
+        <th>Total Orders</th>
+        <th>Total Sales (₹)</th>
+        <th>Total Discount (₹)</th>
+        <th>Total Coupon Deduction (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= reportData.totalOrders %></td>
+        <td><%= reportData.totalSales %></td>
+        <td><%= reportData.totalDiscount %></td>
+        <td><%= reportData.totalCouponDeduction %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <%- include("../../views/partials/admin/footer") %>
 
 <script>
   function toggleDateInputs() {
     const reportType = document.getElementById('reportType').value;
-    document.getElementById('startDate').disabled = reportType !== 'custom';
-    document.getElementById('endDate').disabled = reportType !== 'custom';
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+
+    if (reportType === 'custom') {
+      startDate.disabled = false;
+      endDate.disabled = false;
+    } else {
+      startDate.disabled = true;
+      endDate.disabled = true;
+      startDate.value = '';
+      endDate.value = '';
+    }
   }
+
+  window.onload = toggleDateInputs;
+
+  function loadSalesReport(page = 1) {
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    $.ajax({
+      url: `/admin/sales-report-pagination?page=${page}`,
+      method: 'GET',
+      data: { reportType, startDate, endDate },
+      success: function(data) {
+        $('#ordersTable').html(`
+          <table class="table table-striped text-center">
+            <thead class="thead-light">
+              <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Regular Total Price</th>
+                <th>Discount</th>
+                <th>Coupons Deduction</th>
+                <th>Sold Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.orders.map(order => `
+                <tr>
+                  <td>${order.orderId}</td>
+                  <td>${order.productId.productName}</td>
+                  <td>${order.quantity}</td>
+                  <td>₹${order.totalPrice}</td>
+                  <td>₹${order.discount}</td>
+                  <td>₹${order.couponDiscount}</td>
+                  <td>₹${order.finalTotalPriceWithAllDiscount}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `);
+
+        const paginationHtml = [];
+        if (data.currentPage > 1) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${data.currentPage - 1})" class="btn btn-outline-secondary">Previous</a>`);
+        }
+        for (let i = 1; i <= data.totalPages; i++) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${i})" class="btn ${i === data.currentPage ? 'btn-primary' : 'btn-outline-primary'} mx-1">${i}</a>`);
+        }
+        if (data.currentPage < data.totalPages) {
+          paginationHtml.push(`<a href="javascript:void(0)" onclick="loadSalesReport(${data.currentPage + 1})" class="btn btn-outline-secondary">Next</a>`);
+        }
+
+        $('#paginationNav').html(paginationHtml.join(''));
+      }
+    });
+  }
+
+  loadSalesReport();
+
+  // Download buttons
+  $('#downloadPdf').on('click', () => {
+    window.location.href = `/admin/sales-report-download?reportType=${document.getElementById('reportType').value}&startDate=${document.getElementById('startDate').value}&endDate=${document.getElementById('endDate').value}&format=pdf`;
+  });
+
+  $('#downloadExcel').on('click', () => {
+    window.location.href = `/admin/sales-report-download?reportType=${document.getElementById('reportType').value}&startDate=${document.getElementById('startDate').value}&endDate=${document.getElementById('endDate').value}&format=excel`;
+  });
 </script>
 

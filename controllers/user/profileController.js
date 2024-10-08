@@ -67,8 +67,8 @@ const getProfileView = async (req,res) => {
 }
 const getEditUser = async (req,res) => {
     try {
-        const userId = req.params.id;
-        const user = await User.findById(userId);
+        
+        const user = await User.findById(req.session.user);
         res.render('editUser', {
             user,
             title: 'User Edit Form',

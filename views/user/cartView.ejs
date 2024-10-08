@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/userCss/cart.css">
 
 <!-- Cart Section -->
+
 <div class="container mt-5">
     <% if (cart && cart.items && cart.items.length > 0) { %>
         <h2 class="text-center mb-4">Your Shopping Cart</h2>
@@ -11,7 +12,10 @@
             <div id="cart-message" class="alert alert-success w-100 text-center">
                 <%= message %>
             </div>
+           
         <% } %>
+
+
 
         <!-- Cart Items -->
         <div class="col-md-8">
@@ -37,33 +41,38 @@
                                     <!-- Product Description and Price -->
                                     <h6 class="mb-1"><%= item.productId.description %></h6>
                                     <p class="text-muted mb-2">Product Price: <strong>$<%= item.price %></strong></p>
-                                    <p class="text-muted mb-2">Total Price (Before Discount): <strong>$<%= item.totalPrice %></strong></p>
+                                    <p class="text-muted mb-2">Total Price (Before Discount): <strong id="item-total-price-<%= item.id %>">$<%= item.totalPrice %></strong></p>
                                     <p class="text-muted mb-2">Discount: <strong>$<%= item.discount || '0.00' %></strong></p>
-                                    <p class="text-muted mb-2">Final Price: <strong>$<%= item.finalPrice || (item.totalPrice - (item.discount * item.quantity)).toFixed(2) %></strong></p>
+                                    <p class="text-muted mb-2">Final Price: <strong id="item-final-price-<%= item.id %>">$<%= item.finalTotalPrice %></strong></p>
+                                    <p class="text-muted mb-2">
+                                        Stock Status: <strong><%= item.productId.quantity > 0 ? 'In Stock' : 'Out of Stock' %></strong>
+                                    </p>
+                                    <p class="text-muted mb-2">
+                                        Estimated Delivery: <strong><%= item.estimatedDeliveryDate %></strong>
+                                    </p>
 
-                                    <!-- Quantity Control -->
-                                    <div class="quantity-control d-flex align-items-center">
-                                        <form action="/cart/update/<%= item.productId._id %>/<%= item.id %>?page=<%= currentPage %>" method="POST" id="cart-form-<%= item.id %>" class="d-flex">
-                                            
-                                            <input type="number" name="quantity" value="<%= item.quantity %>" id="quantity-<%= item.id %>" min="1" class="form-control quantity-input mx-2" style="width: 80px; height: 30px; font-size: 1em;" />
-                                            
+                                   
 
-                                            <!-- Hidden fields for product id and cart item id -->
-                                            <input type="hidden" name="productId" value="<%= item.productId._id %>">
-                                            <input type="hidden" name="cartItemId" value="<%= item.id %>">
-                                        </form>
+                                        <div class="quantity-control d-flex align-items-center">
+                                            <button class="btn btn-sm btn-outline-primary" aria-label="Decrease quantity" onclick="updateQuantity('<%= item.id %>', 'decrease', '<%= item.productId._id %>')">-</button>
+                                            <input type="text" id="quantity-<%= item.id %>" value="<%= item.quantity %>" readonly class="form-control quantity-input mx-2" style="width: 60px; text-align: center;" />
+                                            <button class="btn btn-sm btn-outline-primary" aria-label="Increase quantity"  onclick="updateQuantity('<%= item.id %>', 'increase' , '<%= item.productId._id %>')">+</button>
+                                        </div>
+
+
+
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    
                 <% }) %>
             <% } else { %>
                 <h2 class="text-center mb-4">No Cart Items</h2>
                 <p>Your cart is empty.</p>
             <% } %>
 
-            <!-- Pagination -->
+             <!-- Pagination -->
             <!-- Pagination -->
             <% if (totalPages > 1) { %> <!-- Only show pagination if more than 1 page -->
                 <div class="pagination justify-content-center mt-4">
@@ -78,7 +87,10 @@
                     <% } %>
                 </div>
             <% } %>
+       
+
         </div>
+           
 
        <!-- Order Summary -->
   <!-- Order Summary -->
@@ -90,11 +102,11 @@
                 <ul class="list-group mb-3">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Subtotal</span>
-                        <strong>$<%= cart && cart.totalCartPrice ? cart.totalCartPrice.toFixed(2) : '0.00' %></strong>
+                        <strong id="cart-subtotal">$<%= cart && cart.totalCartPrice ? cart.totalCartPrice.toFixed(2) : '0.00' %></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Discount</span>
-                        <strong>$<%= cart && cart.totalDiscount ? cart.totalDiscount.toFixed(2) : '0.00' %></strong>
+                        <strong id="cart-discount">$<%= cart && cart.totalDiscount ? cart.totalDiscount.toFixed(2) : '0.00' %></strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Tax (0%)</span>
@@ -102,16 +114,17 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Total</span>
-                        <strong>$<%= cart && cart.finalTotalCartPrice ? cart.finalTotalCartPrice : '0.00' %></strong>
+                        <strong id="cart-total">$<%= cart && cart.finalTotalCartPrice ? cart.finalTotalCartPrice : '0.00' %></strong>
                     </li>
                 </ul>
                 <button class="btn btn-primary btn-block" onclick="location.href='/checkout'">Proceed to Checkout</button>
             </div>
         </div>
     </div>
+</div>
 <% } %>
 
-    </div>
+    
 </div>
 
 <%- include("../../views/partials/user/footer") %>

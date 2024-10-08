@@ -15,6 +15,7 @@ const couponController = require("../controllers/user/couponController")
 const wishListController = require("../controllers/user/wishListController");
 const walletController = require("../controllers/user/walletController");
 const offerController = require("../controllers/user/offerController");
+const verificationController = require("../controllers/user/verificationController");
 const {userAuth,adminAuth} = require("../middlewares/auth")
 
 
@@ -63,7 +64,11 @@ router.get('/product/view/:productId', productController.getProductView);
 
   //profile view 
 router.get('/profileview/:id',userAuth, profileController.getProfileView);
-router.get('/editUser/:id',userAuth,profileController.getEditUser);
+/////////Verification for editing user data
+router.get('/editUser',userAuth,verificationController.verifyUser);
+router.post('/verificationForUserAndEmail',userAuth,verificationController.verifyOtp);
+router.post("/resent-verificationForUserAndEmail",userAuth,verificationController.resendOtp); 
+router.get('/edit-user-profile',userAuth,profileController.getEditUser);
 router.post('/editUser/:id',userAuth,profileController.postEditUser);
 
 
@@ -84,7 +89,8 @@ router.post('/addressDelete/:addressId',userAuth, addressController.deleteAddres
 router.get('/product/addCart/:productId',userAuth,cartController.addCart);
 router.get('/cartView',userAuth,cartController.LoadCartPage);
                //Cart Quantity updation
-router.post('/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);
+               
+router.post('/cart/update/:cartItemId/:productId',userAuth,cartController.cartUpdate);  //This is updating (increment /decrement)
 router.get('/cart/update/:productId',userAuth,cartController.LoadCartPage);
 router.post('/cartView/remove/:productId/:cartItemId',userAuth,cartController.removeCartItem);
 router.post('/checkout/cart/update/:productId/:cartItemId',userAuth,cartController.cartUpdate);

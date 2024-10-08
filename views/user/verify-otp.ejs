@@ -15,7 +15,7 @@
     <p>Please enter the OTP sent to your email</p>
     
     <!-- Form Starts Here -->
-    <form id="otp-form" action="/verify-otp" method="POST">
+    <form id="otp-form"  data-type="<%= type %>">
         <input type="text" id="otp-input" name="otp" placeholder="Enter OTP">
         <button type="submit" id="verify-btn"><i class="fas fa-check-circle"></i>Verify Email</button>
     </form>

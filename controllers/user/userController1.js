@@ -202,7 +202,8 @@ const signup = async (req, res) => {
         req.session.userOtp = otp;
         req.session.otpExpiresAt = otpExpiresAt;
         req.session.userData = { name, phone, email, password ,referralCode };
-        res.render("verify-otp");
+        // For signup otp verification
+        res.render('verify-otp', { type: 'signup' });
         console.log("OTP Sent ",otp);
     } catch (error) {
         console.error("Signup error", error);

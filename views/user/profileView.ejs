@@ -11,7 +11,7 @@
                     </button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'wishlist') ? 'active' : '' %>" onclick="location.href='/wishlist/<%= user._id %>'">Wishlists</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'cart') ? 'active' : '' %>" onclick="location.href='/cartView'">Cart</button>
-                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/orders/<%= user._id %>'">Orders</button>
+                    <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'orders') ? 'active' : '' %>" onclick="location.href='/viewOrder'">Orders</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'account details') ? 'active' : '' %>" onclick="location.href='/userDetails/<%= user._id %>'">Account Details</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'address management') ? 'active' : '' %>" onclick="location.href='/addresses/<%= user._id %>'">Address Management</button>
                     <button type="button" class="list-group-item list-group-item-action <%= (activePage === 'addAddress') ? 'active' : '' %>" onclick="location.href='/addAddress'">Add New Address</button>
@@ -94,7 +94,7 @@
                         <%= user.email || "No Email Provided" %>,
                         <%= user.phone || "No Phone Number Provided" %>
                     </p>
-                    <button class="btn btn-primary" onclick="location.href='/editUser/<%= user._id %>'">Edit Account Info</button>
+                    <button class="btn btn-primary" onclick="location.href='/editUser'">Edit Account Info</button>
                 </div>
 
                 <!-- Optional Form Section -->

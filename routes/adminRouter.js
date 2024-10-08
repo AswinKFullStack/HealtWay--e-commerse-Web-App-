@@ -21,6 +21,7 @@ const upload = require("../helpers/multer");
 
 
 
+
 //Admin loging mnagment 
 router.get("/login",adminController1.loadLogin);
 router.post("/login",adminController1.login);
@@ -69,15 +70,26 @@ router.get('/brand/delete/:id',adminAuth,brandController.deleteBrand);
 //Product management
 
 
-router.get('/addProduct',adminAuth,productController.getProductAddPage);
+
 // Product management
-router.get('/addProduct', adminAuth, productController.getProductAddPage);
-router.post('/addProduct', adminAuth, upload.array('productImage', 5), productController.postAddProduct);
+router.get('/addProduct', productController.getProductAddPage);
+router.post('/addProduct', adminAuth,upload.fields([
+        { name: 'productImage1', maxCount: 1 },
+        { name: 'productImage2', maxCount: 1 },
+        { name: 'productImage3', maxCount: 1 }
+    ]), productController.postAddProduct);
                                 //listing product
-router.get("/products",adminAuth,productController.getProducts);
+router.get("/products",productController.getProducts);
 router.route('/product/edit/:id')
-    .get(adminAuth, productController.getEditProduct)
-    .post(adminAuth, upload.array('productImage', 5), productController.postEditProduct);
+    .get( productController.getEditProduct)
+    .post( upload.fields([
+        { name: 'productImage1', maxCount: 1 },
+        { name: 'productImage2', maxCount: 1 },
+        { name: 'productImage3', maxCount: 1 }
+    ]), productController.postEditProduct);
+
+
+      
 
                         // Route to view product details
 router.get('/product/view/:id',adminAuth, productController.getProductDetails);
@@ -117,5 +129,7 @@ router.get("/deactivate-offer/:offerId", adminAuth, offerController.deactivateOf
 //Report
 
 router.get("/sales-report", adminAuth ,salesReportController.getSalesReport);
-
+router.get('/sales-report-pagination',adminAuth,salesReportController.getSalesReport);
+router.get('/sales-report-download',adminAuth,salesReportController.downloadSaleReport);
+router.get("/sales-report-filter", adminAuth ,salesReportController.getSalesReport);
 module.exports = router

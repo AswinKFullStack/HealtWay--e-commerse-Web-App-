@@ -56,7 +56,7 @@ const viewAllProducts = async (req, res) => {
         let products = [];
 
         if (searchTerm) {
-            // First query for "starts with" the search term
+            
             const startsWithRegex = new RegExp(`^${searchTerm}`, 'i');
             const startsWithProducts = await Product.find({
                 isDeleted: false,
@@ -74,12 +74,11 @@ const viewAllProducts = async (req, res) => {
             .limit(productLimit);
 
 
-            // Then query for "contains" the search term, excluding already fetched products
             const containsRegex = new RegExp(searchTerm, 'i');
             const containsProducts = await Product.find({
                 isDeleted: false,
                 productName: { $regex: containsRegex },
-                _id: { $nin: startsWithProducts.map(p => p._id) } // Exclude products already fetched
+                _id: { $nin: startsWithProducts.map(p => p._id) } 
             })
             .populate('category')
             .populate('brand')
@@ -93,6 +92,7 @@ const viewAllProducts = async (req, res) => {
             .limit(productLimit);
 
              products = [...startsWithProducts, ...containsProducts];
+             products = products.slice(skip,(skip + productLimit));
             
         }else{
              products = await Product.find(productQuery)
@@ -121,8 +121,8 @@ const viewAllProducts = async (req, res) => {
         }
 
 
-    console.log('Sort Criteria:', sortCriteria);
-    console.log('Products:', products.map(p => p.productName));
+    
+
 
 
         const user = req.session.user 
