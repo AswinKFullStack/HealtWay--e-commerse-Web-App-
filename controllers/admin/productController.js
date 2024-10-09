@@ -76,6 +76,10 @@ const postAddProduct = async (req, res) => {
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
             return res.status(400).send('All fields are required.');
         }
+        if (Number(salePrice) > Number(regularPrice)) {
+            return renderErrorPage(res, 400, "Regular price must be greater than the sale price", "Regular price must be greater than the sale price ", '/admin/products');
+        }
+
 
         const productImages = [
             images['productImage1'][0].filename,
@@ -136,7 +140,11 @@ const postEditProduct = async (req, res) => {
         console.log("catogry = ", category);
 
         if (!productName || !description || !brand || !category || !regularPrice || !salePrice || !quantity) {
-            return res.status(400).send('All fields are required.');
+            return renderErrorPage(res, 400, "All fields are required", "All fields are required ", '/admin/products');
+        }
+
+        if (Number(salePrice) >= Number(regularPrice)) {
+            return renderErrorPage(res, 400, "Regular price must be greater than the sale price", "Regular price must be greater than the sale price ", '/admin/products');
         }
 
 
@@ -175,7 +183,7 @@ const postEditProduct = async (req, res) => {
 
 
         if (product.productImages.length < 3) {
-            return res.status(400).send('Please ensure there are at least three images in total.');
+            return renderErrorPage(res, 400, "Please ensure there are at least three images in total.", "Please ensure there are at least three images in total.", '/admin/products');
         }
 
         
