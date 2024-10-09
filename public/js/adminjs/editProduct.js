@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.createElement('img');
+                    const img = new Image();
                     img.src = e.target.result;
                     img.style.maxWidth = '200px';
-                    imagePreview.innerHTML = ''; // Clear previous preview
+                    imagePreview.innerHTML = ''; 
                     imagePreview.appendChild(img);
 
                     // Initialize cropper
@@ -34,7 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (cropper) {
                         cropper.destroy();
                     }
-                   cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
+                   cropper = new Cropper(img, {  
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.8,});
                 };
                 reader.readAsDataURL(file);
             }
@@ -144,6 +147,15 @@ function validateForm() {
         clearError(salePrice);
     }
 
+    if (Number(regularPrice.value) <= Number(salePrice.value)) {
+        setError(salePrice, 'Sale price must be less than the regular price.');
+        setError(regularPrice, 'Regular price must be greater than the sale price.');
+        isValid = false;
+    } else {
+        clearError(regularPrice);
+        clearError(salePrice);
+    }
+
     // Validate quantity
     const quantity = document.getElementById('productQuantity');
     if (quantity.value.trim() === '' || isNaN(quantity.value) || Number(quantity.value) <= 0) {
@@ -169,7 +181,7 @@ function validateForm() {
         const existingImage = previewContainer.querySelector('img'); // Check if an image exists in preview
 
         if (!existingImage && input.files.length === 0) {
-            setError(input, `Please upload a valid image for Product Image ${index + 1}.`);
+            setImageError(input, `Please upload a valid image for Product Image ${index + 1}.`);
             isValid = false;
         } else {
             clearError(input);
@@ -183,12 +195,19 @@ function setError(element, message) {
     const invalidFeedback = element.nextElementSibling;
     invalidFeedback.innerText = message;
     element.classList.add('is-invalid');
+    element.style.borderColor = '#dc3545'; 
+}
+
+function setImageError(element, message) {
+    setError(element, message);
+    element.nextElementSibling.style.color = '#dc3545'; 
 }
 
 function clearError(element) {
     const invalidFeedback = element.nextElementSibling;
     invalidFeedback.innerText = '';
     element.classList.remove('is-invalid');
+    element.style.borderColor = '';
 }
 
 
